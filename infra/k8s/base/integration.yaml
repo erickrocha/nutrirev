@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myfit-integration
+  namespace: myfit
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: myfit-integration }
+  template:
+    metadata:
+      labels: { app: myfit-integration }
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: integration
+          image: myfit/integration:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - { name: grpc, containerPort: 50051 }
+          envFrom:
+            - configMapRef: { name: myfit-runtime }
+            - secretRef: { name: myfit-runtime }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+            readOnlyRootFilesystem: true
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { cpu: 1000m, memory: 512Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myfit-integration
+  namespace: myfit
+spec:
+  selector: { app: myfit-integration }
+  ports:
+    - { name: grpc, port: 50051, targetPort: grpc }
+

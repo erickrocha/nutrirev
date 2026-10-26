@@ -1,0 +1,39 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Frontend: Vite + React",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/frontend",
+            "preLaunchTask": "Start Frontend (Vite)"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Backend: Rust",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--manifest-path=${workspaceFolder}/backend/Cargo.toml"
+                ],
+                "filter": {
+                    "name": "backend",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}/backend"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Fullstack: Rust + React",
+            "configurations": [
+                "Backend: Rust",
+                "Frontend: Vite + React"
+            ]
+        }
+    ]
+}

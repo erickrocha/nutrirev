@@ -1,0 +1,54 @@
+services:
+
+  mariadb:
+    image: mariadb:latest
+    container_name: nutrirev-dev
+    environment:
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb-data-dev:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+#  backend:
+#    build:
+#      context: ..
+#      dockerfile: infra/docker/application.Dockerfile
+#    image: nutrirev-backend:latest
+#    container_name: nutrirev-backend
+#    env_file:
+#      - ../backend/.env
+#    environment:
+#      - HOST=0.0.0.0
+#      - PORT=8080
+#      - DATABASE_URL=mysql://${MARIADB_USER}:${MARIADB_PASSWORD}@mariadb:3306/${MARIADB_DATABASE}
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      mariadb:
+#        condition: service_healthy
+#
+#  frontend:
+#    build:
+#      context: ..
+#      dockerfile: infra/docker/Dockerfile.frontend
+#      args:
+#        VITE_API_URL: http://localhost:8080
+#    image: nutrirev-frontend:latest
+#    container_name: nutrirev-frontend
+#    ports:
+#      - "5173:8080"
+#    depends_on:
+#      - backend
+
+volumes:
+  mariadb-data-dev:
+    name: mariadb-data-dev

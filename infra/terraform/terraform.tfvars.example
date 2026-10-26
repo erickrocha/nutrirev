@@ -1,0 +1,45 @@
+# Example Terraform Variable Values for Production Deployment
+aws_region         = "us-east-1"
+name_prefix        = "nutrirev"
+environment        = "prod"
+availability_zones = ["us-east-1a", "us-east-1b"]
+
+# Database Settings
+database_name      = "nutrirev_prod"
+db_admin_username  = "nutrirev_admin"
+# Leave db_admin_password blank to auto-generate a secure 24-character password in Secrets Manager
+# db_admin_password = "ChangeThisToASecurePassword123!"
+# Verify what's actually available before applying:
+#   aws rds describe-db-engine-versions --engine mariadb --query "DBEngineVersions[].EngineVersion" --output table
+# Local dev runs MariaDB 11.8 (infra/docker-compose.yml) - pick the closest version RDS offers.
+rds_engine_version = "11.8.8"
+rds_instance_class = "db.t4g.micro"
+rds_multi_az       = false
+
+# Application secrets - generate fresh production values, do NOT reuse backend/.env dev secrets
+# access_token_secret  = "..."
+# refresh_token_secret = "..."
+# sysadmin_email        = "admin@example.com"
+# sysadmin_password     = "..."
+
+# AI provider config - claude_api_key/gemini_api_key are secrets (Secrets Manager);
+# the rest are plain env vars on the backend App Runner service.
+# claude_api_key       = "..."
+# claude_model         = "claude-sonnet-5"
+# gemini_api_key       = "..."
+# gemini_model         = "gemini-3-flash-preview"
+# ai_primary_provider  = "claude"
+# ai_fallback_provider = "gemini"
+# ai_timeout_ms        = 45000
+
+# Local development access to RDS: the database is publicly accessible, restricted
+# by security group to the CIDR blocks below. Get your current public IP with:
+#   curl -s https://checkip.amazonaws.com
+# Keep this current - if your IP changes, connections will be refused until you
+# update this value and re-apply (see infra/PRODUCTION_DEPLOYMENT.md).
+db_allowed_cidr_blocks = ["203.0.113.10/32"]
+
+# Application Image Tags
+backend_image_tag       = "latest"
+frontend_image_tag      = "latest"
+enable_frontend_service = true

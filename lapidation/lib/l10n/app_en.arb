@@ -1,0 +1,229 @@
+{
+  "@@locale": "en",
+  "appTitle": "Lapidation",
+  "@appTitle": {
+    "description": "Application title"
+  },
+  "navHome": "Home",
+  "navMealPlan": "Meal Plan",
+  "navDaily": "Daily",
+  "navEat": "Eat",
+  "navSettings": "Settings",
+  "mealPlanTitle": "Meal Plan",
+  "dailyTitle": "Daily",
+  "eatTitle": "Eat",
+  "settingsTitle": "Settings",
+  "defaultEmptyMessage": "Nothing here yet.",
+  "retryButton": "Try again",
+  "homeMealPlanSectionTitle": "Your meal plan",
+  "mealPlanEmptyMessage": "No meal plan assigned yet.",
+  "homeDailyMealsSectionTitle": "Your meals for the day",
+  "dailyMealsEmptyMessage": "No meal categories assigned yet.",
+  "mealsPlannedCount": "{count, plural, one{{count} meal planned} other{{count} meals planned}}",
+  "@mealsPlannedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mealPlanDetailEmpty": "No meals detailed in this plan.",
+  "eatEmptyMessage": "No recipes available yet.",
+  "minutesLabel": "{minutes} min",
+  "@minutesLabel": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "portionsLabel": "{count, plural, one{{count} serving} other{{count} servings}}",
+  "@portionsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ingredientsTitle": "Ingredients",
+  "directionsTitle": "Directions",
+  "logoutButton": "Log out",
+  "appFooter": "Lapidation · v{version}",
+  "@appFooter": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "loginValidationError": "Please enter your email and password.",
+  "loginTagline": "CLINIC & NUTRITION",
+  "loginAreaLabel": "PATIENT AREA",
+  "loginHeadline": "Access your meal plan",
+  "loginSubtext": "Enter your email and password to access the app.",
+  "emailLabel": "Access Email",
+  "emailHint": "your.email@example.com",
+  "passwordLabel": "Password",
+  "loginSubmitButton": "LOG IN TO THE APP",
+  "welcomeValidationEmpty": "Please enter and confirm your new password.",
+  "welcomeValidationMismatch": "The passwords entered do not match.",
+  "welcomeValidationMinLength": "The password must be at least 6 characters long.",
+  "welcomeBadge": "FIRST ACCESS",
+  "welcomeGreeting": "Welcome, {name}!",
+  "@welcomeGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeSubtext": "Your access to the mobile app has been activated by the clinic. For your security, create your new personal password below.",
+  "newPasswordLabel": "New Personal Password",
+  "newPasswordHint": "At least 6 characters",
+  "confirmPasswordLabel": "Confirm New Password",
+  "confirmPasswordHint": "Repeat the password entered",
+  "welcomeSubmitButton": "SAVE AND CONTINUE TO THE APP",
+  "greetingMorning": "Good morning",
+  "greetingAfternoon": "Good afternoon",
+  "greetingEvening": "Good evening",
+  "errorGenericMealPlan": "Could not load the meal plan.",
+  "errorGenericDailyMeals": "Could not load your meals for the day.",
+  "errorGenericRecipes": "Could not load the recipes.",
+  "errorGenericProfile": "Could not load your profile.",
+  "errorGenericConnection": "Could not connect. Check your connection and try again.",
+  "errorGenericSavePassword": "Could not save your new password. Please try again.",
+  "dailyCameraOption": "Take photo with Camera",
+  "dailyGalleryOption": "Choose from Gallery",
+  "dailyAnalyzeButton": "Analyze Meal Photo",
+  "dailyAnalyzeSubtext": "Tap to take or choose a photo of your plate for instant AI nutrition analysis",
+  "dailyAnalyzingTitle": "Analyzing meal image...",
+  "dailyAnalysisResultsTitle": "Nutritional Analysis",
+  "dailyCaloriesLabel": "Calories",
+  "dailyProteinLabel": "Protein",
+  "dailyCarbsLabel": "Carbs",
+  "dailyFatLabel": "Fat",
+  "dailyFoodItemsTitle": "Identified Food Items",
+  "dailySelectImageTitle": "Add Meal Photo",
+  "dailyPickMealSlotPrompt": "Which meal is this?",
+  "dailySaveToLogButton": "Save to log",
+  "dailySavedToLog": "Saved to log",
+  "dailySavedToLogWithPoints": "Saved · +{points} pts",
+  "@dailySavedToLogWithPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "errorGenericSaveMealLog": "Could not save this meal to your log. Please try again.",
+  "dailyLoggedMealsTitle": "Logged meals for this day",
+  "dailyNoLoggedMeals": "No meals logged for this day yet.",
+  "errorGenericMealLogs": "Could not load your logged meals.",
+  "dailyModeAi": "AI Photo Scan",
+  "dailyModeManual": "Manual Entry",
+  "dailyManualSearchPlaceholder": "Search ingredients (e.g. Chicken, Rice)...",
+  "dailyManualSearchHint": "Search by name to configure quantity & portion",
+  "dailyManualAddIngredient": "Add Ingredient",
+  "dailyManualQuantity": "Quantity",
+  "dailyManualUnit": "Measurement Unit",
+  "dailyManualSelectedItems": "Selected Ingredients",
+  "dailyManualEmptyItems": "No ingredients added yet. Search and select items above to build your meal.",
+  "dailyManualSubmit": "Calculate & Save Meal",
+  "dailyManualSubmitting": "Calculating & Saving...",
+  "dailyManualLiveNutrition": "Estimated Macros",
+  "dailyManualQuickAdd": "Add to meal",
+  "dailyManualNoIngredientsFound": "No ingredients found matching \"{query}\"",
+  "@dailyManualNoIngredientsFound": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "dailyManualSearching": "Searching ingredients...",
+  "dailyManualPer100g": "per 100g",
+  "dailyManualItemRemoved": "Item removed",
+  "dailyManualSelectMealSlotFirst": "Select a meal category above to continue",
+  "dailyManualClearSearch": "Clear search",
+  "dailyManualNutritionalSummary": "Meal Nutritional Summary",
+  "enumRoleSysAdmin": "System Admin",
+  "enumRoleTenantOwner": "Tenant Owner",
+  "enumRoleTenantUser": "Tenant User",
+  "enumRoleUser": "User",
+  "enumUnitGrams": "g",
+  "enumUnitKg": "kg",
+  "enumUnitMl": "ml",
+  "enumUnitLiter": "liter",
+  "enumUnitUnits": "unit",
+  "enumUnitCup": "cup",
+  "enumUnitTableSpoon": "tablespoon",
+  "enumUnitTeaSpoon": "teaspoon",
+  "enumUnitCoffeeSpoon": "coffee spoon",
+  "enumUnitDessertSpoon": "dessert spoon",
+  "enumUnitPinch": "pinch",
+  "enumUnitSlice": "slice",
+  "enumUnitShell": "ladle",
+  "enumUnitGlass": "glass",
+  "enumUnitLittleSquares": "small squares",
+  "enumUnitScoop": "scoop",
+  "enumPeriodWeekly": "Weekly",
+  "enumPeriodMonthly": "Monthly",
+  "enumCategoryLoseWeight": "Lose Weight",
+  "enumCategoryKeepFit": "Keep Fit",
+  "enumCategoryEarnWeight": "Gain Weight",
+  "enumCategoryHypocaloric": "Hypocaloric",
+  "enumCategoryHypertrophy": "Hypertrophy",
+  "enumCategoryMaintenance": "Maintenance",
+  "enumCategoryKetogenic": "Ketogenic",
+  "enumCategoryLowCarb": "Low Carb",
+  "enumStatusDraft": "Draft",
+  "enumStatusFinished": "Finished",
+  "enumMealTypeBreakfast": "Breakfast",
+  "enumMealTypeMorningSnack": "Morning Snack",
+  "enumMealTypeLunch": "Lunch",
+  "enumMealTypeSnack": "Snack",
+  "enumMealTypeDinner": "Dinner",
+  "enumMealTypeSupper": "Supper",
+  "enumMealTypePreWorkout": "Pre-workout",
+  "enumMealTypePostWorkout": "Post-workout",
+  "paymentsTitle": "Payments",
+  "paymentsSectionTitle": "Your plan",
+  "paymentsEmptyMessage": "No charges here yet.",
+  "paymentsNextDue": "Next due",
+  "paymentsDueIn": "{days, plural, =0{Due today} one{Due in {days} day} other{Due in {days} days}}",
+  "paymentsOverdueBy": "{days, plural, one{{days} day overdue} other{{days} days overdue}}",
+  "paymentsPayButton": "Pay by card or Pix",
+  "paymentsStatusOpen": "Open",
+  "paymentsStatusOverdue": "Overdue",
+  "paymentsStatusPaid": "Paid",
+  "paymentsStatusCancelled": "Cancelled",
+  "paymentsCardTitle": "Card details",
+  "paymentsCardHolder": "Name on card",
+  "paymentsCardNumber": "Card number",
+  "paymentsCardExpiry": "Expiry (MM/YYYY)",
+  "paymentsCardCvv": "CVV",
+  "paymentsCardInvalid": "Check the card details.",
+  "paymentsConfirmButton": "Confirm payment",
+  "paymentsApproved": "Payment approved.",
+  "paymentsDeclined": "Payment was not authorized. Try another card.",
+  "paymentsUncertain": "We could not confirm this payment. Wait a few minutes and check before trying again.",
+  "paymentsBannerOverdue": "You have an overdue charge. Settle it to keep your access.",
+  "paymentsBannerDueSoon": "Your next charge is due soon.",
+  "errorGenericPayments": "Could not load your charges.",
+  "paymentsMethodCard": "Card",
+  "paymentsMethodPix": "Pix",
+  "paymentsMethodTitle": "How would you like to pay?",
+  "paymentsPixGenerating": "Generating your Pix code...",
+  "paymentsPixInstructions": "Open your banking app, choose Pix and scan the QR code — or copy the code below.",
+  "paymentsPixCopy": "Copy code",
+  "paymentsPixCopied": "Code copied",
+  "paymentsPixWaiting": "Waiting for payment",
+  "paymentsPixExpired": "This code has expired. Close and generate a new one.",
+  "paymentsPixError": "Could not generate the Pix charge. Please try again.",
+  "paymentsPixUseCode": "Use the copy-and-paste code",
+  "paymentsRecurringLabel": "Charge automatically every cycle",
+  "paymentsRecurringHint": "We store your card securely with the provider and charge it on each due date. You can turn this off at any time.",
+  "paymentsRecurringFailed": "Payment approved, but automatic billing could not be enabled.",
+  "paymentsTaxId": "CPF or CNPJ",
+  "paymentsTaxIdRequired": "We need your taxpayer document to issue this charge. It is asked only once."
+}

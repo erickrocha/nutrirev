@@ -1,0 +1,29 @@
+@use 'variables' as *;
+
+:root {
+  --bg-primary: #{$color-bg-primary};
+  --bg-alt: #{$color-bg-alt};
+  --bg-dark: #{$color-bg-dark};
+  --text-heading: #{$color-text-heading};
+  --text-body: #{$color-text-body};
+  --accent-primary: #{$color-accent-primary};
+  --accent-hover: #{$color-accent-hover};
+  --accent-secondary: #{$color-accent-secondary};
+  --accent-secondary-hover: #{$color-accent-secondary-hover};
+  --border-color: #{$color-border};
+  --badge-bg: #{$color-badge-bg};
+  --badge-accent-bg: #{$color-badge-accent-bg};
+  --font-family: #{$font-family-primary};
+  --hero-pattern-opacity: 0.15;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-body);
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}

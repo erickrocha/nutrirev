@@ -1,0 +1,29 @@
+# GCP e2-micro (always free). MySQL is external (Hostinger), so no db service here.
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on: [backend, frontend]
+
+  backend:
+    image: ghcr.io/${GHCR_OWNER}/nutrirev-backend:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8080
+    mem_limit: 450m
+
+  frontend:
+    image: ghcr.io/${GHCR_OWNER}/nutrirev-frontend:latest
+    restart: unless-stopped
+    mem_limit: 64m
+
+volumes:
+  caddy-data:

@@ -1,0 +1,12 @@
+.git
+.gitignore
+.idea
+.env
+target
+*.swp
+*.swo
+*~
+.DS_Store
+node_modules
+*.log
+

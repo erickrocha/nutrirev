@@ -1,0 +1,7 @@
+/target
+.idea
+/cloudfront_private.pem
+.env
+/cloudfront_private_rsa.pem
+/.claude/
+/.tokensave/

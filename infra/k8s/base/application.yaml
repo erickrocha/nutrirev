@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myfit-application
+  namespace: myfit
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: myfit-application }
+  template:
+    metadata:
+      labels: { app: myfit-application }
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: application
+          image: myfit/application:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - { name: http, containerPort: 8080 }
+          envFrom:
+            - configMapRef: { name: myfit-runtime }
+            - secretRef: { name: myfit-runtime }
+          volumeMounts:
+            - name: jwt-keypair
+              mountPath: /run/secrets/jwt
+              readOnly: true
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+            readOnlyRootFilesystem: true
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { cpu: 1000m, memory: 512Mi }
+      volumes:
+        - name: jwt-keypair
+          secret:
+            secretName: myfit-jwt-keypair
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myfit-application
+  namespace: myfit
+spec:
+  selector: { app: myfit-application }
+  ports:
+    - { name: http, port: 80, targetPort: http }
