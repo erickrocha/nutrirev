@@ -11,6 +11,7 @@ export { dashboardService } from './dashboardService';
 export { tenantDashboardService } from './tenantDashboardService';
 export { sysAdminDashboardService } from './sysAdminDashboardService';
 export { businessPlanService } from './businessPlanService';
+export { planOrderService } from './planOrderService';
 export { mealLogService } from './mealLogService';
 export { mealAnalysisService } from './mealAnalysisService';
 export { paymentService } from './paymentService';

@@ -52,7 +52,7 @@ export const Topbar = ({ onToggleMobileMenu }) => {
         <div className="topbar-logo">
           <LogoMark size={32} />
           <div className="brand-text">
-            <span className="brand-name brand-wordmark">social<b>fit</b></span>
+            <span className="brand-name brand-wordmark">nutri<b>rev</b></span>
             <span className="brand-sub">{activeTenant?.name || t('topbar.defaultTagline')}</span>
           </div>
         </div>

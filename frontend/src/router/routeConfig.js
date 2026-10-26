@@ -21,6 +21,8 @@ export const PATHS = {
   BUSINESS_PLANS: '/admin/business-plans',
   BUSINESS_PLAN_NEW: '/admin/business-plans/new',
   BUSINESS_PLAN_EDIT: '/admin/business-plans/:id/edit',
+  PLAN_ORDERS: '/admin/orders',
+  PLAN_ORDER_DETAIL: '/admin/orders/:uuid',
   PAYMENT_CONNECTIONS: '/admin/payment-connections',
   USERS: '/users',
   TENANTS: '/tenants',
@@ -91,6 +93,8 @@ export const ROLE_ALLOWED_PATHS = {
     PATHS.BUSINESS_PLANS,
     PATHS.BUSINESS_PLAN_NEW,
     PATHS.BUSINESS_PLAN_EDIT,
+    PATHS.PLAN_ORDERS,
+    PATHS.PLAN_ORDER_DETAIL,
     // Provisioning acquirer connections is the platform operator's alone: the
     // secret pointer names a deployment secret, not a clinic-settable value.
     PATHS.PAYMENT_CONNECTIONS,

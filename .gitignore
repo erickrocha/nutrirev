@@ -54,4 +54,5 @@ infra/.env
 infra/certs/*.pem
 infra/certs/*.pub
 infra/gcp/.env
+infra/dev/.env
 

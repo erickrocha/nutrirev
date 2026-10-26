@@ -1,0 +1,3 @@
+/* Sem preflight: o reset global do SCSS existente continua valendo. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);

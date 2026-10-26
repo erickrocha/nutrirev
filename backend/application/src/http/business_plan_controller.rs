@@ -1,7 +1,8 @@
 use crate::commons::exception_response::{ExceptionResponse, HttpResponse};
 use crate::commons::i18n::{ErrorKey, Locale};
 use crate::http::json::business_plan_json::{
-    BusinessPlanJson, BusinessPlanTierJson, CreateBusinessPlanJson, UpdateBusinessPlanJson,
+    BusinessPlanJson, BusinessPlanTierJson, CreateBusinessPlanJson, PublicBusinessPlanJson,
+    UpdateBusinessPlanJson,
 };
 use crate::http::json::error_response_json::{
     BadRequestErrorJson, ForbiddenErrorJson, NotFoundErrorJson, UnauthorizedErrorJson,
@@ -160,6 +161,39 @@ pub async fn list_all(
         .find_all()
         .await
         .map(|plans| Json(plans.into_iter().map(response).collect()))
+        .map_err(|error| map_error(locale, &error.message))
+}
+
+#[utoipa::path(
+    get,
+    tag = "Business Plan",
+    path = "/public/business-plans",
+    responses((status = 200, body = Vec<PublicBusinessPlanJson>))
+)]
+pub async fn list_public(
+    State(state): State<AppState>,
+    Extension(locale): Extension<Locale>,
+) -> HttpResponse<Json<Vec<PublicBusinessPlanJson>>> {
+    use_case(&state)
+        .find_all()
+        .await
+        .map(|plans| {
+            Json(
+                plans
+                    .into_iter()
+                    .map(response)
+                    .map(|plan| PublicBusinessPlanJson {
+                        uuid: plan.uuid,
+                        name: plan.name,
+                        price_in_cents: plan.price_in_cents,
+                        available_users: plan.available_users,
+                        period_days: plan.period_days,
+                        daily_ai_quota: plan.daily_ai_quota,
+                        tiers: plan.tiers,
+                    })
+                    .collect(),
+            )
+        })
         .map_err(|error| map_error(locale, &error.message))
 }
 

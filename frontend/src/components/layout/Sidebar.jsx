@@ -28,6 +28,7 @@ import {
   Apple,
   Star,
   CreditCard,
+  Inbox,
 } from 'lucide-react';
 import { PATHS } from '../../router/routeConfig';
 import { ROLES } from '../../utils/enums';
@@ -69,6 +70,7 @@ export const Sidebar = ({ collapsed, setCollapsed, mobileOpen, onCloseMobile }) 
             ...(!isTenantUser ? [{ path: PATHS.USERS, label: t('sidebar.users'), icon: Users }] : []),
             ...(isSysAdmin ? [{ path: PATHS.TENANTS, label: t('sidebar.tenants'), icon: Building }] : []),
             ...(isSysAdmin ? [{ path: PATHS.BUSINESS_PLANS, label: t('sidebar.businessPlans'), icon: FileText }] : []),
+            ...(isSysAdmin ? [{ path: PATHS.PLAN_ORDERS, label: t('sidebar.planOrders'), icon: Inbox }] : []),
             ...(isSysAdmin ? [{ path: PATHS.PAYMENT_CONNECTIONS, label: t('sidebar.paymentConnections'), icon: CreditCard }] : []),
             { path: PATHS.CUSTOMERS, label: t('sidebar.customers'), icon: UserCheck },
             ...((isTenantOwner || isTenantUser || isSysAdmin) ? [{ path: PATHS.DOCTORS, label: t('sidebar.doctors'), icon: Stethoscope }] : []),

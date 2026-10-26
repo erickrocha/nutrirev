@@ -23,7 +23,9 @@ pub async fn authentication(
         || req.uri().path().starts_with("/signup")
         || req.uri().path().starts_with("/refresh")
         || req.uri().path().starts_with("/accept-invite")
-        || (req.method() == axum::http::Method::GET && req.uri().path() == "/legal/documents")
+        || (req.method() == axum::http::Method::GET
+            && matches!(req.uri().path(), "/legal/documents" | "/province"))
+        || req.uri().path().starts_with("/public/")
     {
         return Ok(next.run(req).await);
     }

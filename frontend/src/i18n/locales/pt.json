@@ -100,7 +100,8 @@
     "activityLevels": "Níveis de Atividade",
     "mealPointTiers": "Níveis de Pontos (Gamificação)",
     "systemVersion": "NutriRev v1.0",
-    "paymentSettings": "Formas de pagamento"
+    "paymentSettings": "Formas de pagamento",
+    "planOrders": "Pedidos"
   },
   "topbar": {
     "openMenu": "Abrir menu",
@@ -263,7 +264,9 @@
     "activeToggleHelp": "Ao ativar esta assinatura, qualquer outro plano ativo desta clínica será automaticamente desativado.",
     "savePlan": "Salvar Assinatura",
     "subscriptionSuccess": "Assinatura da clínica atualizada com sucesso.",
-    "planSelected": "Selecionado"
+    "planSelected": "Selecionado",
+    "taxId": "CPF/CNPJ",
+    "taxIdInvalid": "Informe um CPF ou CNPJ válido."
   },
   "address": {
     "addressLine1": "Endereço - linha 1",
@@ -1078,5 +1081,249 @@
     "saveError": "Não foi possível salvar a conexão.",
     "disableError": "Não foi possível desativar a conexão.",
     "deleteError": "Não foi possível excluir a conexão."
+  },
+  "site": {
+    "seo": {
+      "description": "Plataforma de gestão para clínicas e consultórios de nutrição: ficha clínica, plano alimentar, diário do paciente com análise por IA, app mobile e cobrança recorrente."
+    },
+    "nav": {
+      "aria": "Navegação principal",
+      "home": "NutriRev, página inicial",
+      "features": "Funcionalidades",
+      "how": "Como funciona",
+      "plans": "Planos",
+      "faq": "Dúvidas",
+      "tagline": "A revolução em nutrição"
+    },
+    "access": "Acessar sistema",
+    "hero": {
+      "badge": "Gestão de clínicas de nutrição",
+      "title": "O sistema que organiza sua clínica de nutrição",
+      "titleAccent": "do prontuário à mensalidade",
+      "sub": "Ficha clínica, plano alimentar, diário do paciente com análise por IA, app mobile e cobrança recorrente. Tudo em uma plataforma só, sem implantação.",
+      "seePlans": "Ver planos e preços",
+      "strip": [
+        "App do paciente incluído",
+        "Cobrança por PIX e cartão"
+      ],
+      "from": "A partir de {{price}}/mês"
+    },
+    "audiences": {
+      "title": "Feito para quem atende nutrição",
+      "sub": "Do consultório de uma sala à rede com várias unidades.",
+      "items": [
+        {
+          "title": "Nutricionista autônomo",
+          "text": "Sai da planilha e do PDF por WhatsApp sem contratar um sistema de clínica grande."
+        },
+        {
+          "title": "Clínica de nutrição",
+          "text": "Equipe, agenda de cobrança e prontuário compartilhado, com cada profissional no seu escopo."
+        },
+        {
+          "title": "Rede e franquia",
+          "text": "Várias unidades na mesma conta, cada uma com sua identidade visual e seus dados isolados."
+        }
+      ]
+    },
+    "features": {
+      "title": "Tudo que a clínica usa no dia, em um lugar",
+      "sub": "Sem alternar entre planilha, aplicativo de mensagem e caderno de cobrança.",
+      "items": [
+        {
+          "title": "Ficha clínica completa",
+          "text": "Condições pré-existentes, restrições alimentares, função intestinal e histórico do paciente em um só lugar."
+        },
+        {
+          "title": "Metas e cálculo energético",
+          "text": "Fórmulas, fator de atividade e objetivo aplicados automaticamente ao definir a meta de cada paciente."
+        },
+        {
+          "title": "Planos alimentares e receitas",
+          "text": "Monte o plano com base de ingredientes TACO, reaproveite receitas e entregue direto no app do paciente."
+        },
+        {
+          "title": "Análise de refeição por IA",
+          "text": "O paciente fotografa o prato e recebe a leitura dos macros. Você revisa o que chegou, sem transcrever nada."
+        },
+        {
+          "title": "Diário alimentar e adesão",
+          "text": "Acompanhe o que foi registrado dia a dia e veja quem está seguindo o plano antes da próxima consulta."
+        },
+        {
+          "title": "Evolução do paciente",
+          "text": "Medições e análise corporal ao longo do tempo, para mostrar resultado com dado e não com impressão."
+        },
+        {
+          "title": "Cobrança recorrente",
+          "text": "Datas de pagamento, PIX e cartão. A mensalidade do paciente deixa de depender de você lembrar."
+        },
+        {
+          "title": "Equipe e permissões",
+          "text": "Nutricionistas, médicos e recepção com acesso ao que lhes cabe — cada perfil vê apenas o seu escopo."
+        },
+        {
+          "title": "Dashboard da clínica",
+          "text": "Pacientes ativos, planos em andamento e pagamentos em aberto na primeira tela do dia."
+        }
+      ]
+    },
+    "steps": {
+      "title": "Como funciona",
+      "sub": "Três passos entre criar a conta e acompanhar o primeiro paciente.",
+      "items": [
+        {
+          "title": "Cadastre a clínica e a equipe",
+          "text": "Você entra, cria os usuários e define quem acessa o quê. Sem implantação, sem consultoria."
+        },
+        {
+          "title": "Monte o plano do paciente",
+          "text": "Ficha clínica, meta calculada e plano alimentar. O paciente recebe o acesso ao app na hora."
+        },
+        {
+          "title": "Acompanhe e cobre",
+          "text": "O diário chega sozinho, a evolução fica registrada e a mensalidade é cobrada na data combinada."
+        }
+      ]
+    },
+    "app": {
+      "badge": "App do paciente",
+      "title": "O acompanhamento continua fora da consulta",
+      "sub": "O paciente registra a refeição pela foto, consulta o plano alimentar e vê a própria evolução. Você chega na consulta seguinte já sabendo o que aconteceu no intervalo.",
+      "list": [
+        "Plano alimentar sempre atualizado no celular",
+        "Registro de refeição por foto, com leitura dos macros",
+        "Histórico de medições e evolução",
+        "Mensalidade e comprovantes na própria conta"
+      ],
+      "phone": [
+        "Café da manhã · 412 kcal",
+        "Almoço analisado por IA",
+        "Meta do dia: 78%",
+        "−3,2 kg em 8 semanas"
+      ]
+    },
+    "plans": {
+      "title": "Planos e preços",
+      "sub": "Preço por clínica, não por paciente. Sem taxa de implantação e sem fidelidade.",
+      "flag": "Mais escolhido",
+      "currency": "R$",
+      "start": "Começar com o {{name}}",
+      "period_month": "/mês",
+      "period_year": "/ano",
+      "period_days": "/{{count}} dias",
+      "users": "Até {{count}} usuários",
+      "aiQuota": "{{count}} análises de IA por dia",
+      "tiers": "Faixas de preço por volume de usuários",
+      "unavailable": "Não foi possível carregar os planos agora. Tente novamente em instantes."
+    },
+    "faq": {
+      "title": "Dúvidas frequentes",
+      "items": [
+        {
+          "q": "A NutriRev serve para nutricionista que atende sozinho?",
+          "a": "Serve. Há plano para o consultório individual, com plano alimentar, diário do paciente e o app já incluídos — é o mesmo produto que a clínica grande usa, na escala de um consultório."
+        },
+        {
+          "q": "O paciente precisa instalar algum aplicativo?",
+          "a": "O paciente usa o app da NutriRev para registrar refeições, ver o plano alimentar e acompanhar a evolução. O acesso é criado por você no momento do cadastro, sem custo extra por paciente."
+        },
+        {
+          "q": "Como funciona a análise de refeição por inteligência artificial?",
+          "a": "O paciente fotografa o prato e a IA identifica os alimentos e estima os macronutrientes. Cada plano tem uma cota diária de análises por paciente. O registro fica no diário para você revisar antes da consulta."
+        },
+        {
+          "q": "Consigo cobrar meus pacientes pela plataforma?",
+          "a": "Sim. Você define a data de pagamento de cada paciente e a cobrança é gerada de forma recorrente, com PIX e cartão."
+        },
+        {
+          "q": "Os dados dos meus pacientes ficam seguros?",
+          "a": "Cada clínica tem os dados isolados das demais, o acesso é controlado por perfil e todo acesso a dado clínico é registrado. O tratamento de dados segue a LGPD e está descrito na Política de Privacidade."
+        },
+        {
+          "q": "Posso trocar de plano depois?",
+          "a": "Pode, a qualquer momento. O plano define quantos usuários e quantas análises de IA por dia a clínica tem — se a equipe cresce, você sobe de faixa sem perder histórico."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Comece a atender pela NutriRev",
+      "text": "Crie a conta da sua clínica e cadastre o primeiro paciente hoje."
+    },
+    "footer": {
+      "tagline": "Plataforma de gestão para clínicas e consultórios de nutrição.",
+      "product": "Produto",
+      "faq": "Dúvidas frequentes",
+      "access": "Acesso",
+      "legal": "Legal",
+      "terms": "Termos de uso",
+      "privacy": "Política de privacidade"
+    }
+  },
+  "order": {
+    "title": "Contratar plano",
+    "yourPlan": "Seu plano",
+    "yourData": "Seus dados",
+    "address": "Endereço",
+    "taxId": "CPF ou CNPJ",
+    "fullName": "Nome completo",
+    "companyName": "Razão social",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "postalCode": "CEP",
+    "street": "Rua",
+    "number": "Número",
+    "complement": "Complemento",
+    "neighborhood": "Bairro",
+    "city": "Cidade",
+    "state": "UF",
+    "acceptPrefix": "Li e aceito os",
+    "acceptAnd": "e a",
+    "submit": "Enviar pedido",
+    "sending": "Enviando...",
+    "invalid": "Confira os dados informados (CPF/CNPJ, e-mail, telefone e CEP) e tente novamente.",
+    "failed": "Não foi possível enviar o pedido agora. Tente novamente em instantes.",
+    "planNotFound": "Plano não encontrado.",
+    "back": "Voltar ao site",
+    "manualNote": "Após o envio, nossa equipe entra em contato para formalizar a contratação. Nenhuma cobrança é feita agora.",
+    "doneTitle": "Recebemos seu pedido!",
+    "doneText": "Enviamos uma confirmação para {{email}}. Em breve nossa equipe entrará em contato para formalizar a contratação.",
+    "orderNumber": "Pedido",
+    "errors": {
+      "required": "Campo obrigatório.",
+      "taxId": "Informe um CPF ou CNPJ válido.",
+      "email": "E-mail inválido.",
+      "phone": "Informe DDD + telefone.",
+      "postalCode": "CEP deve ter 8 dígitos.",
+      "state": "Use a sigla com 2 letras.",
+      "accept": "É necessário aceitar os termos."
+    },
+    "selectState": "Selecione o estado"
+  },
+  "planOrders": {
+    "title": "Pedidos de contratação",
+    "subtitle": "Pedidos feitos pela landing page. Após fechar o acordo, converta o pedido em tenant.",
+    "loadError": "Não foi possível carregar os pedidos.",
+    "actionError": "Não foi possível concluir a ação.",
+    "empty": "Nenhum pedido encontrado.",
+    "all": "Todos",
+    "date": "Data",
+    "customer": "Cliente",
+    "plan": "Plano",
+    "status": "Status",
+    "open": "Abrir",
+    "firstDueDate": "Primeiro vencimento",
+    "convert": "Converter em tenant",
+    "cancel": "Cancelar pedido",
+    "convertConfirm": "Criar o tenant para {{name}} com este plano?",
+    "cancelConfirm": "Cancelar o pedido de {{name}}?",
+    "statuses": {
+      "pending": "Pendente",
+      "converted": "Convertido",
+      "cancelled": "Cancelado"
+    },
+    "breadcrumb": "Pedidos",
+    "detailLoadError": "Não foi possível carregar o pedido.",
+    "dueDateRequired": "Campo obrigatório."
   }
 }

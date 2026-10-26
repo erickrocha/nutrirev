@@ -5,6 +5,7 @@ import { loginUser, clearError } from '../../store/authSlice';
 import { Link } from 'react-router-dom';
 import { Sparkles, Shield, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
 import { Logo } from '../../components/brand/Logo';
+import { LanguageToggle } from '../../components/common/LanguageSwitcher';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -74,6 +75,7 @@ export const LoginPage = () => {
 
       {/* RIGHT SIDE - Login Input Form */}
       <div className="login-split-right">
+        <LanguageToggle className="login-lang" />
         <div className="login-card">
           <div className="card-header">
             <h3>{t('auth.restrictedAccess')}</h3>

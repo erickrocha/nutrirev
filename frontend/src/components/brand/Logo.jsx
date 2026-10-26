@@ -24,7 +24,7 @@ export const Logo = ({ size = 36, className = '' }) => (
   <span className={`brand-lockup ${className}`.trim()}>
     <LogoMark size={size} />
     <span className="brand-wordmark">
-      social<b>fit</b>
+      Nutri<b>rev</b>
     </span>
   </span>
 );

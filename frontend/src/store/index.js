@@ -7,6 +7,7 @@ import mealPlanReducer from './mealPlanSlice';
 import customerReducer from './customerSlice';
 import ingredientReducer from './ingredientSlice';
 import clinicalReducer from './clinicalSlice';
+import planOrderReducer from './planOrderSlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     customer: customerReducer,
     ingredient: ingredientReducer,
     clinical: clinicalReducer,
+    planOrder: planOrderReducer,
   },
 });
 
