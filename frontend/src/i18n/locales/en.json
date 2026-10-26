@@ -264,7 +264,9 @@
     "activeToggleHelp": "When set to active, any other active plan for this clinic will automatically be deactivated.",
     "savePlan": "Save Subscription",
     "subscriptionSuccess": "Tenant subscription updated successfully.",
-    "planSelected": "Selected"
+    "planSelected": "Selected",
+    "taxId": "Tax ID (CPF/CNPJ)",
+    "taxIdInvalid": "Enter a valid CPF or CNPJ."
   },
   "address": {
     "addressLine1": "Address line 1",
@@ -1289,7 +1291,7 @@
     "orderNumber": "Order",
     "errors": {
       "required": "Required field.",
-      "taxId": "Enter a CPF (11) or CNPJ (14 digits).",
+      "taxId": "Enter a valid CPF or CNPJ.",
       "email": "Invalid email.",
       "phone": "Enter area code + phone.",
       "postalCode": "Postal code must have 8 digits.",

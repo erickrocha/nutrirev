@@ -45,6 +45,7 @@ settings-not-added = Configuração não adicionada
 tenant-created-failed = Falha ao criar tenant
 tenant-not-found = Tenant não encontrado
 tenant-update-failed = Falha ao atualizar tenant
+tenant-tax-id-invalid = Informe um CPF ou CNPJ válido (e que ainda não esteja cadastrado)
 business-plan-forbidden = Apenas o administrador do sistema pode gerenciar planos de negócios
 business-plan-not-found = Plano de negócios não encontrado
 business-plan-invalid = Dados inválidos para o plano de negócios

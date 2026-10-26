@@ -9,6 +9,7 @@ import { MapPin } from 'lucide-react';
 import { FilterableMultiSelect } from '../common/FilterableMultiSelect';
 import type { Province } from '../../types/planOrder';
 import { FormCard } from '../molecules/FormCard';
+import { isValidTaxId } from '../../utils/taxId';
 import { maskPhone, maskPostalCode, maskTaxId, onlyDigits } from '../../utils/format';
 
 export interface PlanOrderFormValues {
@@ -46,7 +47,7 @@ export const PlanOrderForm = ({ provinces, submitting, error, onSubmit }: Props)
     const required = t('order.errors.required');
     const text = (max: number) => yup.string().trim().max(max).required(required);
     return yup.object({
-      taxId: yup.string().required(required).test('tax-id', t('order.errors.taxId'), (v) => [11, 14].includes(onlyDigits(v).length)),
+      taxId: yup.string().required(required).test('tax-id', t('order.errors.taxId'), (v) => isValidTaxId(v)),
       name: text(200),
       email: yup.string().trim().max(200).email(t('order.errors.email')).required(required),
       phone: yup.string().required(required).test('phone', t('order.errors.phone'), (v) => [10, 11].includes(onlyDigits(v).length)),
@@ -82,26 +83,26 @@ export const PlanOrderForm = ({ provinces, submitting, error, onSubmit }: Props)
           </>
         }
       >
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-[14px]">
-          <TextField id="taxId" label={t('order.taxId')} inputMode="numeric" autoComplete="off" placeholder="000.000.000-00" error={errors.taxId?.message} {...masked('taxId', maskTaxId)} />
-          <TextField id="name" label={isCompany ? t('order.companyName') : t('order.fullName')} autoComplete="name" error={errors.name?.message} {...register('name')} />
-          <TextField id="email" type="email" label={t('order.email')} autoComplete="email" error={errors.email?.message} {...register('email')} />
-          <TextField id="phone" type="tel" label={t('order.phone')} autoComplete="tel" placeholder="(00) 00000-0000" error={errors.phone?.message} {...masked('phone', maskPhone)} />
+        <div className="grid grid-cols-12 gap-[14px]">
+          <TextField id="taxId" className="col-span-12 md:col-span-4" label={t('order.taxId')} inputMode="numeric" autoComplete="off" placeholder="000.000.000-00" error={errors.taxId?.message} {...masked('taxId', maskTaxId)} />
+          <TextField id="name" className="col-span-12 md:col-span-8" label={isCompany ? t('order.companyName') : t('order.fullName')} autoComplete="name" error={errors.name?.message} {...register('name')} />
+          <TextField id="email" className="col-span-12 md:col-span-7" type="email" label={t('order.email')} autoComplete="email" error={errors.email?.message} {...register('email')} />
+          <TextField id="phone" className="col-span-12 md:col-span-5" type="tel" label={t('order.phone')} autoComplete="tel" placeholder="(00) 00000-0000" error={errors.phone?.message} {...masked('phone', maskPhone)} />
         </div>
 
         <h2 className="mb-[14px] mt-6 text-[1.1rem]">{t('order.address')}</h2>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-[14px]">
-          <TextField id="postalCode" label={t('order.postalCode')} inputMode="numeric" autoComplete="postal-code" placeholder="00000-000" error={errors.postalCode?.message} {...masked('postalCode', maskPostalCode)} />
-          <TextField id="street" label={t('order.street')} autoComplete="address-line1" error={errors.street?.message} {...register('street')} />
-          <TextField id="number" label={t('order.number')} error={errors.number?.message} {...register('number')} />
-          <TextField id="complement" label={t('order.complement')} error={errors.complement?.message} {...register('complement')} />
-          <TextField id="neighborhood" label={t('order.neighborhood')} error={errors.neighborhood?.message} {...register('neighborhood')} />
-          <TextField id="city" label={t('order.city')} autoComplete="address-level2" error={errors.city?.message} {...register('city')} />
+        <div className="grid grid-cols-12 gap-[14px]">
+          <TextField id="postalCode" className="col-span-12 sm:col-span-4 md:col-span-3" label={t('order.postalCode')} inputMode="numeric" autoComplete="postal-code" placeholder="00000-000" error={errors.postalCode?.message} {...masked('postalCode', maskPostalCode)} />
+          <TextField id="street" className="col-span-12 sm:col-span-8 md:col-span-9" label={t('order.street')} autoComplete="address-line1" error={errors.street?.message} {...register('street')} />
+          <TextField id="number" className="col-span-6 md:col-span-2" label={t('order.number')} error={errors.number?.message} {...register('number')} />
+          <TextField id="complement" className="col-span-6 md:col-span-4" label={t('order.complement')} error={errors.complement?.message} {...register('complement')} />
+          <TextField id="neighborhood" className="col-span-12 md:col-span-6" label={t('order.neighborhood')} error={errors.neighborhood?.message} {...register('neighborhood')} />
+          <TextField id="city" className="col-span-12 sm:col-span-8" label={t('order.city')} autoComplete="address-level2" error={errors.city?.message} {...register('city')} />
           <Controller
             name="state"
             control={control}
             render={({ field }) => (
-              <div>
+              <div className="col-span-12 sm:col-span-4">
                 <FilterableMultiSelect
                   label={t('order.state')}
                   icon={MapPin}

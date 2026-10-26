@@ -25,11 +25,11 @@ describe('PlanOrderForm', () => {
     const onSubmit = vi.fn();
     render(<PlanOrderForm provinces={provinces} submitting={false} error="" onSubmit={onSubmit} />);
     await fill({
-      'order.taxId': '12345678901', 'order.fullName': 'Maria Silva', 'order.email': 'maria@x.com',
+      'order.taxId': '52998224725', 'order.fullName': 'Maria Silva', 'order.email': 'maria@x.com',
       'order.phone': '11999990000', 'order.postalCode': '01310100', 'order.street': 'Av. Paulista',
       'order.number': '1000', 'order.city': 'São Paulo',
     });
-    expect(screen.getByLabelText('order.taxId')).toHaveValue('123.456.789-01');
+    expect(screen.getByLabelText('order.taxId')).toHaveValue('529.982.247-25');
     await userEvent.click(screen.getByText('order.selectState'));
     await userEvent.click(screen.getByText('SP - São Paulo'));
     await userEvent.click(screen.getByRole('checkbox'));
@@ -40,7 +40,7 @@ describe('PlanOrderForm', () => {
 
   it('troca o rótulo do nome para razão social com CNPJ', async () => {
     render(<PlanOrderForm provinces={provinces} submitting={false} error="" onSubmit={vi.fn()} />);
-    await userEvent.type(screen.getByLabelText('order.taxId'), '12345678000195');
+    await userEvent.type(screen.getByLabelText('order.taxId'), '11222333000181');
     expect(screen.getByLabelText('order.companyName')).toBeInTheDocument();
   });
 

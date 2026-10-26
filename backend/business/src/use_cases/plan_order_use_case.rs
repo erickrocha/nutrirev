@@ -182,6 +182,7 @@ impl PlanOrderUseCase {
 
         let tenant = tenant_entity::ActiveModel {
             name: Set(Some(order.name.clone())),
+            tax_id: Set(Some(order.tax_id.clone())),
             email: Set(Some(order.email.clone())),
             phone: Set(Some(order.phone.clone())),
             address_line1: Set(Some(order.address_line1.clone())),

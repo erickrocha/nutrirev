@@ -264,7 +264,9 @@
     "activeToggleHelp": "Ao ativar esta assinatura, qualquer outro plano ativo desta clínica será automaticamente desativado.",
     "savePlan": "Salvar Assinatura",
     "subscriptionSuccess": "Assinatura da clínica atualizada com sucesso.",
-    "planSelected": "Selecionado"
+    "planSelected": "Selecionado",
+    "taxId": "CPF/CNPJ",
+    "taxIdInvalid": "Informe um CPF ou CNPJ válido."
   },
   "address": {
     "addressLine1": "Endereço - linha 1",
@@ -1289,7 +1291,7 @@
     "orderNumber": "Pedido",
     "errors": {
       "required": "Campo obrigatório.",
-      "taxId": "Informe um CPF (11) ou CNPJ (14 dígitos).",
+      "taxId": "Informe um CPF ou CNPJ válido.",
       "email": "E-mail inválido.",
       "phone": "Informe DDD + telefone.",
       "postalCode": "CEP deve ter 8 dígitos.",

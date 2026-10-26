@@ -45,6 +45,7 @@ settings-added-failed = Failed to add settings
 tenant-created-failed = Failed to create tenant
 tenant-not-found = Tenant not found
 tenant-update-failed = Failed to update tenant
+tenant-tax-id-invalid = Enter a valid CPF or CNPJ (and make sure it is not already registered)
 business-plan-forbidden = Only the system administrator can manage business plans
 business-plan-not-found = Business plan not found
 business-plan-invalid = Invalid business plan data
