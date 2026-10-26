@@ -6,6 +6,7 @@ pub mod meal_point_tier_entity;
 pub mod point_transaction_entity;
 pub mod tenant_entity;
 pub mod tenant_plan_entity;
+pub mod plan_order_entity;
 pub mod business_plan_entity;
 pub mod business_plan_tier_entity;
 pub mod account_deletion_entity;

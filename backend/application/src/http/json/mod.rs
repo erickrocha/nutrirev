@@ -5,6 +5,7 @@ pub mod error_response_json;
 pub mod tenant_json;
 pub mod tenant_plan_json;
 pub mod business_plan_json;
+pub mod plan_order_json;
 pub mod sysadmin_dashboard_json;
 pub mod tenant_dashboard_json;
 pub mod catalog_csv_import_json;

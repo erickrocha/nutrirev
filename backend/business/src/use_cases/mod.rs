@@ -4,6 +4,7 @@ pub mod user_use_case;
 pub mod tenant_use_case;
 pub mod tenant_plan_use_case;
 pub mod business_plan_use_case;
+pub mod plan_order_use_case;
 pub mod sysadmin_dashboard_use_case;
 pub mod tenant_dashboard_use_case;
 pub mod catalog_csv_import_use_case;

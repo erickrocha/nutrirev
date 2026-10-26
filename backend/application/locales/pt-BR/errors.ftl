@@ -56,3 +56,7 @@ payment-tax-id-required = Informe o CPF ou CNPJ para pagar esta cobrança
 payment-attempt-not-found = Tentativa de pagamento não encontrada
 payment-provider-unavailable = O provedor de pagamento está indisponível, tente novamente em instantes
 payment-method-unavailable = Esta clínica não oferece essa forma de pagamento
+plan-order-forbidden = Apenas o administrador do sistema pode gerenciar pedidos
+plan-order-not-found = Pedido não encontrado
+plan-order-invalid = Dados inválidos para o pedido
+plan-order-not-pending = Este pedido não está pendente

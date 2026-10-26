@@ -1,0 +1,51 @@
+# Ambiente de desenvolvimento: MariaDB + LocalStack (S3 e SQS). Uso: docker compose up -d
+services:
+  mariadb:
+    image: mariadb:11
+    container_name: nutrirev-dev-mariadb
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  localstack:
+    image: localstack/localstack:3
+    container_name: nutrirev-dev-localstack
+    environment:
+      SERVICES: s3,sqs
+      AWS_DEFAULT_REGION: us-east-1
+    ports:
+      - "4566:4566"
+    volumes:
+      - localstack-data:/var/lib/localstack
+      # Scripts rodam quando o LocalStack fica pronto: criam o bucket e a fila.
+      - ./localstack/init.sh:/etc/localstack/init/ready.d/init.sh:ro
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Caixa de e-mail de desenvolvimento: SMTP em localhost:1025, interface em http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.21
+    container_name: nutrirev-dev-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  mariadb-data:
+    name: nutrirev-dev-mariadb-data
+  localstack-data:
+    name: nutrirev-dev-localstack-data

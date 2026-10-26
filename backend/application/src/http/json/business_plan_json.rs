@@ -58,3 +58,16 @@ pub struct BusinessPlanJson {
     pub updated_by: Option<String>,
     pub tiers: Vec<BusinessPlanTierJson>,
 }
+
+/// Vitrine pública dos planos (landing page): só o que o visitante precisa ver, sem ids nem auditoria.
+#[derive(Debug, Clone, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct PublicBusinessPlanJson {
+    pub uuid: String,
+    pub name: String,
+    pub price_in_cents: i64,
+    pub available_users: i32,
+    pub period_days: i32,
+    pub daily_ai_quota: i32,
+    pub tiers: Vec<BusinessPlanTierJson>,
+}

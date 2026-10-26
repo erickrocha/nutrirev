@@ -100,7 +100,8 @@
     "activityLevels": "Activity Levels",
     "mealPointTiers": "Meal Point Tiers (Gamification)",
     "systemVersion": "NutriRev v1.0",
-    "paymentSettings": "Payment methods"
+    "paymentSettings": "Payment methods",
+    "planOrders": "Orders"
   },
   "topbar": {
     "openMenu": "Open menu",
@@ -1078,5 +1079,249 @@
     "saveError": "Could not save the connection.",
     "disableError": "Could not disable the connection.",
     "deleteError": "Could not delete the connection."
+  },
+  "site": {
+    "seo": {
+      "description": "Management platform for nutrition clinics and practices: clinical records, meal plans, patient diary with AI analysis, mobile app and recurring billing."
+    },
+    "nav": {
+      "aria": "Main navigation",
+      "home": "NutriRev, home page",
+      "features": "Features",
+      "how": "How it works",
+      "plans": "Plans",
+      "faq": "FAQ",
+      "tagline": "The nutrition revolution"
+    },
+    "access": "Sign in",
+    "hero": {
+      "badge": "Nutrition clinic management",
+      "title": "The system that runs your nutrition clinic",
+      "titleAccent": "from medical record to monthly fee",
+      "sub": "Clinical records, meal plans, a patient diary with AI analysis, a mobile app and recurring billing. All in one platform, with no setup.",
+      "seePlans": "See plans and pricing",
+      "strip": [
+        "Patient app included",
+        "PIX and card billing"
+      ],
+      "from": "From {{price}}/month"
+    },
+    "audiences": {
+      "title": "Built for nutrition professionals",
+      "sub": "From the one-room practice to the multi-location network.",
+      "items": [
+        {
+          "title": "Independent nutritionist",
+          "text": "Leave spreadsheets and PDFs sent over WhatsApp behind without buying a large-clinic system."
+        },
+        {
+          "title": "Nutrition clinic",
+          "text": "Team, billing schedule and shared records, with each professional limited to their own scope."
+        },
+        {
+          "title": "Network and franchise",
+          "text": "Several locations on one account, each with its own visual identity and isolated data."
+        }
+      ]
+    },
+    "features": {
+      "title": "Everything the clinic uses every day, in one place",
+      "sub": "No more switching between spreadsheets, messaging apps and billing notebooks.",
+      "items": [
+        {
+          "title": "Complete clinical record",
+          "text": "Pre-existing conditions, dietary restrictions, bowel function and patient history in one place."
+        },
+        {
+          "title": "Goals and energy calculation",
+          "text": "Formulas, activity factor and objective applied automatically when you set each patient's goal."
+        },
+        {
+          "title": "Meal plans and recipes",
+          "text": "Build the plan from the TACO ingredient base, reuse recipes and deliver straight to the patient's app."
+        },
+        {
+          "title": "AI meal analysis",
+          "text": "The patient photographs the plate and gets a macro reading. You review what arrived, with nothing to transcribe."
+        },
+        {
+          "title": "Food diary and adherence",
+          "text": "Follow what was logged day by day and see who is sticking to the plan before the next appointment."
+        },
+        {
+          "title": "Patient progress",
+          "text": "Measurements and body analysis over time, to show results with data instead of impressions."
+        },
+        {
+          "title": "Recurring billing",
+          "text": "Payment dates, PIX and card. The patient's monthly fee no longer depends on you remembering."
+        },
+        {
+          "title": "Team and permissions",
+          "text": "Nutritionists, doctors and reception with access to what concerns them — each role sees only its own scope."
+        },
+        {
+          "title": "Clinic dashboard",
+          "text": "Active patients, plans in progress and open payments on the first screen of the day."
+        }
+      ]
+    },
+    "steps": {
+      "title": "How it works",
+      "sub": "Three steps between creating the account and following your first patient.",
+      "items": [
+        {
+          "title": "Register the clinic and the team",
+          "text": "You sign in, create the users and decide who accesses what. No setup, no consulting."
+        },
+        {
+          "title": "Build the patient's plan",
+          "text": "Clinical record, calculated goal and meal plan. The patient gets app access right away."
+        },
+        {
+          "title": "Follow up and bill",
+          "text": "The diary arrives on its own, progress is recorded and the monthly fee is charged on the agreed date."
+        }
+      ]
+    },
+    "app": {
+      "badge": "Patient app",
+      "title": "Follow-up continues outside the appointment",
+      "sub": "Patients log meals by photo, check their meal plan and see their own progress. You arrive at the next appointment already knowing what happened in between.",
+      "list": [
+        "Meal plan always up to date on the phone",
+        "Meal logging by photo, with a macro reading",
+        "Measurement and progress history",
+        "Monthly fee and receipts in their own account"
+      ],
+      "phone": [
+        "Breakfast · 412 kcal",
+        "Lunch analyzed by AI",
+        "Daily goal: 78%",
+        "−3.2 kg in 8 weeks"
+      ]
+    },
+    "plans": {
+      "title": "Plans and pricing",
+      "sub": "Priced per clinic, not per patient. No setup fee and no lock-in.",
+      "flag": "Most popular",
+      "currency": "R$",
+      "start": "Get started with {{name}}",
+      "period_month": "/month",
+      "period_year": "/year",
+      "period_days": "/{{count}} days",
+      "users": "Up to {{count}} users",
+      "aiQuota": "{{count}} AI analyses per day",
+      "tiers": "Price tiers by user volume",
+      "unavailable": "Plans could not be loaded right now. Please try again shortly."
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "q": "Is NutriRev suitable for a nutritionist who works alone?",
+          "a": "Yes. There is a plan for the individual practice, with meal plans, the patient diary and the app already included — the same product a large clinic uses, at the scale of a private practice."
+        },
+        {
+          "q": "Does the patient need to install an app?",
+          "a": "Patients use the NutriRev app to log meals, see their meal plan and follow their progress. You create their access at registration, at no extra cost per patient."
+        },
+        {
+          "q": "How does AI meal analysis work?",
+          "a": "The patient photographs the plate and the AI identifies the foods and estimates the macronutrients. Each plan has a daily analysis quota per patient. The record stays in the diary for you to review before the appointment."
+        },
+        {
+          "q": "Can I bill my patients through the platform?",
+          "a": "Yes. You set each patient's payment date and billing is generated on a recurring basis, with PIX and card."
+        },
+        {
+          "q": "Is my patients' data safe?",
+          "a": "Each clinic's data is isolated from the others, access is controlled by role and every access to clinical data is logged. Data processing follows the LGPD and is described in the Privacy Policy."
+        },
+        {
+          "q": "Can I change plans later?",
+          "a": "Yes, at any time. The plan defines how many users and how many AI analyses per day the clinic has — if the team grows, you move up a tier without losing history."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Start seeing patients with NutriRev",
+      "text": "Create your clinic's account and register your first patient today."
+    },
+    "footer": {
+      "tagline": "Management platform for nutrition clinics and practices.",
+      "product": "Product",
+      "faq": "FAQ",
+      "access": "Access",
+      "legal": "Legal",
+      "terms": "Terms of use",
+      "privacy": "Privacy policy"
+    }
+  },
+  "order": {
+    "title": "Order a plan",
+    "yourPlan": "Your plan",
+    "yourData": "Your details",
+    "address": "Address",
+    "taxId": "CPF or CNPJ (Brazilian tax ID)",
+    "fullName": "Full name",
+    "companyName": "Company name",
+    "email": "Email",
+    "phone": "Phone",
+    "postalCode": "Postal code (CEP)",
+    "street": "Street",
+    "number": "Number",
+    "complement": "Complement",
+    "neighborhood": "Neighborhood",
+    "city": "City",
+    "state": "State",
+    "acceptPrefix": "I have read and accept the",
+    "acceptAnd": "and the",
+    "submit": "Send order",
+    "sending": "Sending...",
+    "invalid": "Please check the details you entered (tax ID, email, phone and postal code) and try again.",
+    "failed": "We could not send your order right now. Please try again shortly.",
+    "planNotFound": "Plan not found.",
+    "back": "Back to site",
+    "manualNote": "After you submit, our team will contact you to finalize the agreement. You are not charged now.",
+    "doneTitle": "We received your order!",
+    "doneText": "We sent a confirmation to {{email}}. Our team will contact you shortly to finalize the agreement.",
+    "orderNumber": "Order",
+    "errors": {
+      "required": "Required field.",
+      "taxId": "Enter a CPF (11) or CNPJ (14 digits).",
+      "email": "Invalid email.",
+      "phone": "Enter area code + phone.",
+      "postalCode": "Postal code must have 8 digits.",
+      "state": "Use the 2-letter code.",
+      "accept": "You must accept the terms."
+    },
+    "selectState": "Select the state"
+  },
+  "planOrders": {
+    "title": "Contract orders",
+    "subtitle": "Orders placed through the landing page. Once the agreement is closed, convert the order into a tenant.",
+    "loadError": "Unable to load the orders.",
+    "actionError": "Unable to complete the action.",
+    "empty": "No orders found.",
+    "all": "All",
+    "date": "Date",
+    "customer": "Customer",
+    "plan": "Plan",
+    "status": "Status",
+    "open": "Open",
+    "firstDueDate": "First due date",
+    "convert": "Convert to tenant",
+    "cancel": "Cancel order",
+    "convertConfirm": "Create the tenant for {{name}} with this plan?",
+    "cancelConfirm": "Cancel the order from {{name}}?",
+    "statuses": {
+      "pending": "Pending",
+      "converted": "Converted",
+      "cancelled": "Cancelled"
+    },
+    "breadcrumb": "Orders",
+    "detailLoadError": "Could not load the order.",
+    "dueDateRequired": "Required field."
   }
 }

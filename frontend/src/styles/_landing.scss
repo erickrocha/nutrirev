@@ -72,8 +72,15 @@
   &:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
 }
 
+.lp-btn-accent {
+  background-color: var(--accent-secondary);
+  color: var(--text-heading);
+
+  &:hover { background-color: var(--accent-secondary-hover); }
+}
+
 .lp-btn-lg { padding: 14px 30px; font-size: 1rem; }
-.lp-btn-block { width: 100%; margin-top: auto; }
+.lp-btn-block { width: 100%; margin-top: auto; white-space: normal; text-align: center; }
 
 // Badge — amarelo só como fundo, texto escuro por cima
 .lp-badge {
@@ -110,7 +117,20 @@
   gap: 24px;
 }
 
-.lp-brand { text-decoration: none; color: var(--text-heading); }
+.lp-brand {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--text-heading);
+}
+
+.lp-brand-tagline {
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--text-body);
+}
 
 .lp-nav {
   display: flex;
@@ -485,3 +505,6 @@
   .lp-footer-inner { grid-template-columns: 1fr; gap: 28px; }
   .lp-quote { padding: 26px 24px; }
 }
+
+// ── Contratação ──────────────────────────────────────────────────────────────
+.lp-lang { margin-left: auto; font-size: 0.875rem; }

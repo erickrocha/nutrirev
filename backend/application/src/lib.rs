@@ -22,7 +22,8 @@ use crate::http::welcome_controller::welcome;
 use crate::routes::authentication_routes::auth_routes;
 use crate::routes::legal_routes::legal_routes;
 use crate::routes::tenant_routes::tenant_routes;
-use crate::routes::business_plan_routes::business_plan_routes;
+use crate::routes::plan_order_routes::{plan_order_routes, public_plan_order_routes};
+use crate::routes::business_plan_routes::{business_plan_routes, public_business_plan_routes};
 use crate::routes::sysadmin_dashboard_routes::sysadmin_dashboard_routes;
 use crate::routes::tenant_dashboard_routes::tenant_dashboard_routes;
 use crate::routes::user_routes::user_routes;
@@ -97,6 +98,13 @@ impl Modify for SecurityAddon {
 		http::tenant_controller::get_active_plan,
 		http::business_plan_controller::add,
 		http::business_plan_controller::list_all,
+		http::business_plan_controller::list_public,
+		http::plan_order_controller::get_public_plan,
+		http::plan_order_controller::create_order,
+		http::plan_order_controller::list_orders,
+		http::plan_order_controller::get_order,
+		http::plan_order_controller::convert_order,
+		http::plan_order_controller::cancel_order,
 		http::business_plan_controller::get_by_id,
 		http::business_plan_controller::get_by_uuid,
 		http::business_plan_controller::update,
@@ -290,6 +298,12 @@ impl Modify for SecurityAddon {
 			http::json::business_plan_json::CreateBusinessPlanJson,
 			http::json::business_plan_json::UpdateBusinessPlanJson,
 			http::json::business_plan_json::BusinessPlanJson,
+			http::json::business_plan_json::PublicBusinessPlanJson,
+			http::json::plan_order_json::CreatePlanOrderJson,
+			http::json::plan_order_json::PlanOrderCreatedJson,
+			http::json::plan_order_json::PublicPlanDetailJson,
+			http::json::plan_order_json::PlanOrderJson,
+			http::json::plan_order_json::ConvertPlanOrderJson,
 			http::json::sysadmin_dashboard_json::SysAdminDashboardJson,
 			http::json::sysadmin_dashboard_json::SysAdminDashboardTotalsJson,
 			http::json::sysadmin_dashboard_json::RecentSysAdminTenantJson,
@@ -484,9 +498,12 @@ async fn start() -> anyhow::Result<()> {
 		.merge(welcome_route())
 		.merge(auth_routes(state.clone()))
 		.merge(legal_routes(state.clone()))
+		.merge(public_business_plan_routes(state.clone()))
+		.merge(public_plan_order_routes(state.clone()))
 		// API routes with authentication
 		.nest("/tenant", tenant_routes(state.clone()))
 		.nest("/business-plan", business_plan_routes(state.clone()))
+		.nest("/plan-order", plan_order_routes(state.clone()))
 		.merge(sysadmin_dashboard_routes(state.clone()))
 		.merge(tenant_dashboard_routes(state.clone()))
 		.nest("/user", user_routes(state.clone()))

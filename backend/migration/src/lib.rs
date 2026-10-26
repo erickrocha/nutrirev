@@ -55,6 +55,7 @@ mod m20260904_000002_pix_attempt;
 mod m20260904_000003_card_on_file;
 mod m20260904_000004_payment_reversal;
 mod m20260904_000005_merchant_capabilities;
+mod m20260905_000001_create_plan_order;
 
 pub struct Migrator;
 
@@ -116,6 +117,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260904_000003_card_on_file::Migration),
             Box::new(m20260904_000004_payment_reversal::Migration),
             Box::new(m20260904_000005_merchant_capabilities::Migration),
+            Box::new(m20260905_000001_create_plan_order::Migration),
         ]
     }
 }

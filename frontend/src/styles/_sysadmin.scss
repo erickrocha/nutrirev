@@ -3,6 +3,30 @@
 .sysadmin-dashboard-page,
 .business-plan-management-page,
 .business-plan-form-page {
+  .btn-action-accent {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 11px 24px;
+    border: 0;
+    border-radius: $border-radius-pill;
+    background: var(--accent-secondary);
+    color: var(--text-heading);
+    font-family: $font-family-heading;
+    font-size: .85rem;
+    font-weight: $weight-medium;
+    letter-spacing: .08em;
+    line-height: 1;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: $transition-smooth;
+
+    &:hover:not(:disabled) { background: var(--accent-secondary-hover); transform: translateY(-1px); }
+    &:disabled { opacity: .55; cursor: not-allowed; }
+  }
+
   max-width: 1280px;
   margin: 0 auto;
   padding-bottom: 48px;

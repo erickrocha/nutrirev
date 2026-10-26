@@ -56,3 +56,7 @@ payment-tax-id-required = A CPF or CNPJ is required to pay this charge
 payment-attempt-not-found = Payment attempt not found
 payment-provider-unavailable = The payment provider is unavailable, try again shortly
 payment-method-unavailable = This clinic does not offer that payment method
+plan-order-forbidden = Only the system administrator can manage orders
+plan-order-not-found = Order not found
+plan-order-invalid = Invalid order data
+plan-order-not-pending = This order is not pending
