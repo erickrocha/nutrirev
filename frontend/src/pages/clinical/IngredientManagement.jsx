@@ -378,22 +378,27 @@ export const IngredientManagement = () => {
                         >
                           <Eye size={15} /> {t('common.view', 'View')}
                         </button>
-                        <button
-                          type="button"
-                          className="btn-table-edit"
-                          onClick={() => openEdit(item)}
-                          title={t('common.edit')}
-                        >
-                          <Edit2 size={15} /> {t('common.edit')}
-                        </button>
-                        <button
-                          type="button"
-                          className="btn-table-delete"
-                          onClick={() => setDeletingItem(item)}
-                          title={t('common.delete')}
-                        >
-                          <Trash2 size={15} />
-                        </button>
+                        {/* Catálogo global (TACO, sem tenant): só leitura para as clínicas. */}
+                        {(isSysAdmin || item.tenantId) && (
+                          <>
+                            <button
+                              type="button"
+                              className="btn-table-edit"
+                              onClick={() => openEdit(item)}
+                              title={t('common.edit')}
+                            >
+                              <Edit2 size={15} /> {t('common.edit')}
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-table-delete"
+                              onClick={() => setDeletingItem(item)}
+                              title={t('common.delete')}
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>

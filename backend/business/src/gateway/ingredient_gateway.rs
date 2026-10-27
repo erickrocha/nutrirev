@@ -1,6 +1,6 @@
 use crate::commons::entity_mapper::EntityMapper;
 use crate::commons::functions::string_to_bytes;
-use crate::commons::gateway::{tenant_delete, tenant_select, Gateway};
+use crate::commons::gateway::{tenant_delete, tenant_or_global_select, Gateway};
 use crate::domain::ingredient::{Ingredient, IngredientEntityMapper};
 use entity::ingredient_entity;
 use entity::prelude::IngredientEntity as IngredientQuery;
@@ -36,20 +36,20 @@ impl Gateway<Ingredient, ingredient_entity::Model, ingredient_entity::ActiveMode
     }
 
     async fn find_by_id(&self, id: i32) -> Result<Option<ingredient_entity::Model>, DbErr> {
-        tenant_select(IngredientQuery::find(), ingredient_entity::Column::TenantId)
+        tenant_or_global_select(IngredientQuery::find(), ingredient_entity::Column::TenantId)
             .filter(ingredient_entity::Column::Id.eq(id))
             .one(&self.db)
             .await
     }
 
     async fn find_by_uuid(&self, uuid: String) -> Result<Option<ingredient_entity::Model>, DbErr> {
-        tenant_select(IngredientQuery::find(), ingredient_entity::Column::TenantId)
+        tenant_or_global_select(IngredientQuery::find(), ingredient_entity::Column::TenantId)
             .filter(ingredient_entity::Column::Uuid.eq(string_to_bytes(&uuid)))
             .one(&self.db)
             .await
     }
 
     async fn find_all(&self) -> Result<Vec<ingredient_entity::Model>, DbErr> {
-        tenant_select(IngredientQuery::find(), ingredient_entity::Column::TenantId).all(&self.db).await
+        tenant_or_global_select(IngredientQuery::find(), ingredient_entity::Column::TenantId).all(&self.db).await
     }
 }

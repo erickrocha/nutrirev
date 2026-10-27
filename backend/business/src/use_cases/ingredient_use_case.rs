@@ -47,8 +47,15 @@ impl IngredientUseCase {
                 return Err(e);
             }
         };
+        // O catálogo global (TACO, sem tenant) só pode ser alterado por quem não é restrito a um tenant.
+        if existing.tenant_id.is_none() && matches!(entity::audit::tenant_scope(), entity::audit::TenantScope::Tenant(_)) {
+            let msg = format!("Ingredient not found with id {}", id);
+            log::error!("[IngredientUseCase::update] Global catalog ingredient is read-only for tenants: {}", msg);
+            return Err(BusinessError::new(msg));
+        }
         entity.id = Some(id);
         entity.uuid = existing.uuid;
+        entity.tenant_id = existing.tenant_id;
         let active = self
             .gateway
             .persist(entity)
