@@ -29,6 +29,7 @@ pub mod province;
 pub mod city;
 
 pub mod ingredient;
+pub mod ingredient_search;
 pub mod cycle;
 pub mod eat;
 pub mod meal_plan;

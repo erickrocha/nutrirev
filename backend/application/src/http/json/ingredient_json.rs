@@ -15,6 +15,14 @@ pub struct IngredientJson {
     pub fiber: f64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub taco_id: Option<i32>,
+    /// English name (`name` is the Portuguese one).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name_en: Option<String>,
+    /// Global catalog origin: TACO or USDA.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fdc_id: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub moisture: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -71,4 +79,12 @@ pub struct IngredientJson {
     pub updated_at: Option<chrono::NaiveDateTime>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_by: Option<String>,
+}
+
+#[derive(Serialize, Debug, Clone, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct IngredientPageJson {
+    pub items: Vec<IngredientJson>,
+    /// Total de ingredientes que casam com a busca (sem paginação).
+    pub total: u64,
 }

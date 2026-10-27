@@ -9,22 +9,6 @@ static TACO_CSV: &str = include_str!("../data/taco_ingredients.csv");
 
 const BATCH: usize = 50;
 
-/// Divide uma linha CSV respeitando aspas (nomes como "Arroz, integral, cozido").
-fn split_csv_line(line: &str) -> Vec<String> {
-    let mut fields = Vec::new();
-    let mut current = String::new();
-    let mut quoted = false;
-    for c in line.chars() {
-        match c {
-            '"' => quoted = !quoted,
-            ',' if !quoted => fields.push(std::mem::take(&mut current)),
-            _ => current.push(c),
-        }
-    }
-    fields.push(current);
-    fields
-}
-
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
@@ -46,9 +30,10 @@ impl MigrationTrait for Migration {
             return Ok(());
         }
 
-        let mut lines = TACO_CSV.lines().filter(|line| !line.trim().is_empty());
-        let header: Vec<String> = split_csv_line(lines.next().ok_or_else(|| DbErr::Custom("TACO csv is empty".into()))?);
-        let rows: Vec<Vec<String>> = lines.map(split_csv_line).collect();
+        let (header, rows) = crate::csv_lite::parse(TACO_CSV);
+        if header.is_empty() {
+            return Err(DbErr::Custom("TACO csv is empty".into()));
+        }
 
         for chunk in rows.chunks(BATCH) {
             let mut insert = Query::insert();

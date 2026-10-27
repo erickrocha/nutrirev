@@ -2,6 +2,7 @@ use crate::commons::entity_mapper::EntityMapper;
 use crate::commons::gateway::Gateway;
 use crate::domain::business_error::BusinessError;
 use crate::domain::ingredient::{Ingredient, IngredientEntityMapper};
+use crate::domain::ingredient_search::IngredientSearch;
 use crate::gateway::ingredient_gateway::IngredientGateway;
 
 pub struct IngredientUseCase {
@@ -66,6 +67,26 @@ impl IngredientUseCase {
                 BusinessError::new(msg)
             })?;
         Ok(IngredientEntityMapper::from_active_model(active))
+    }
+
+    pub async fn search(&self, search: &IngredientSearch) -> Result<(Vec<Ingredient>, u64), BusinessError> {
+        log::info!("[IngredientUseCase::search] Executing for terms: {:?}", search.terms);
+        let (rows, total) = self.gateway.search(search).await.map_err(|e| {
+            let msg = format!("Database error: {}", e);
+            log::error!("[IngredientUseCase::search] {}", msg);
+            BusinessError::new(msg)
+        })?;
+        Ok((rows.into_iter().map(IngredientEntityMapper::from_model).collect(), total))
+    }
+
+    pub async fn find_by_ids(&self, ids: &[i32]) -> Result<Vec<Ingredient>, BusinessError> {
+        log::info!("[IngredientUseCase::find_by_ids] Executing for {} ids", ids.len());
+        let rows = self.gateway.find_by_ids(ids).await.map_err(|e| {
+            let msg = format!("Database error: {}", e);
+            log::error!("[IngredientUseCase::find_by_ids] {}", msg);
+            BusinessError::new(msg)
+        })?;
+        Ok(rows.into_iter().map(IngredientEntityMapper::from_model).collect())
     }
 
     pub async fn find_by_id(&self, id: i32) -> Result<Ingredient, BusinessError> {

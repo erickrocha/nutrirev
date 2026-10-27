@@ -15,6 +15,12 @@ pub struct Model {
     pub fat: f64,
     pub fiber: f64,
     pub taco_id: Option<i32>,
+    /// Nome em inglês (`name` é o nome em português).
+    pub name_en: Option<String>,
+    /// Origem do catálogo global: TACO ou USDA.
+    pub source: Option<String>,
+    /// Id do alimento no USDA FoodData Central.
+    pub fdc_id: Option<i32>,
     pub moisture: Option<f64>,
     pub kj: Option<f64>,
     pub cholesterol: Option<f64>,
