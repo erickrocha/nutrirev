@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Utensils, Star, Clock, Sparkles, AlertCircle, Video } from 'lucide-react';
-import { fetchIngredients } from '../../store/ingredientSlice';
+import { fetchIngredientsByIds } from '../../store/ingredientSlice';
+import { ingredientName as localizedName } from '../../utils/ingredients';
 import { eatService } from '../../services/api';
 import { enumLabel } from '../../utils/enums';
 
@@ -11,16 +12,13 @@ export const CustomerEatDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.startsWith('en') ? 'en' : 'pt';
   const { ingredientsList } = useSelector((state) => state.ingredient);
 
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    dispatch(fetchIngredients());
-  }, [dispatch]);
 
   useEffect(() => {
     const load = async () => {
@@ -29,6 +27,7 @@ export const CustomerEatDetailPage = () => {
       try {
         const data = await eatService.getById(id);
         setRecipe(data);
+        dispatch(fetchIngredientsByIds((data?.ingredients || []).map((ing) => ing.ingredientId)));
       } catch (err) {
         console.error('Error loading recipe:', err);
         setError(t('eat.errorLoadingRecipe'));
@@ -37,9 +36,9 @@ export const CustomerEatDetailPage = () => {
       }
     };
     load();
-  }, [id, t]);
+  }, [id, t, dispatch]);
 
-  const ingredientName = (ingId) => ingredientsList.find((i) => i.id === ingId)?.name || `Ingrediente #${ingId}`;
+  const ingredientName = (ingId) => localizedName(ingredientsList.find((i) => i.id === ingId), lang) || `Ingrediente #${ingId}`;
 
   if (loading) {
     return (

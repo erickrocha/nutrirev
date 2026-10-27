@@ -106,7 +106,8 @@ const csvIngredientColumns = [
 ];
 
 export const IngredientManagement = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.startsWith('en') ? 'en' : 'pt';
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { activeTenant, tenantsList } = useSelector((state) => state.tenant);
@@ -116,6 +117,8 @@ export const IngredientManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedTerm, setDebouncedTerm] = useState('');
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -131,14 +134,25 @@ export const IngredientManagement = () => {
     setLoading(true);
     setError('');
     try {
-      const data = await ingredientService.getAll();
-      setItems(Array.isArray(data) ? data : []);
+      const data = await ingredientService.search({
+        q: debouncedTerm,
+        lang,
+        limit: pageSize,
+        offset: (page - 1) * pageSize,
+      });
+      setItems(Array.isArray(data?.items) ? data.items : []);
+      setTotal(data?.total ?? 0);
     } catch (requestError) {
       setError(requestError?.response?.data?.message || t('ingredients.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, [t, debouncedTerm, lang, page, pageSize]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedTerm(searchTerm.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
     loadData();
@@ -157,19 +171,9 @@ export const IngredientManagement = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [viewingItem]);
 
-  const displayedItems = useMemo(
-    () =>
-      items.filter((item) =>
-        (item.name || '').toLowerCase().includes(searchTerm.toLowerCase()),
-      ),
-    [items, searchTerm],
-  );
-
-  const totalPages = Math.max(1, Math.ceil(displayedItems.length / pageSize));
-  const paginatedItems = useMemo(
-    () => displayedItems.slice((page - 1) * pageSize, page * pageSize),
-    [displayedItems, page, pageSize],
-  );
+  const displayName = (item) => (lang === 'en' && item.nameEn ? item.nameEn : item.name);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const paginatedItems = items;
 
   useEffect(() => {
     setPage((current) => Math.min(current, totalPages));
@@ -321,7 +325,7 @@ export const IngredientManagement = () => {
             <RefreshCw size={24} className="spin-icon" />
             <p>{t('entities.loadingRecords')}</p>
           </div>
-        ) : displayedItems.length === 0 ? (
+        ) : total === 0 && !loading ? (
           <div className="table-empty-state">
             <Apple size={36} />
             <p>{t('ingredients.empty')}</p>
@@ -357,7 +361,7 @@ export const IngredientManagement = () => {
                     <td className="td-name">
                       <span className="ingredient-name">
                         <Apple size={16} className="ingredient-icon" />
-                        <span>{item.name}</span>
+                        <span>{displayName(item)}</span>
                       </span>
                     </td>
                     {macroFields.map((field) => (
@@ -409,10 +413,10 @@ export const IngredientManagement = () => {
         )}
       </div>
 
-      {displayedItems.length > 0 && (
+      {total > 0 && (
         <div className="catalog-pagination">
           <span>
-            {displayedItems.length} {t('ingredients.entityName')} — {page} / {totalPages}
+            {total} {t('ingredients.entityName')} — {page} / {totalPages}
           </span>
           <div>
             <select
@@ -625,7 +629,7 @@ export const IngredientManagement = () => {
           <div className="modal-content ingredient-details-modal" role="dialog" aria-modal="true" aria-labelledby="ingredient-details-title">
             <div className="modal-header">
               <div>
-                <h3 id="ingredient-details-title" className="modal-title">{viewingItem.name}</h3>
+                <h3 id="ingredient-details-title" className="modal-title">{displayName(viewingItem)}</h3>
                 <small style={{ color: 'var(--text-body)' }}>
                   {viewingItem.tacoId ? `TACO #${viewingItem.tacoId} — ` : ''}
                   {t('ingredients.per100g')}
@@ -779,7 +783,7 @@ export const IngredientManagement = () => {
             <div className="modal-header">
               <h3 className="modal-title">{t('ingredients.deleteTitle')}</h3>
             </div>
-            <p>{t('ingredients.deleteMessage', { name: deletingItem.name })}</p>
+            <p>{t('ingredients.deleteMessage', { name: displayName(deletingItem) })}</p>
             <div className="modal-footer">
               <button type="button" className="btn-modal-cancel" onClick={() => setDeletingItem(null)} disabled={saving}>
                 {t('common.cancel')}

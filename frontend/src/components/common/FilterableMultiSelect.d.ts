@@ -18,6 +18,7 @@ export interface FilterableMultiSelectProps {
   showSearch?: boolean;
   disabled?: boolean;
   isClearable?: boolean;
+  onSearch?: ((text: string) => void) | null;
 }
 
 export const FilterableMultiSelect: ComponentType<FilterableMultiSelectProps>;

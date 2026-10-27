@@ -15,6 +15,7 @@ export const FilterableMultiSelect = ({
   showSearch = true,
   disabled = false,
   isClearable = true,
+  onSearch = null,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [filterText, setFilterText] = useState('');
@@ -92,9 +93,18 @@ export const FilterableMultiSelect = ({
     [selectedIds]
   );
 
-  const filteredOptions = options.filter((opt) =>
-    (opt.name || '').toLowerCase().includes(filterText.toLowerCase())
-  );
+  // Com `onSearch` a busca é feita fora (servidor): as opções já chegam filtradas.
+  const filteredOptions = onSearch
+    ? options
+    : options.filter((opt) => (opt.name || '').toLowerCase().includes(filterText.toLowerCase()));
+
+  useEffect(() => {
+    if (!onSearch || !isOpen) return undefined;
+    const timer = setTimeout(() => onSearch(filterText.trim()), 300);
+    return () => clearTimeout(timer);
+    // onSearch costuma ser recriada a cada render; a busca só depende do texto digitado.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterText, isOpen]);
 
   const selectedOptions = options.filter((opt) => isIdSelected(opt.id));
 

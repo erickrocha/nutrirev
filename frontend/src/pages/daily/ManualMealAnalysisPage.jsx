@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ingredientName } from '../../utils/ingredients';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -50,7 +51,8 @@ const UNIT_MULTIPLIERS = {
 };
 
 export const ManualMealAnalysisPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.startsWith('en') ? 'en' : 'pt';
   const navigate = useNavigate();
 
   // Selection state
@@ -88,10 +90,9 @@ export const ManualMealAnalysisPage = () => {
       setMealSlotsLoading(true);
       setIngredientsLoading(true);
       try {
-        const [custData, allSlots, allIngredients] = await Promise.all([
+        const [custData, allSlots] = await Promise.all([
           customerService.getMe().catch(() => null),
           dailyMealService.getAll().catch(() => []),
-          ingredientService.getAll().catch(() => []),
         ]);
 
         if (cancelled) return;
@@ -115,13 +116,11 @@ export const ManualMealAnalysisPage = () => {
           setSelectedMealSlotId(userSlots[0].id);
         }
 
-        setIngredients(allIngredients || []);
       } catch (err) {
         console.error('Error loading manual analysis form data:', err);
       } finally {
         if (!cancelled) {
           setMealSlotsLoading(false);
-          setIngredientsLoading(false);
         }
       }
     };
@@ -144,14 +143,27 @@ export const ManualMealAnalysisPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filtered ingredients
-  const filteredIngredients = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return ingredients.slice(0, 15);
-    return ingredients
-      .filter((ing) => (ing.name || '').toLowerCase().includes(q))
-      .slice(0, 25);
-  }, [ingredients, searchQuery]);
+  // Busca no servidor: sem acento, em português ou inglês.
+  useEffect(() => {
+    let cancelled = false;
+    setIngredientsLoading(true);
+    const timer = setTimeout(async () => {
+      try {
+        const data = await ingredientService.search({ q: searchQuery.trim(), lang, limit: 25 });
+        if (!cancelled) setIngredients(data?.items || []);
+      } catch {
+        if (!cancelled) setIngredients([]);
+      } finally {
+        if (!cancelled) setIngredientsLoading(false);
+      }
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [searchQuery, lang]);
+
+  const filteredIngredients = ingredients;
 
   // Handle selecting an ingredient from search list to configure
   const handleSelectIngredient = (ingredient) => {
@@ -185,7 +197,7 @@ export const ManualMealAnalysisPage = () => {
     const newItem = {
       tempId: Date.now() + Math.random(),
       ingredientId: activeIngredient.id,
-      name: activeIngredient.name,
+      name: ingredientName(activeIngredient, lang),
       quantity: qty,
       unit: itemUnit,
       macros: activeItemMacros,
@@ -464,7 +476,7 @@ export const ManualMealAnalysisPage = () => {
                         onMouseDown={() => handleSelectIngredient(ing)}
                       >
                         <div className="ing-info">
-                          <span className="ing-name">{ing.name}</span>
+                          <span className="ing-name">{ingredientName(ing, lang)}</span>
                           <span className="ing-details">
                             {Math.round(ing.kcal || 0)} kcal • {ing.protein || 0}g P • {ing.carbs || 0}g C • {ing.fat || 0}g F / 100g
                           </span>
@@ -482,7 +494,7 @@ export const ManualMealAnalysisPage = () => {
               <div className="quick-add-panel">
                 <div className="quick-add-header">
                   <div>
-                    <h4 className="active-ing-name">{activeIngredient.name}</h4>
+                    <h4 className="active-ing-name">{ingredientName(activeIngredient, lang)}</h4>
                     <span className="active-ing-base-macros">
                       {Math.round(activeIngredient.kcal || 0)} kcal {t('manualMealAnalysis.nutritionPer100g')} ({activeIngredient.protein || 0}g P, {activeIngredient.carbs || 0}g C, {activeIngredient.fat || 0}g F)
                     </span>
