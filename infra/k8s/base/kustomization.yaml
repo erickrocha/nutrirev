@@ -4,5 +4,4 @@ resources:
   - namespace.yaml
   - configmap.yaml
   - application.yaml
-  - integration.yaml
 
