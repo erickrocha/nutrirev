@@ -14,22 +14,20 @@ pub fn build_body_user_message(gender_hint: Option<&str>, goal_hint: Option<&str
         .expect("body_analysis.user_message_base missing in vision_prompts.json")
         .to_string();
 
-    if let Some(gender) = gender_hint {
-        if !gender.trim().is_empty() {
+    if let Some(gender) = gender_hint
+        && !gender.trim().is_empty() {
             let template = VISION_PROMPTS["body_analysis"]["gender_hint_suffix"]
                 .as_str()
                 .expect("body_analysis.gender_hint_suffix missing in vision_prompts.json");
             message.push_str(&template.replace("{gender}", gender.trim()));
         }
-    }
-    if let Some(goal) = goal_hint {
-        if !goal.trim().is_empty() {
+    if let Some(goal) = goal_hint
+        && !goal.trim().is_empty() {
             let template = VISION_PROMPTS["body_analysis"]["goal_hint_suffix"]
                 .as_str()
                 .expect("body_analysis.goal_hint_suffix missing in vision_prompts.json");
             message.push_str(&template.replace("{goal}", goal.trim()));
         }
-    }
 
     message.push_str(
         VISION_PROMPTS["body_analysis"]["user_message_closing"]

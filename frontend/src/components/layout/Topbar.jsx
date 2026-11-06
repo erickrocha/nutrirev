@@ -6,7 +6,7 @@ import { logout } from '../../store/authSlice';
 import { User, UserCheck, LogOut, ChevronDown, Shield, Building, Menu } from 'lucide-react';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { LogoMark } from '../brand/Logo';
-import { enumLabel } from '../../utils/enums';
+import { enumLabel, ROLES } from '../../utils/enums';
 
 export const Topbar = ({ onToggleMobileMenu }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -20,6 +20,7 @@ export const Topbar = ({ onToggleMobileMenu }) => {
 
   const roleName = user?.role || '';
   const roleLabel = enumLabel(t, 'role', roleName);
+  const isUserRole = roleName === ROLES.USER;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -104,17 +105,19 @@ export const Topbar = ({ onToggleMobileMenu }) => {
               <div className="dropdown-divider"></div>
 
               <div className="dropdown-menu-list">
-                <button
-                  type="button"
-                  className="dropdown-item"
-                  onClick={() => {
-                    setDropdownOpen(false);
-                    navigate('/settings');
-                  }}
-                >
-                  <UserCheck size={16} />
-                  <span>{t('topbar.editProfile')}</span>
-                </button>
+                {isUserRole && (
+                  <button
+                    type="button"
+                    className="dropdown-item"
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      navigate('/settings');
+                    }}
+                  >
+                    <UserCheck size={16} />
+                    <span>{t('topbar.editProfile')}</span>
+                  </button>
+                )}
                 <LanguageSwitcher />
                 {/* Last item MUST be logout */}
                 <button

@@ -196,7 +196,7 @@ impl CardPaymentUseCase {
             Err(CardProcessorError::Declined(result)) => {
                 active.status = Set("declined".into());
                 active.active_charge_id = Set(None);
-                apply_processor_result(&mut active, result);
+                apply_processor_result(&mut active, *result);
             }
             Err(CardProcessorError::Unknown) => {
                 active.status = Set("unknown".into());
@@ -603,7 +603,7 @@ impl CardPaymentUseCase {
                 // customer, by hand — can try again. Holding it would turn one
                 // refusal into a charge nobody can ever pay.
                 active.active_charge_id = Set(None);
-                apply_processor_result(&mut active, result);
+                apply_processor_result(&mut active, *result);
                 AttemptStatus::Declined
             }
             Err(CardProcessorError::Unknown) | Err(CardProcessorError::Configuration) => {

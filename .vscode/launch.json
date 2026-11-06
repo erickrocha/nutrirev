@@ -16,10 +16,12 @@
             "cargo": {
                 "args": [
                     "build",
+                    "--bin=nutrirev",
+                    "--package=application",
                     "--manifest-path=${workspaceFolder}/backend/Cargo.toml"
                 ],
                 "filter": {
-                    "name": "backend",
+                    "name": "nutrirev",
                     "kind": "bin"
                 }
             },

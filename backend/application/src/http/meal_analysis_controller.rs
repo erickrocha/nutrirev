@@ -69,20 +69,18 @@ pub async fn analyze_meal(State(state): State<AppState>,Extension(current_user):
                 image_bytes = Some(bytes.to_vec());
             }
         } else if name == "meal_type" || name == "mealType" {
-            if let Ok(text) = field.text().await {
-                if !text.trim().is_empty() {
+            if let Ok(text) = field.text().await
+                && !text.trim().is_empty() {
                     meal_type_hint = Some(text.trim().to_string());
                 }
-            }
         } else if name == "daily_meal_id" || name == "dailyMealId" {
             if let Ok(text) = field.text().await {
                 daily_meal_id_raw = Some(text.trim().to_string());
             }
-        } else if name == "meal_date" || name == "mealDate" {
-            if let Ok(text) = field.text().await {
+        } else if (name == "meal_date" || name == "mealDate")
+            && let Ok(text) = field.text().await {
                 meal_date_raw = Some(text.trim().to_string());
             }
-        }
     }
 
     let raw_bytes = match image_bytes {

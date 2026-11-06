@@ -70,18 +70,15 @@ pub async fn analyze_body(
                 image_bytes = Some(bytes.to_vec());
             }
         } else if name == "gender" || name == "gender_hint" {
-            if let Ok(text) = field.text().await {
-                if !text.trim().is_empty() {
+            if let Ok(text) = field.text().await
+                && !text.trim().is_empty() {
                     gender_hint = Some(text.trim().to_string());
                 }
-            }
-        } else if name == "goal" || name == "goal_hint" {
-            if let Ok(text) = field.text().await {
-                if !text.trim().is_empty() {
+        } else if (name == "goal" || name == "goal_hint")
+            && let Ok(text) = field.text().await
+                && !text.trim().is_empty() {
                     goal_hint = Some(text.trim().to_string());
                 }
-            }
-        }
     }
 
     let raw_bytes = match image_bytes {

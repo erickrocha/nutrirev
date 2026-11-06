@@ -140,8 +140,10 @@ mod tests {
         use entity::user_entity;
         use sea_orm::MockExecResult;
 
-        std::env::set_var("SYSADMIN_EMAIL", "testadmin@afrodite.com");
-        std::env::set_var("SYSADMIN_PASSWORD", "secret123");
+        unsafe {
+            std::env::set_var("SYSADMIN_EMAIL", "testadmin@afrodite.com");
+            std::env::set_var("SYSADMIN_PASSWORD", "secret123");
+        }
 
         let db = MockDatabase::new(DatabaseBackend::MySql)
             // find_by_email query -> returns None
@@ -184,8 +186,10 @@ mod tests {
         use entity::user_entity;
         use sea_orm::MockExecResult;
 
-        std::env::set_var("SYSADMIN_EMAIL", "new-admin@nutrirev.com");
-        std::env::set_var("SYSADMIN_PASSWORD", "new-secret");
+        unsafe {
+            std::env::set_var("SYSADMIN_EMAIL", "new-admin@nutrirev.com");
+            std::env::set_var("SYSADMIN_PASSWORD", "new-secret");
+        }
 
         let db = MockDatabase::new(DatabaseBackend::MySql)
             // find_by_role query -> returns the existing SysAdmin (old email)

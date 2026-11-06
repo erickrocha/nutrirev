@@ -104,8 +104,7 @@ impl CustomerUseCase {
         // fixes the plan and opens the subscription from the payment screen.
         if let (Some(customer_id), Some(clinical_plan_id)) =
             (created.id, created.clinical_plan_id)
-        {
-            if let Err(e) = PaymentScheduleUseCase::start_subscription(
+            && let Err(e) = PaymentScheduleUseCase::start_subscription(
                 self.gateway.db(),
                 customer_id,
                 clinical_plan_id,
@@ -119,7 +118,6 @@ impl CustomerUseCase {
                     e.message
                 );
             }
-        }
 
         Ok(created)
     }
@@ -252,13 +250,12 @@ impl CustomerUseCase {
             return Err(BusinessError::new("Country code must contain two letters".to_string()));
         }
 
-        if let Ok(Some(existing_email_owner)) = self.gateway.find_by_email(email_trimmed).await {
-            if existing_email_owner.id != id {
+        if let Ok(Some(existing_email_owner)) = self.gateway.find_by_email(email_trimmed).await
+            && existing_email_owner.id != id {
                 let msg = "Customer with this email already exists".to_string();
                 log::error!("[CustomerUseCase::update] {}", msg);
                 return Err(BusinessError::new(msg));
             }
-        }
 
         entity.tax_id = match normalized_tax_id(entity.tax_id.as_deref()) {
             Ok(value) => value,

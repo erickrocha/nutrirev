@@ -16,24 +16,19 @@ impl QuotaManager {
     }
 
     pub async fn resolve_limit(&self, db: &DatabaseConnection) -> u32 {
-        if let TenantScope::Tenant(tenant_id) = tenant_scope() {
-            if let Ok(Some(tenant_plan)) = tenant_plan_entity::Entity::find()
+        if let TenantScope::Tenant(tenant_id) = tenant_scope()
+            && let Ok(Some(tenant_plan)) = tenant_plan_entity::Entity::find()
                 .filter(tenant_plan_entity::Column::TenantId.eq(tenant_id))
                 .filter(tenant_plan_entity::Column::Active.eq(true))
                 .one(db)
                 .await
-            {
-                if let Ok(Some(plan)) =
+                && let Ok(Some(plan)) =
                     business_plan_entity::Entity::find_by_id(tenant_plan.business_plan_id)
                         .one(db)
                         .await
-                {
-                    if plan.daily_ai_quota > 0 {
+                    && plan.daily_ai_quota > 0 {
                         return plan.daily_ai_quota as u32;
                     }
-                }
-            }
-        }
 
         Self::env_limit()
     }
