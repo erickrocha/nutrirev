@@ -7,10 +7,9 @@ COPY backend/application ./backend/application
 COPY backend/business ./backend/business
 COPY backend/entity ./backend/entity
 COPY backend/migration ./backend/migration
-COPY backend/src ./backend/src
 
 WORKDIR /build/backend
-RUN cargo build --release -p backend
+RUN cargo build --release -p application --bin nutrirev
 
 FROM debian:trixie-slim AS runtime
 RUN apt-get update \
@@ -18,7 +17,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --system --uid 10001 --create-home nutrirev
 
-COPY --from=builder /build/backend/target/release/backend /usr/local/bin/nutrirev-backend
+COPY --from=builder /build/backend/target/release/nutrirev /usr/local/bin/nutrirev-backend
 USER 10001
 ENV PORT=8080
 EXPOSE 8080
