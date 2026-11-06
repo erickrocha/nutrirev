@@ -131,7 +131,7 @@ impl CardTokenizer for StubTokenizer {
         };
         match self.outcome {
             Outcome::Captured => Ok(result),
-            Outcome::Declined => Err(CardProcessorError::Declined(result)),
+            Outcome::Declined => Err(CardProcessorError::Declined(Box::new(result))),
             Outcome::Unknown => Err(CardProcessorError::Unknown),
         }
     }

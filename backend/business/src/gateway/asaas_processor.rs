@@ -83,7 +83,7 @@ impl AsaasProcessor {
         if status.is_success() {
             Ok(payment)
         } else if status.is_client_error() {
-            Err(PaymentFailure::Rejected(payment))
+            Err(PaymentFailure::Rejected(Box::new(payment)))
         } else {
             Err(PaymentFailure::Unknown)
         }
@@ -204,7 +204,7 @@ impl CardProcessor for AsaasProcessor {
         match self.payment(body).await {
             Ok(payment) => Ok(payment.into_card_result()),
             Err(PaymentFailure::Rejected(payment)) => {
-                Err(CardProcessorError::Declined(payment.into_card_result()))
+                Err(CardProcessorError::Declined(Box::new(payment.into_card_result())))
             }
             Err(PaymentFailure::Unknown) => Err(CardProcessorError::Unknown),
         }
@@ -334,7 +334,7 @@ impl CardTokenizer for AsaasProcessor {
         match self.payment(body).await {
             Ok(payment) => Ok(payment.into_card_result()),
             Err(PaymentFailure::Rejected(payment)) => {
-                Err(CardProcessorError::Declined(payment.into_card_result()))
+                Err(CardProcessorError::Declined(Box::new(payment.into_card_result())))
             }
             Err(PaymentFailure::Unknown) => Err(CardProcessorError::Unknown),
         }
@@ -342,7 +342,7 @@ impl CardTokenizer for AsaasProcessor {
 }
 
 enum PaymentFailure {
-    Rejected(AsaasPayment),
+    Rejected(Box<AsaasPayment>),
     Unknown,
 }
 

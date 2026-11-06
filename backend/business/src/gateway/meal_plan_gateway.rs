@@ -44,8 +44,8 @@ impl MealPlanGateway {
 
         let mut query = tenant_select(MealPlanQuery::find(), meal_plan_entity::Column::TenantId);
 
-        if let Some(s) = search {
-            if !s.trim().is_empty() {
+        if let Some(s) = search
+            && !s.trim().is_empty() {
                 let pattern = format!("%{}%", s.trim());
                 query = query.filter(
                     meal_plan_entity::Column::Name
@@ -53,13 +53,11 @@ impl MealPlanGateway {
                         .or(meal_plan_entity::Column::Category.like(&pattern)),
                 );
             }
-        }
 
-        if let Some(cat) = category {
-            if !cat.trim().is_empty() {
+        if let Some(cat) = category
+            && !cat.trim().is_empty() {
                 query = query.filter(meal_plan_entity::Column::Category.eq(cat));
             }
-        }
 
         if let Some(pid) = patient_id {
             query = query.filter(meal_plan_entity::Column::PatientId.eq(pid));

@@ -50,6 +50,9 @@ pub async fn add(
     let use_case = TenantUseCase::new(TenantGateway::new(state.conn.as_ref().clone()));
     match use_case.create(domain).await {
         Ok(tenant) => Ok((StatusCode::CREATED, Json(TenantMapper::json(tenant)))),
+        Err(err) if err.message.contains("tax id") || err.message.contains("uq_tenant_tax_id") => {
+            Err(ExceptionResponse::BadRequest(locale, ErrorKey::TenantTaxIdInvalid))
+        }
         Err(_) => Err(ExceptionResponse::BadRequest(
             locale,
             ErrorKey::TenantCreatedFailed,
@@ -186,6 +189,8 @@ pub async fn update(
         Err(err) => {
             if err.message.contains("not found") {
                 Err(ExceptionResponse::NotFound(locale, ErrorKey::TenantNotFound))
+            } else if err.message.contains("tax id") || err.message.contains("uq_tenant_tax_id") {
+                Err(ExceptionResponse::BadRequest(locale, ErrorKey::TenantTaxIdInvalid))
             } else {
                 Err(ExceptionResponse::BadRequest(
                     locale,

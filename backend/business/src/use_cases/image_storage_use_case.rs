@@ -61,11 +61,10 @@ impl ImageStorageUseCase {
 
     /// Infers correct MIME Content-Type from extension if missing or generic.
     pub fn infer_content_type(extension: &str, content_type: Option<&str>) -> String {
-        if let Some(ct) = content_type {
-            if !ct.trim().is_empty() && ct != "application/octet-stream" {
+        if let Some(ct) = content_type
+            && !ct.trim().is_empty() && ct != "application/octet-stream" {
                 return ct.to_string();
             }
-        }
         let ext = extension.trim_start_matches('.').to_lowercase();
         match ext.as_str() {
             "webp" => "image/webp".to_string(),
@@ -217,10 +216,14 @@ mod tests {
 
     #[test]
     fn test_storage_mode_resolution() {
-        env::set_var("IMAGE_STORAGE_MODE", "base64");
+        unsafe {
+            env::set_var("IMAGE_STORAGE_MODE", "base64");
+        }
         assert_eq!(ImageStorageUseCase::get_storage_mode(), StorageMode::Base64);
 
-        env::set_var("IMAGE_STORAGE_MODE", "s3");
+        unsafe {
+            env::set_var("IMAGE_STORAGE_MODE", "s3");
+        }
         assert_eq!(ImageStorageUseCase::get_storage_mode(), StorageMode::S3);
     }
 }

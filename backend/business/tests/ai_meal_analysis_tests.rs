@@ -175,10 +175,14 @@ fn test_image_processor_rejects_empty_bytes() {
 #[test]
 fn test_quota_manager_env_limit_resolution() {
     let std_env_var = "MEAL_ANALYSIS_DAILY_QUOTA";
-    std::env::set_var(std_env_var, "42");
+    unsafe {
+        std::env::set_var(std_env_var, "42");
+    }
     assert_eq!(QuotaManager::env_limit(), 42);
 
-    std::env::remove_var(std_env_var);
+    unsafe {
+        std::env::remove_var(std_env_var);
+    }
     assert_eq!(QuotaManager::env_limit(), 50);
 }
 

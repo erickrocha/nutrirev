@@ -45,3 +45,4 @@ pub mod pix_payment_controller;
 pub mod payment_webhook_controller;
 pub mod recurring_payment_controller;
 pub mod payment_settings_controller;
+pub mod plan_order_controller;

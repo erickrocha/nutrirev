@@ -297,7 +297,7 @@ impl CardProcessor for StubProcessor {
         if self.approve {
             Ok(result)
         } else {
-            Err(CardProcessorError::Declined(result))
+            Err(CardProcessorError::Declined(Box::new(result)))
         }
     }
 }

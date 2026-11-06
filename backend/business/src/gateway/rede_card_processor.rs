@@ -94,7 +94,7 @@ impl CardProcessor for RedeSandboxProcessor {
         if result.approved {
             Ok(result)
         } else {
-            Err(CardProcessorError::Declined(result))
+            Err(CardProcessorError::Declined(Box::new(result)))
         }
     }
 }

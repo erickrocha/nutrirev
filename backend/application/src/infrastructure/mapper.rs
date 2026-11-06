@@ -156,23 +156,6 @@ fn country_code(value: Option<String>) -> Option<String> {
     optional_text(value).map(|value| value.to_uppercase())
 }
 
-#[cfg(test)]
-mod address_mapping_tests {
-    use super::{canonical_address, country_code, optional_text};
-
-    #[test]
-    fn canonical_address_wins_and_legacy_alias_fills_missing_value() {
-        assert_eq!(canonical_address(Some("  Campinas ".into()), Some("São Paulo".into())), Some("Campinas".into()));
-        assert_eq!(canonical_address(Some("  ".into()), Some(" São Paulo ".into())), Some("São Paulo".into()));
-    }
-
-    #[test]
-    fn optional_address_values_are_cleaned_and_country_is_uppercase() {
-        assert_eq!(optional_text(Some("  ".into())), None);
-        assert_eq!(country_code(Some(" br ".into())), Some("BR".into()));
-    }
-}
-
 impl Mapper<Tenant, TenantJson> for TenantMapper {
     fn json(t: Tenant) -> TenantJson {
         let province = t.administrative_area.clone();
@@ -182,6 +165,7 @@ impl Mapper<Tenant, TenantJson> for TenantMapper {
             id: t.id,
             uuid: t.uuid,
             name: t.name,
+            tax_id: t.tax_id,
             email: t.email,
             phone: t.phone,
             address_line1: t.address_line1,
@@ -209,6 +193,7 @@ impl Mapper<Tenant, TenantJson> for TenantMapper {
             id: u.id,
             uuid: u.uuid,
             name: u.name,
+            tax_id: optional_text(u.tax_id),
             email: optional_text(u.email),
             phone: optional_text(u.phone),
             address_line1: optional_text(u.address_line1),
@@ -916,6 +901,9 @@ impl Mapper<business::domain::ingredient::Ingredient, crate::http::json::ingredi
             fat: t.fat,
             fiber: t.fiber,
             taco_id: t.taco_id,
+            name_en: t.name_en,
+            source: t.source,
+            fdc_id: t.fdc_id,
             moisture: t.moisture,
             kj: t.kj,
             cholesterol: t.cholesterol,
@@ -959,6 +947,9 @@ impl Mapper<business::domain::ingredient::Ingredient, crate::http::json::ingredi
             fat: u.fat,
             fiber: u.fiber,
             taco_id: u.taco_id,
+            name_en: u.name_en,
+            source: u.source,
+            fdc_id: u.fdc_id,
             moisture: u.moisture,
             kj: u.kj,
             cholesterol: u.cholesterol,
@@ -1306,5 +1297,22 @@ impl PaymentChargeJsonMapper {
 
     pub fn json_vec(list: Vec<PaymentCharge>) -> Vec<PaymentChargeJson> {
         list.into_iter().map(Self::json).collect()
+    }
+}
+
+#[cfg(test)]
+mod address_mapping_tests {
+    use super::{canonical_address, country_code, optional_text};
+
+    #[test]
+    fn canonical_address_wins_and_legacy_alias_fills_missing_value() {
+        assert_eq!(canonical_address(Some("  Campinas ".into()), Some("São Paulo".into())), Some("Campinas".into()));
+        assert_eq!(canonical_address(Some("  ".into()), Some(" São Paulo ".into())), Some("São Paulo".into()));
+    }
+
+    #[test]
+    fn optional_address_values_are_cleaned_and_country_is_uppercase() {
+        assert_eq!(optional_text(Some("  ".into())), None);
+        assert_eq!(country_code(Some(" br ".into())), Some("BR".into()));
     }
 }

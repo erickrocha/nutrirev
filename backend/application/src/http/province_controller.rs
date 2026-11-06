@@ -34,11 +34,8 @@ fn normalize_country_code(value: &str) -> Option<String> {
     responses(
         (status = 200, description = "List of provinces", body = Vec<ProvinceJson>),
         (status = 400, description = "Missing or invalid country code", body = BadRequestErrorJson),
-        (status = 401, description = "Unauthorized", body = UnauthorizedErrorJson),
-        (status = 403, description = "Forbidden", body = ForbiddenErrorJson),
         (status = 500, description = "Internal server error", body = InternalServerErrorJson),
-    ),
-    security(("bearer_auth" = []))
+    )
 )]
 pub async fn list_all(
     state: State<AppState>,

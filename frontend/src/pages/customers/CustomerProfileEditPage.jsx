@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { ROLES } from '../../utils/enums';
+import { DEFAULT_PATH_BY_ROLE } from '../../router/routeConfig';
 import { updateCustomer, uploadCustomerPhoto } from '../../store/customerSlice';
 import { FilterableMultiSelect } from '../../components/common/FilterableMultiSelect';
 import {
@@ -100,8 +103,14 @@ export const CustomerProfileEditPage = () => {
   const [selectedConditions, setSelectedConditions] = useState([]);
   const [selectedDailyMeals, setSelectedDailyMeals] = useState([]);
 
+  const roleName = user?.role || '';
+  const isUserRole = roleName === ROLES.USER;
+
   // 1. Initial Load of Master Options and Current Customer Profile
   useEffect(() => {
+    if (!user || !isUserRole) {
+      return;
+    }
     const fetchMasterDataAndProfile = async () => {
       setLoading(true);
       setError(null);
@@ -184,7 +193,7 @@ export const CustomerProfileEditPage = () => {
     };
 
     fetchMasterDataAndProfile();
-  }, [user]);
+  }, [user, isUserRole]);
 
   const loadCitiesForProvince = async (provinceVal, provList = provincesList) => {
     if (!provinceVal) {
@@ -363,6 +372,11 @@ export const CustomerProfileEditPage = () => {
       setSaving(false);
     }
   };
+
+  if (user && !isUserRole) {
+    const fallback = DEFAULT_PATH_BY_ROLE[roleName] || DEFAULT_PATH_BY_ROLE.default;
+    return <Navigate to={fallback} replace />;
+  }
 
   if (loading) {
     return (

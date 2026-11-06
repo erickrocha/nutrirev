@@ -5,9 +5,12 @@ import { ArrowLeft, Building, ChevronRight, MapPin, Save, X } from 'lucide-react
 import { createTenant, updateTenant } from '../../store/tenantSlice';
 import { cityService, provinceService } from '../../services';
 import { FilterableMultiSelect } from '../../components/common/FilterableMultiSelect';
+import { maskTaxId } from '../../utils/format';
+import { isValidTaxId } from '../../utils/taxId';
 
 const emptyTenantForm = {
   name: '',
+  taxId: '',
   email: '',
   phone: '',
   addressLine1: '',
@@ -104,6 +107,7 @@ export const TenantFormPage = ({ editingTenant = null, onBack, onSaveSuccess }) 
       const administrativeArea = editingTenant?.administrativeArea || editingTenant?.province || '';
       setFormData(editingTenant ? {
         name: editingTenant.name || '',
+        taxId: maskTaxId(editingTenant.taxId),
         email: editingTenant.email || '',
         phone: editingTenant.phone || '',
         addressLine1: editingTenant.addressLine1 || '',
@@ -146,6 +150,11 @@ export const TenantFormPage = ({ editingTenant = null, onBack, onSaveSuccess }) 
     setError(null);
     if (!formData.name.trim()) {
       setError(t('tenants.nameRequired'));
+      return;
+    }
+
+    if (formData.taxId.trim() && !isValidTaxId(formData.taxId)) {
+      setError(t('tenants.taxIdInvalid'));
       return;
     }
 
@@ -193,8 +202,9 @@ export const TenantFormPage = ({ editingTenant = null, onBack, onSaveSuccess }) 
           <h3 style={{ fontFamily: "'Jost', sans-serif", fontSize: '1.1rem', color: 'var(--accent-primary)', margin: '0 0 20px', paddingBottom: '8px', borderBottom: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Building size={18} /> {t('tenants.clinicDetails')}
           </h3>
-          <div>
-            <div style={{ marginBottom: '20px' }}><label style={labelStyle}>{t('tenants.clinicName')}</label><input style={fieldStyle} value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} required /></div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(180px, 1fr) minmax(240px, 2fr)', gap: '20px', marginBottom: '20px' }}>
+            <div><label style={labelStyle}>{t('tenants.taxId')}</label><input style={fieldStyle} inputMode="numeric" autoComplete="off" placeholder="00.000.000/0000-00" value={formData.taxId} onChange={(event) => setFormData({ ...formData, taxId: maskTaxId(event.target.value) })} /></div>
+            <div><label style={labelStyle}>{t('tenants.clinicName')}</label><input style={fieldStyle} value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} required /></div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
             <div><label style={labelStyle}>{t('common.email')}</label><input style={fieldStyle} type="email" value={formData.email} onChange={(event) => setFormData({ ...formData, email: event.target.value })} /></div>

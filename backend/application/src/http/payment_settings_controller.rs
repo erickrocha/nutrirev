@@ -318,7 +318,7 @@ fn staff_scope(
 ) -> Result<i32, ExceptionResponse> {
     let forbidden = || ExceptionResponse::Forbidden(locale, ErrorKey::PaymentChargeForbidden);
     match user.role {
-        Role::SysAdmin => requested_tenant_id.filter(|id| *id > 0).ok_or_else(|| {
+        Role::SysAdmin => requested_tenant_id.filter(|id| *id > 0).ok_or({
             ExceptionResponse::BadRequest(locale, ErrorKey::InvalidParameterValue)
         }),
         Role::TenantOwner | Role::TenantUser => {

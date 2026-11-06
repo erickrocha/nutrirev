@@ -1,7 +1,7 @@
 use crate::authentication::authentication_middleware::authentication;
 use crate::http::catalog_csv_import_controller::import_ingredients;
 use crate::http::ingredient_controller::{
-    add, delete as delete_ingredient, get_by_id, get_by_uuid, list_all, update,
+    add, delete as delete_ingredient, get_by_id, get_by_uuid, list_all, list_by_ids, search, update,
 };
 use crate::AppState;
 use axum::extract::DefaultBodyLimit;
@@ -15,6 +15,8 @@ pub fn ingredient_routes(state: AppState) -> Router<AppState> {
         .route("/", post(add))
         .route("/import", post(import_ingredients))
         .route("/", get(list_all))
+        .route("/search", get(search))
+        .route("/by-ids", get(list_by_ids))
         .route("/{id}", get(get_by_id))
         .route("/uuid/{uuid}", get(get_by_uuid))
         .route("/{id}", put(update))

@@ -3,14 +3,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { FileText, Star, AlertCircle, ChevronDown, ChevronUp, Utensils } from 'lucide-react';
 import { fetchMealPlansPaginated } from '../../store/mealPlanSlice';
-import { fetchIngredients } from '../../store/ingredientSlice';
+import { fetchIngredientsByIds } from '../../store/ingredientSlice';
+import { ingredientName as localizedName } from '../../utils/ingredients';
 import { mealPlanCategoryLabel } from './mealPlanCategories';
 import { customerService } from '../../services/api';
 import { enumLabel } from '../../utils/enums';
 
 export const MyMealPlanPage = () => {
   const dispatch = useDispatch();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.startsWith('en') ? 'en' : 'pt';
   const { mealPlans: plans, loading, error: reduxError } = useSelector((state) => state.mealPlan);
   const { ingredientsList } = useSelector((state) => state.ingredient);
 
@@ -31,10 +33,17 @@ export const MyMealPlanPage = () => {
 
   useEffect(() => {
     loadPlans();
-    dispatch(fetchIngredients());
-  }, [loadPlans, dispatch]);
+  }, [loadPlans]);
 
-  const ingredientName = (id) => ingredientsList.find((i) => i.id === id)?.name || `Ingrediente #${id}`;
+  // Só os ingredientes usados nos planos exibidos (o catálogo global é grande).
+  useEffect(() => {
+    const ids = (plans || []).flatMap((plan) =>
+      (plan.meals || []).flatMap((meal) => (meal.options || []).flatMap((opt) => (opt.items || []).map((it) => it.ingredientId)))
+    );
+    if (ids.length) dispatch(fetchIngredientsByIds(ids));
+  }, [plans, dispatch]);
+
+  const ingredientName = (id) => localizedName(ingredientsList.find((i) => i.id === id), lang) || `Ingrediente #${id}`;
 
   return (
     <div className="my-meal-plan-page">

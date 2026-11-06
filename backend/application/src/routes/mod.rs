@@ -42,3 +42,4 @@ pub mod payment_webhook_routes;
 pub mod pix_payment_routes;
 pub mod recurring_payment_routes;
 pub mod payment_settings_routes;
+pub mod plan_order_routes;

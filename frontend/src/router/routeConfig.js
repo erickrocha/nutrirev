@@ -21,6 +21,8 @@ export const PATHS = {
   BUSINESS_PLANS: '/admin/business-plans',
   BUSINESS_PLAN_NEW: '/admin/business-plans/new',
   BUSINESS_PLAN_EDIT: '/admin/business-plans/:id/edit',
+  PLAN_ORDERS: '/admin/orders',
+  PLAN_ORDER_DETAIL: '/admin/orders/:uuid',
   PAYMENT_CONNECTIONS: '/admin/payment-connections',
   USERS: '/users',
   TENANTS: '/tenants',
@@ -82,21 +84,20 @@ const NON_SYSADMIN_PATHS = [
 
 export const ROLE_ALLOWED_PATHS = {
   [ROLES.USER]: [PATHS.HOME, PATHS.MY_MEAL_PLAN, PATHS.DAILY, PATHS.MANUAL_MEAL_ANALYSIS, PATHS.EAT, PATHS.EAT_DETAIL, PATHS.PAYMENTS, PATHS.SETTINGS],
-  // SETTINGS (Topbar's "Editar Perfil") is reachable by every role, matching
-  // the old unrestricted 'edit_profile' tab behavior.
-  [ROLES.TENANT_USER]: [...TENANT_USER_PATHS, PATHS.SETTINGS],
-  [ROLES.TENANT_OWNER]: [...NON_SYSADMIN_PATHS, PATHS.SETTINGS],
+  [ROLES.TENANT_USER]: [...TENANT_USER_PATHS],
+  [ROLES.TENANT_OWNER]: [...NON_SYSADMIN_PATHS],
   [ROLES.SYS_ADMIN]: [
     PATHS.SYSADMIN_DASHBOARD,
     PATHS.BUSINESS_PLANS,
     PATHS.BUSINESS_PLAN_NEW,
     PATHS.BUSINESS_PLAN_EDIT,
+    PATHS.PLAN_ORDERS,
+    PATHS.PLAN_ORDER_DETAIL,
     // Provisioning acquirer connections is the platform operator's alone: the
     // secret pointer names a deployment secret, not a clinic-settable value.
     PATHS.PAYMENT_CONNECTIONS,
     PATHS.TENANTS,
     ...NON_SYSADMIN_PATHS,
-    PATHS.SETTINGS,
   ],
 };
 

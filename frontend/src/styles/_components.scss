@@ -831,7 +831,7 @@
       .brand-wordmark {
         font-size: 1.9rem;
 
-        // Azul sobre azul não lê: no painel escuro o "fit" vira amarelo.
+        // Azul sobre azul não lê: no painel escuro o "rev" vira amarelo.
         b { color: var(--accent-secondary); }
       }
 
@@ -1340,7 +1340,10 @@
 .main-sidebar {
   width: 280px;
   box-sizing: border-box;
-  background-color: var(--bg-alt);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent-primary) 16%, #fff) 0%,
+    #fff 50%,
+    color-mix(in srgb, var(--accent-secondary) 28%, #fff) 100%);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -5504,4 +5507,10 @@
     accent-color: var(--accent-primary);
     cursor: inherit;
   }
+}
+
+.login-split-right {
+  position: relative;
+
+  .login-lang { position: absolute; top: 1.25rem; right: 1.5rem; font-size: 0.875rem; }
 }

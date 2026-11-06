@@ -4,6 +4,16 @@ use crate::domain::business_error::BusinessError;
 use crate::domain::tenant::{Tenant, TenantEntityMapper};
 use crate::gateway::tenant_gateway::TenantGateway;
 
+/// Digits-only CPF/CNPJ, `None` when blank, error when the format or check digits are wrong.
+pub fn normalized_tax_id(raw: Option<&str>) -> Result<Option<String>, BusinessError> {
+    match raw.map(str::trim).filter(|value| !value.is_empty()) {
+        None => Ok(None),
+        Some(value) => crate::domain::tax_id::normalize(value)
+            .map(Some)
+            .ok_or_else(|| BusinessError::new("Tenant tax id is not a valid CPF or CNPJ".to_string())),
+    }
+}
+
 fn valid_country_code(value: &Option<String>) -> bool {
     value.as_ref().is_none_or(|code| code.len() == 2 && code.chars().all(|c| c.is_ascii_alphabetic()))
 }
@@ -17,7 +27,7 @@ impl TenantUseCase {
         Self { gateway }
     }
 
-    pub async fn create(&self, tenant: Tenant) -> Result<Tenant, BusinessError> {
+    pub async fn create(&self, mut tenant: Tenant) -> Result<Tenant, BusinessError> {
         log::info!("[TenantUseCase::create] Executing create tenant for name: {:?}", tenant.name);
 
         if tenant.name.as_ref().is_none_or(|n| n.trim().is_empty()) {
@@ -28,6 +38,7 @@ impl TenantUseCase {
         if !valid_country_code(&tenant.country_code) {
             return Err(BusinessError::new("Country code must contain two letters".to_string()));
         }
+        tenant.tax_id = normalized_tax_id(tenant.tax_id.as_deref())?;
 
         let entity = self
             .gateway
@@ -104,7 +115,7 @@ impl TenantUseCase {
         Ok(TenantEntityMapper::from_models(entities))
     }
 
-    pub async fn update(&self, id: i32, tenant: Tenant) -> Result<Tenant, BusinessError> {
+    pub async fn update(&self, id: i32, mut tenant: Tenant) -> Result<Tenant, BusinessError> {
         log::info!("[TenantUseCase::update] Executing update for id {}: {:?}", id, tenant.name);
 
         let existing = match self.find_by_id(id).await {
@@ -123,6 +134,7 @@ impl TenantUseCase {
         if !valid_country_code(&tenant.country_code) {
             return Err(BusinessError::new("Country code must contain two letters".to_string()));
         }
+        tenant.tax_id = normalized_tax_id(tenant.tax_id.as_deref())?;
         if tenant.payment_grace_days.is_some_and(|days| days < 0) {
             return Err(BusinessError::new("Payment grace days cannot be negative".to_string()));
         }
@@ -131,6 +143,7 @@ impl TenantUseCase {
             id: Some(id),
             uuid: existing.uuid,
             name: tenant.name,
+            tax_id: tenant.tax_id,
             email: tenant.email,
             phone: tenant.phone,
             address_line1: tenant.address_line1,

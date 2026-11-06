@@ -2,6 +2,7 @@ use crate::commons::entity_mapper::EntityMapper;
 use crate::commons::gateway::Gateway;
 use crate::domain::business_error::BusinessError;
 use crate::domain::ingredient::{Ingredient, IngredientEntityMapper};
+use crate::domain::ingredient_search::IngredientSearch;
 use crate::gateway::ingredient_gateway::IngredientGateway;
 
 pub struct IngredientUseCase {
@@ -47,8 +48,15 @@ impl IngredientUseCase {
                 return Err(e);
             }
         };
+        // O catálogo global (TACO, sem tenant) só pode ser alterado por quem não é restrito a um tenant.
+        if existing.tenant_id.is_none() && matches!(entity::audit::tenant_scope(), entity::audit::TenantScope::Tenant(_)) {
+            let msg = format!("Ingredient not found with id {}", id);
+            log::error!("[IngredientUseCase::update] Global catalog ingredient is read-only for tenants: {}", msg);
+            return Err(BusinessError::new(msg));
+        }
         entity.id = Some(id);
         entity.uuid = existing.uuid;
+        entity.tenant_id = existing.tenant_id;
         let active = self
             .gateway
             .persist(entity)
@@ -59,6 +67,26 @@ impl IngredientUseCase {
                 BusinessError::new(msg)
             })?;
         Ok(IngredientEntityMapper::from_active_model(active))
+    }
+
+    pub async fn search(&self, search: &IngredientSearch) -> Result<(Vec<Ingredient>, u64), BusinessError> {
+        log::info!("[IngredientUseCase::search] Executing for terms: {:?}", search.terms);
+        let (rows, total) = self.gateway.search(search).await.map_err(|e| {
+            let msg = format!("Database error: {}", e);
+            log::error!("[IngredientUseCase::search] {}", msg);
+            BusinessError::new(msg)
+        })?;
+        Ok((rows.into_iter().map(IngredientEntityMapper::from_model).collect(), total))
+    }
+
+    pub async fn find_by_ids(&self, ids: &[i32]) -> Result<Vec<Ingredient>, BusinessError> {
+        log::info!("[IngredientUseCase::find_by_ids] Executing for {} ids", ids.len());
+        let rows = self.gateway.find_by_ids(ids).await.map_err(|e| {
+            let msg = format!("Database error: {}", e);
+            log::error!("[IngredientUseCase::find_by_ids] {}", msg);
+            BusinessError::new(msg)
+        })?;
+        Ok(rows.into_iter().map(IngredientEntityMapper::from_model).collect())
     }
 
     pub async fn find_by_id(&self, id: i32) -> Result<Ingredient, BusinessError> {

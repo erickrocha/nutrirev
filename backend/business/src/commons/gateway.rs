@@ -23,6 +23,23 @@ where
     }
 }
 
+/// Like `tenant_select`, but a tenant also sees the shared rows (`tenant_column IS NULL`),
+/// e.g. the global TACO ingredient catalog.
+pub fn tenant_or_global_select<E, C>(query: Select<E>, tenant_column: C) -> Select<E>
+where
+    E: EntityTrait,
+    C: ColumnTrait,
+{
+    match entity::audit::tenant_scope() {
+        entity::audit::TenantScope::Tenant(id) => query.filter(
+            sea_orm::Condition::any()
+                .add(tenant_column.eq(id))
+                .add(tenant_column.is_null()),
+        ),
+        _ => tenant_select(query, tenant_column),
+    }
+}
+
 pub fn tenant_delete<E, C>(query: DeleteMany<E>, tenant_column: C) -> DeleteMany<E>
 where
     E: EntityTrait,

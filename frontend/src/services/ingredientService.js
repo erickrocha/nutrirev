@@ -5,6 +5,16 @@ export const ingredientService = {
     const response = await api.get('/ingredient');
     return response.data;
   },
+  // Busca paginada no servidor: sem acento, em português ou inglês. Devolve { items, total }.
+  async search({ q = '', lang = 'pt', limit = 20, offset = 0 } = {}) {
+    const response = await api.get('/ingredient/search', { params: { q, lang, limit, offset } });
+    return response.data;
+  },
+  async getByIds(ids) {
+    if (!ids?.length) return [];
+    const response = await api.get('/ingredient/by-ids', { params: { ids: ids.join(',') } });
+    return response.data;
+  },
   async getById(id) {
     const response = await api.get(`/ingredient/${id}`);
     return response.data;

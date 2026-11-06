@@ -143,8 +143,8 @@ impl SqsConsumerUseCase {
 
         let target_folder = parts[1]; // e.g. "customer-12" or "eat-5"
         if let Some(id_str) = target_folder.strip_prefix("customer-") {
-            if let Ok(customer_id) = id_str.parse::<i32>() {
-                if let Ok(Some(model)) = customer_entity::Entity::find()
+            if let Ok(customer_id) = id_str.parse::<i32>()
+                && let Ok(Some(model)) = customer_entity::Entity::find()
                     .filter(customer_entity::Column::Id.eq(customer_id))
                     .one(db)
                     .await
@@ -154,10 +154,9 @@ impl SqsConsumerUseCase {
                     let _ = active.update(db).await;
                     log::info!("[SqsConsumerUseCase::update_entity_photo] Updated customer id={} photo to '{}'", customer_id, object_key);
                 }
-            }
-        } else if let Some(id_str) = target_folder.strip_prefix("eat-") {
-            if let Ok(eat_id) = id_str.parse::<i32>() {
-                if let Ok(Some(model)) = eat_entity::Entity::find()
+        } else if let Some(id_str) = target_folder.strip_prefix("eat-")
+            && let Ok(eat_id) = id_str.parse::<i32>()
+                && let Ok(Some(model)) = eat_entity::Entity::find()
                     .filter(eat_entity::Column::Id.eq(eat_id))
                     .one(db)
                     .await
@@ -167,18 +166,15 @@ impl SqsConsumerUseCase {
                     let _ = active.update(db).await;
                     log::info!("[SqsConsumerUseCase::update_entity_photo] Updated eat id={} photo to '{}'", eat_id, object_key);
                 }
-            }
-        }
 
         Ok(())
     }
 
     fn unwrap_sns_envelope(body: &str) -> String {
-        if let Ok(envelope) = serde_json::from_str::<SnsEnvelope>(body) {
-            if envelope.message.trim_start().starts_with('{') {
+        if let Ok(envelope) = serde_json::from_str::<SnsEnvelope>(body)
+            && envelope.message.trim_start().starts_with('{') {
                 return envelope.message;
             }
-        }
         body.to_string()
     }
 }

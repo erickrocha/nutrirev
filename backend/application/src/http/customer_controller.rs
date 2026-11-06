@@ -283,13 +283,13 @@ pub async fn issue_invite(
 
     let user_id = customer
         .user_id
-        .ok_or_else(|| ExceptionResponse::BadRequest(locale, ErrorKey::InvalidParameterValue))?;
+        .ok_or(ExceptionResponse::BadRequest(locale, ErrorKey::InvalidParameterValue))?;
 
     let user = entity::user_entity::Entity::find_by_id(user_id)
         .one(state.conn.as_ref())
         .await
         .map_err(|_| ExceptionResponse::BadRequest(locale, ErrorKey::InvalidParameterValue))?
-        .ok_or_else(|| ExceptionResponse::NotFound(locale, ErrorKey::RequiredParameterMissing))?;
+        .ok_or(ExceptionResponse::NotFound(locale, ErrorKey::RequiredParameterMissing))?;
 
     match AccountInviteUseCase::issue(&user) {
         Ok(invite) => Ok(Json(AccountInviteJson {
@@ -339,7 +339,7 @@ pub async fn delete_me(
 
     let customer_id = customer
         .id
-        .ok_or_else(|| ExceptionResponse::NotFound(locale, ErrorKey::RequiredParameterMissing))?;
+        .ok_or(ExceptionResponse::NotFound(locale, ErrorKey::RequiredParameterMissing))?;
 
     match use_case.delete_account(state.conn.as_ref(), customer_id).await {
         Ok(receipt) => Ok(Json(AccountDeletionJson {

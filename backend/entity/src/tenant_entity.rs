@@ -8,6 +8,8 @@ pub struct Model {
     #[sea_orm(unique)]
     pub uuid: Vec<u8>,
     pub name: Option<String>,
+    /// CPF/CNPJ, somente dígitos.
+    pub tax_id: Option<String>,
     pub email: Option<String>,
     pub phone: Option<String>,
     pub address_line1: Option<String>,

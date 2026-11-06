@@ -9,6 +9,8 @@ const TenantDashboardPage = lazy(() => import('../pages/dashboard/TenantDashboar
 const SysAdminDashboardPage = lazy(() => import('../pages/dashboard/SysAdminDashboardPage').then((module) => ({ default: module.SysAdminDashboardPage })));
 const BusinessPlanManagement = lazy(() => import('../pages/admin/BusinessPlanManagement').then((module) => ({ default: module.BusinessPlanManagement })));
 const BusinessPlanFormPage = lazy(() => import('../pages/admin/BusinessPlanFormPage').then((module) => ({ default: module.BusinessPlanFormPage })));
+const PlanOrderManagement = lazy(() => import('../pages/admin/PlanOrderManagement').then((module) => ({ default: module.PlanOrderManagement })));
+const PlanOrderDetailPage = lazy(() => import('../pages/admin/PlanOrderDetailPage').then((module) => ({ default: module.PlanOrderDetailPage })));
 const PaymentConnectionManagement = lazy(() => import('../pages/admin/PaymentConnectionManagement').then((module) => ({ default: module.PaymentConnectionManagement })));
 const CustomerManagement = lazy(() => import('../pages/customers/CustomerManagement').then((module) => ({ default: module.CustomerManagement })));
 const CustomerGoalSettingManagement = lazy(() => import('../pages/customers/CustomerGoalSettingManagement').then((module) => ({ default: module.CustomerGoalSettingManagement })));
@@ -59,6 +61,8 @@ export const AppRoutes = () => (
       <Route path={PATHS.BUSINESS_PLANS} element={<BusinessPlanManagement />} />
       <Route path={PATHS.BUSINESS_PLAN_NEW} element={<BusinessPlanFormPage />} />
       <Route path={PATHS.BUSINESS_PLAN_EDIT} element={<BusinessPlanFormPage />} />
+      <Route path={PATHS.PLAN_ORDERS} element={<PlanOrderManagement />} />
+      <Route path={PATHS.PLAN_ORDER_DETAIL} element={<PlanOrderDetailPage />} />
       <Route path={PATHS.PAYMENT_CONNECTIONS} element={<PaymentConnectionManagement />} />
       <Route path={PATHS.USERS} element={<UserManagement />} />
       <Route path={PATHS.TENANTS} element={<TenantManagement />} />

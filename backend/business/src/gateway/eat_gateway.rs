@@ -58,8 +58,8 @@ impl EatGateway {
 
         let mut query = tenant_select(EatQuery::find(), eat_entity::Column::TenantId);
 
-        if let Some(s) = search {
-            if !s.trim().is_empty() {
+        if let Some(s) = search
+            && !s.trim().is_empty() {
                 let pattern = format!("%{}%", s.trim());
                 query = query.filter(
                     eat_entity::Column::Name
@@ -67,13 +67,11 @@ impl EatGateway {
                         .or(eat_entity::Column::Description.like(&pattern)),
                 );
             }
-        }
 
-        if let Some(period) = recommended_period {
-            if !period.trim().is_empty() {
+        if let Some(period) = recommended_period
+            && !period.trim().is_empty() {
                 query = query.filter(eat_entity::Column::RecommendedPeriod.eq(period));
             }
-        }
 
         if let Some(highlight) = is_highlight {
             query = query.filter(eat_entity::Column::IsHighlight.eq(highlight));

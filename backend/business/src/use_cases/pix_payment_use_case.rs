@@ -256,8 +256,8 @@ impl PixPaymentUseCase {
 
         // The provider tells us *that* something happened; our own row is what
         // says how much was owed. A mismatch is never settled automatically.
-        if let Some(paid) = provider_amount_cents {
-            if paid != current.amount_cents {
+        if let Some(paid) = provider_amount_cents
+            && paid != current.amount_cents {
                 let mut mismatched = current.into_active_model();
                 mismatched.status = Set(AttemptStatus::Unknown.as_str().to_owned());
                 mismatched
@@ -269,7 +269,6 @@ impl PixPaymentUseCase {
                     .map_err(|_| error("Unable to flag Pix mismatch"))?;
                 return Err(error("Pix amount does not match the charge"));
             }
-        }
 
         let next = match status {
             PixStatus::Paid => AttemptStatus::Captured,

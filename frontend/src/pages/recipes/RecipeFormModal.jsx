@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { X, Plus, Trash2, Save, Utensils, Image, Video, Upload, AlertCircle, ArrowLeft, ChevronRight } from 'lucide-react';
-import { fetchIngredients, fetchCycles } from '../../store/ingredientSlice';
+import { fetchIngredients, fetchIngredientsByIds, fetchCycles, searchIngredients } from '../../store/ingredientSlice';
+import { ingredientPickerOptions } from '../../utils/ingredients';
 import { uploadRecipePhoto } from '../../store/recipeSlice';
 import { ENUM_VALUES, enumLabel } from '../../utils/enums';
 import { FilterableMultiSelect } from '../../components/common/FilterableMultiSelect';
@@ -10,8 +11,9 @@ import { StyledInput } from '../../components/common/StyledInput';
 
 export const RecipeFormModal = ({ isOpen, onClose, onSave, recipeToEdit = null, presentation = 'modal' }) => {
   const dispatch = useDispatch();
-  const { t } = useTranslation();
-  const { ingredientsList: availableIngredients } = useSelector(
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.startsWith('en') ? 'en' : 'pt';
+  const { ingredientsList: availableIngredients, ingredientOptions } = useSelector(
     (state) => state.ingredient
   );
 
@@ -43,8 +45,9 @@ export const RecipeFormModal = ({ isOpen, onClose, onSave, recipeToEdit = null, 
 
   useEffect(() => {
     if (isOpen) {
-      dispatch(fetchIngredients());
+      dispatch(fetchIngredients(lang));
       dispatch(fetchCycles());
+      dispatch(fetchIngredientsByIds((recipeToEdit?.ingredients || []).map((ing) => ing.ingredientId || ing.ingredient?.id)));
       if (recipeToEdit) {
         setFormData({
           name: recipeToEdit.name || '',
@@ -81,7 +84,7 @@ export const RecipeFormModal = ({ isOpen, onClose, onSave, recipeToEdit = null, 
         resetForm();
       }
     }
-  }, [isOpen, recipeToEdit, dispatch]);
+  }, [isOpen, recipeToEdit, dispatch, lang]);
 
   const resetForm = () => {
     setFormData({
@@ -509,10 +512,10 @@ export const RecipeFormModal = ({ isOpen, onClose, onSave, recipeToEdit = null, 
                     <div key={idx} style={{ display: 'grid', gridTemplateColumns: '3fr 1.6fr 1fr 36px', gap: '0.6rem', alignItems: 'center' }}>
                       <FilterableMultiSelect
                         label=""
-                        options={availableIngredients.map((item) => ({
-                          id: item.id,
-                          name: item.name ? `${item.name}${item.kcal ? ` (${item.kcal} kcal)` : ''}` : `Item #${item.id}`,
-                        }))}
+                        options={ingredientPickerOptions(ing.ingredientId, availableIngredients, ingredientOptions, lang, (item, name) =>
+                          name ? `${name}${item.kcal ? ` (${item.kcal} kcal)` : ''}` : `Item #${item.id}`
+                        )}
+                        onSearch={(q) => dispatch(searchIngredients({ q, lang }))}
                         selectedIds={ing.ingredientId ? [ing.ingredientId] : []}
                         onChange={(vals) => handleIngredientChange(idx, 'ingredientId', vals[0] || '')}
                         placeholder={t('recipes.selectIngredient', 'Selecionar ingrediente...')}

@@ -2,7 +2,7 @@ use crate::domain::card_submission::{CardProcessorResult, CardSubmission};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum CardProcessorError {
-    Declined(CardProcessorResult),
+    Declined(Box<CardProcessorResult>),
     Unknown,
     Configuration,
 }

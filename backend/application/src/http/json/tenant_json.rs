@@ -7,6 +7,8 @@ pub struct TenantJson {
     pub id: Option<i32>,
     pub uuid: Option<String>,
     pub name: Option<String>,
+    /// CPF or CNPJ; digits are stored, formatting is ignored.
+    pub tax_id: Option<String>,
     pub email: Option<String>,
     pub phone: Option<String>,
     pub address_line1: Option<String>,

@@ -26,3 +26,26 @@ export const LanguageSwitcher = () => {
     </button>
   );
 };
+
+// Botão compacto PT | EN para telas públicas (login, landing), fora do menu do usuário.
+export const LanguageToggle = ({ className = '' }) => {
+  const { i18n } = useTranslation();
+  const current = i18n.language?.startsWith('en') ? 'en' : 'pt';
+
+  return (
+    <div className={className} role="group" aria-label="Language" style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
+      <Globe size={16} aria-hidden="true" />
+      {['pt', 'en'].map((lng) => (
+        <button
+          key={lng}
+          type="button"
+          onClick={() => i18n.changeLanguage(lng)}
+          aria-pressed={current === lng}
+          style={{ background: 'none', border: 0, cursor: 'pointer', font: 'inherit', color: 'inherit', fontWeight: current === lng ? 700 : 400, opacity: current === lng ? 1 : 0.6 }}
+        >
+          {lng.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+};

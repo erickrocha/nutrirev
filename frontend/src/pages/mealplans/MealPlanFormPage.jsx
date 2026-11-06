@@ -16,7 +16,8 @@ import {
   User,
 } from 'lucide-react';
 import { fetchAllCustomers } from '../../store/customerSlice';
-import { fetchIngredients } from '../../store/ingredientSlice';
+import { fetchIngredients, fetchIngredientsByIds, searchIngredients } from '../../store/ingredientSlice';
+import { ingredientPickerOptions } from '../../utils/ingredients';
 import { doctorService } from '../../services/api';
 import { FilterableMultiSelect } from '../../components/common/FilterableMultiSelect';
 import { StyledInput } from '../../components/common/StyledInput';
@@ -77,10 +78,11 @@ const calculateOptionMacros = (items, availableIngredients) => {
 
 export const MealPlanFormPage = ({ editingPlan = null, onBack, onSaveSuccess }) => {
   const dispatch = useDispatch();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.startsWith('en') ? 'en' : 'pt';
 
   const { allCustomers: availablePatients } = useSelector((state) => state.customer);
-  const { ingredientsList: availableIngredients } = useSelector((state) => state.ingredient);
+  const { ingredientsList: availableIngredients, ingredientOptions } = useSelector((state) => state.ingredient);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -99,9 +101,9 @@ export const MealPlanFormPage = ({ editingPlan = null, onBack, onSaveSuccess }) 
 
   useEffect(() => {
     dispatch(fetchAllCustomers());
-    dispatch(fetchIngredients());
+    dispatch(fetchIngredients(lang));
     loadDoctors();
-  }, [dispatch]);
+  }, [dispatch, lang]);
 
   const loadDoctors = async () => {
     setLoadingDoctors(true);
@@ -119,6 +121,13 @@ export const MealPlanFormPage = ({ editingPlan = null, onBack, onSaveSuccess }) 
 
   useEffect(() => {
     if (editingPlan) {
+      dispatch(
+        fetchIngredientsByIds(
+          (editingPlan.meals || []).flatMap((m) =>
+            (m.options || []).flatMap((opt) => (opt.items || []).map((it) => it.ingredientId))
+          )
+        )
+      );
       setFormData({
         name: editingPlan.name || '',
         category: editingPlan.category || 'KeepFit',
@@ -172,7 +181,7 @@ export const MealPlanFormPage = ({ editingPlan = null, onBack, onSaveSuccess }) 
       ]);
     }
     setError('');
-  }, [editingPlan]);
+  }, [editingPlan, dispatch]);
 
   const handleAddMeal = () => {
     setMealsList((prev) => [
@@ -205,7 +214,7 @@ export const MealPlanFormPage = ({ editingPlan = null, onBack, onSaveSuccess }) 
   };
 
   const handleAddItemToMealOption = (mIdx, oIdx) => {
-    if (!availableIngredients || availableIngredients.length === 0) return;
+    if (!ingredientOptions || ingredientOptions.length === 0) return;
     setMealsList((prev) =>
       prev.map((meal, i) => {
         if (i !== mIdx) return meal;
@@ -218,7 +227,7 @@ export const MealPlanFormPage = ({ editingPlan = null, onBack, onSaveSuccess }) 
               items: [
                 ...opt.items,
                 {
-                  ingredientId: availableIngredients[0].id,
+                  ingredientId: ingredientOptions[0].id,
                   quantity: 100,
                   unit: 'Grams',
                 },
@@ -757,10 +766,10 @@ export const MealPlanFormPage = ({ editingPlan = null, onBack, onSaveSuccess }) 
                           <div key={itemIdx} style={{ display: 'grid', gridTemplateColumns: '3.5fr 1.2fr 0.8fr 34px', gap: '10px', marginBottom: '8px', alignItems: 'center' }}>
                             <FilterableMultiSelect
                               label=""
-                              options={availableIngredients.map((item) => ({ 
-                                id: item.id, 
-                                name: `${item.name} (${item.kcal || 0}kcal, P:${item.protein || 0}g, C:${item.carbs || 0}g, F:${item.fat || 0}g, Fi:${item.fiber || 0}g)` 
-                              }))}
+                              options={ingredientPickerOptions(it.ingredientId, availableIngredients, ingredientOptions, lang, (item, name) =>
+                                `${name} (${item.kcal || 0}kcal, P:${item.protein || 0}g, C:${item.carbs || 0}g, F:${item.fat || 0}g, Fi:${item.fiber || 0}g)`
+                              )}
+                              onSearch={(q) => dispatch(searchIngredients({ q, lang }))}
                               selectedIds={it.ingredientId ? [it.ingredientId] : []}
                               onChange={(vals) => handleItemChange(mIdx, oIdx, itemIdx, 'ingredientId', vals[0] || '')}
                               placeholder={t('mealPlanForm.selectIngredient', 'Ingrediente...')}
