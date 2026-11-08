@@ -1,5 +1,7 @@
 {
   "common": {
+    "previous": "Previous",
+    "next": "Next",
     "validatingSession": "Validating Session...",
     "loading": "Loading...",
     "saving": "Saving...",
@@ -36,7 +38,10 @@
     "table": "Table",
     "cardsView": "Cards view",
     "tableView": "Table view",
-    "back": "Back"
+    "back": "Back",
+    "view": "View",
+    "itemsPerPage": "Items per page",
+    "viewAll": "View all"
   },
   "auth": {
     "brandTagline": "Management for nutrition clinics",
@@ -142,7 +147,9 @@
     "noTenantGlobal": "No Tenant (Global)",
     "activeInSystem": "Active User in the System",
     "registerUser": "Register User",
-    "passwordRequired": "Password is required to register a new user."
+    "passwordRequired": "Password is required to register a new user.",
+    "errorLoading": "Could not load the users.",
+    "saveError": "Could not save the user."
   },
   "role": {
     "SysAdmin": "System Admin",
@@ -266,7 +273,8 @@
     "subscriptionSuccess": "Tenant subscription updated successfully.",
     "planSelected": "Selected",
     "taxId": "Tax ID (CPF/CNPJ)",
-    "taxIdInvalid": "Enter a valid CPF or CNPJ."
+    "taxIdInvalid": "Enter a valid CPF or CNPJ.",
+    "errorLoadingTenants": "Could not load the clinics."
   },
   "address": {
     "addressLine1": "Address line 1",
@@ -564,7 +572,10 @@
     "detailsTitle": "Nutritional Profile",
     "per100g": "Values per 100g",
     "viewDetails": "View Details",
-    "example": "Beans"
+    "example": "Beans",
+    "fieldRequired": "Required field.",
+    "numberInvalid": "Enter a number greater than or equal to zero.",
+    "tacoIdInvalid": "Enter a whole number."
   },
   "entities": {
     "loadingRecords": "Loading records...",
@@ -616,7 +627,8 @@
     "calories": "Calories",
     "protein": "Protein",
     "carbs": "Carbohydrates",
-    "fat": "Fat"
+    "fat": "Fat",
+    "title": "Daily log"
   },
   "eat": {
     "recipes": "Recipes",
@@ -727,7 +739,17 @@
     "confirmDeleteMsg": "Are you sure you want to delete doctor",
     "cannotBeUndone": "This action cannot be undone.",
     "errorLoading": "Error loading doctors list.",
-    "errorDeleting": "Error deleting doctor."
+    "errorDeleting": "Error deleting doctor.",
+    "doctorDetails": "Personal & Professional Details",
+    "noProvinceFound": "No state found",
+    "selectProvinceFirst": "Select the state first",
+    "loadingCities": "Loading cities...",
+    "searchCity": "Select the city...",
+    "noCityFound": "No city found",
+    "editTitle": "Edit Doctor",
+    "newTitle": "Register New Doctor",
+    "contact": "Contact",
+    "location": "Location"
   },
   "paymentDates": {
     "title": "Payment Dates",
@@ -757,20 +779,32 @@
     "reversalsTitle": "{{count}} reversed payment(s)",
     "reversalsHint": "The money went back to the customer (refund or chargeback) and the charge is owed again, keeping its original due date.",
     "reversalOn": "reversed on {{date}}",
-    "reversalsMore": "and {{count}} more"
+    "reversalsMore": "and {{count}} more",
+    "editPaymentDate": "Edit Payment Date",
+    "firstDueDateRequired": "The due date is required.",
+    "customerRequired": "Select the customer.",
+    "firstDueDateLabel": "First Due Date",
+    "selectCustomer": "Select a customer",
+    "selectPlan": "Select a plan"
   },
   "mealPointTiers": {
-    "title": "Meal Point Tiers (Gamification)",
-    "subtitle": "Manage points assigned to meals and deadlines for scoring.",
+    "title": "Point Tiers (Gamification)",
+    "subtitle": "Manage the points awarded to meals and the scoring deadlines.",
     "newTier": "New Point Tier",
     "searchPlaceholder": "Search by meal, time or points...",
     "loadingRecords": "Loading records...",
-    "emptyStateTitle": "No point tier found.",
+    "emptyStateTitle": "No point tiers found.",
     "emptyStateBtn": "Register First Tier",
     "dailyMeal": "Daily Meal",
     "deadlineTime": "Deadline Time",
     "points": "Points",
-    "editRecord": "Edit Tier"
+    "editRecord": "Edit Tier",
+    "editTier": "Edit Point Tier",
+    "dailyMealRequired": "Select the daily meal.",
+    "deadlineRequired": "The deadline time is required.",
+    "pointsInvalid": "Enter the points as a whole number.",
+    "selectDailyMeal": "Select a meal",
+    "pointsPlaceholder": "E.g. 10"
   },
   "customerProfile": {
     "title": "My Profile",
@@ -858,7 +892,14 @@
     "qtyPlaceholder": "Qty",
     "submitRegister": "Register Plan",
     "mainOption": "Main Option",
-    "optionPrefix": "Option "
+    "optionPrefix": "Option ",
+    "selectIngredient": "Ingredient...",
+    "noIngredientFound": "No ingredient",
+    "selectUnit": "Unit...",
+    "noUnitFound": "No unit",
+    "removeOption": "Remove option",
+    "loadError": "Could not load the meal plan.",
+    "nutritionistNote": "Nutritionist's note"
   },
   "sysAdminDashboard": {
     "title": "System Overview",
@@ -1031,7 +1072,9 @@
     "taxId": "CPF or CNPJ",
     "taxIdPlaceholder": "000.000.000-00",
     "taxIdRequired": "We need your taxpayer document to issue this charge. It is asked only once.",
-    "noMethodsOffered": "This clinic does not accept in-app payments yet. Please contact reception."
+    "noMethodsOffered": "This clinic does not accept in-app payments yet. Please contact reception.",
+    "invoice": "invoice",
+    "invoices": "invoices"
   },
   "paymentSettings": {
     "title": "Payment methods",
@@ -1298,7 +1341,8 @@
       "state": "Use the 2-letter code.",
       "accept": "You must accept the terms."
     },
-    "selectState": "Select the state"
+    "selectState": "Select the state",
+    "loadingPlan": "Loading plan…"
   },
   "planOrders": {
     "title": "Contract orders",
@@ -1325,5 +1369,118 @@
     "breadcrumb": "Orders",
     "detailLoadError": "Could not load the order.",
     "dueDateRequired": "Required field."
+  },
+  "clinicalPlans": {
+    "newPlan": "New Clinical Plan",
+    "editPlan": "Edit Clinical Plan",
+    "emptyStateTitle": "No clinical plans found.",
+    "emptyStateBtn": "Register First Plan",
+    "planName": "Plan Name",
+    "planNamePlaceholder": "E.g. Premium Quarterly Plan",
+    "price": "Price",
+    "renewPeriod": "Renewal Period (days)",
+    "renewPlaceholder": "E.g. 30",
+    "days": "{{count}} days",
+    "nameRequired": "The clinical plan name is required.",
+    "priceInvalid": "Enter a valid price.",
+    "renewInvalid": "Enter a whole number greater than zero."
+  },
+  "mealPlanAdmin": {
+    "title": "Meal Plans",
+    "subtitle": "Nutritional prescription, diet management and calorie goals",
+    "searchPlaceholder": "Search meal plans by name or category...",
+    "newPlan": "New Meal Plan",
+    "empty": "No meal plans found",
+    "emptyHint": "Try adjusting the search filters or create a new plan.",
+    "loading": "Loading meal plans...",
+    "mealsCount": "{{count}} meal(s)",
+    "deleteTitle": "Delete meal plan",
+    "deleteConfirm": "Are you sure you want to delete the plan \"{{name}}\"?",
+    "deleted": "Meal plan deleted successfully.",
+    "created": "Meal plan created successfully!",
+    "updated": "Meal plan updated successfully!",
+    "deleteError": "Could not delete the meal plan.",
+    "loadError": "Could not load the meal plans.",
+    "total": "Total of {{total}} plan(s) — Page {{page}} of {{pages}}",
+    "favorite": "Favorite",
+    "plans": "plan(s)"
+  },
+  "recipeAdmin": {
+    "title": "Recipes (Eat)",
+    "subtitle": "Dish catalog, yield and nutrition tables management",
+    "searchPlaceholder": "Search recipes by name or description...",
+    "newRecipe": "New Recipe",
+    "editRecipe": "Edit Recipe",
+    "empty": "No recipes found",
+    "emptyHint": "Try adjusting the search filters or create a new recipe.",
+    "loading": "Loading recipes...",
+    "allPeriods": "Period: All",
+    "allHighlights": "Highlight: All",
+    "onlyHighlight": "Only New/Highlight",
+    "normal": "Regular",
+    "perPage": "{{count}} per page",
+    "deleteTitle": "Delete recipe",
+    "deleteConfirm": "Are you sure you want to delete the recipe \"{{name}}\"?",
+    "deleted": "Recipe deleted successfully.",
+    "created": "Recipe created successfully!",
+    "updated": "Recipe updated successfully!",
+    "deleteError": "Could not delete the recipe.",
+    "loadError": "Could not load the recipes.",
+    "formLoadError": "Could not load the recipe.",
+    "serves": "Serves: {{count}} portion(s)",
+    "minutes": "{{count}} min",
+    "total": "Total of {{total}} recipe(s) — Page {{page}} of {{pages}}",
+    "name": "Recipe Name",
+    "namePlaceholder": "E.g. Fit Herb Omelette",
+    "nameRequired": "The recipe name is required.",
+    "price": "Price",
+    "photo": "Recipe Photo (S3 Upload)",
+    "changeImage": "Change Image",
+    "uploadImage": "Upload Image",
+    "video": "Video URL (YouTube)",
+    "time": "Prep Time (min)",
+    "portion": "Yield (portions)",
+    "period": "Recommended Period",
+    "highlight": "Highlight / New",
+    "description": "Detailed Description",
+    "descriptionPlaceholder": "Describe the recipe...",
+    "ingredients": "Recipe Ingredients",
+    "addIngredient": "Add ingredient",
+    "noIngredients": "No ingredients added.",
+    "steps": "Preparation Steps",
+    "addStep": "Add step",
+    "noSteps": "No steps added.",
+    "stepPlaceholder": "E.g. Mix the eggs and add the fine herbs...",
+    "restrictions": "Restrictions (comma separated)",
+    "restrictionsPlaceholder": "Gluten-Free, Lactose-Free",
+    "tags": "Tags (comma separated)",
+    "tagsPlaceholder": "High-Protein, Quick, Low Carb",
+    "invalidImage": "Please select a valid image (JPG, PNG).",
+    "imageTooLarge": "The cover photo must be at most 5MB.",
+    "saveError": "Error saving the recipe. Check the data provided.",
+    "removeStep": "Remove step",
+    "step": "Step {{n}}",
+    "items": "recipe(s)"
+  },
+  "select": {
+    "placeholder": "Select...",
+    "search": "Search...",
+    "noOptions": "No options found.",
+    "itemsSelected": "{{count}} item(s) selected",
+    "selectedCount_one": "{{count}} selected",
+    "selectedCount_other": "{{count}} selected",
+    "remove": "Remove",
+    "clearSelection": "Clear selection",
+    "clearSearch": "Clear search",
+    "optionsCount": "{{shown}} of {{total}} options",
+    "selectAll": "Select All",
+    "clearAll": "Clear"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "text": "The address you visited does not exist or has moved.",
+    "home": "Go to the start page",
+    "login": "Go to login",
+    "code": "404"
   }
 }

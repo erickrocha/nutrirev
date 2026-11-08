@@ -1,5 +1,7 @@
 {
   "common": {
+    "previous": "Anterior",
+    "next": "Próxima",
     "validatingSession": "Validando Sessão...",
     "loading": "Carregando...",
     "saving": "Salvando...",
@@ -36,7 +38,10 @@
     "table": "Tabela",
     "cardsView": "Visualização em Cards",
     "tableView": "Visualização em Tabela",
-    "back": "Voltar"
+    "back": "Voltar",
+    "view": "Ver",
+    "itemsPerPage": "Itens por página",
+    "viewAll": "Ver todos"
   },
   "auth": {
     "brandTagline": "Gestão para clínicas de nutrição",
@@ -142,7 +147,9 @@
     "noTenantGlobal": "Sem Clínica (Global)",
     "activeInSystem": "Usuário Ativo no Sistema",
     "registerUser": "Cadastrar Usuário",
-    "passwordRequired": "Senha é obrigatória para cadastrar um novo usuário."
+    "passwordRequired": "Senha é obrigatória para cadastrar um novo usuário.",
+    "errorLoading": "Não foi possível carregar os usuários.",
+    "saveError": "Não foi possível salvar o usuário."
   },
   "role": {
     "SysAdmin": "Administrador Sistema",
@@ -266,7 +273,8 @@
     "subscriptionSuccess": "Assinatura da clínica atualizada com sucesso.",
     "planSelected": "Selecionado",
     "taxId": "CPF/CNPJ",
-    "taxIdInvalid": "Informe um CPF ou CNPJ válido."
+    "taxIdInvalid": "Informe um CPF ou CNPJ válido.",
+    "errorLoadingTenants": "Não foi possível carregar as clínicas."
   },
   "address": {
     "addressLine1": "Endereço - linha 1",
@@ -564,7 +572,10 @@
     "detailsTitle": "Perfil Nutricional",
     "per100g": "Valores por 100g",
     "viewDetails": "Ver Detalhes",
-    "example": "Feijão"
+    "example": "Feijão",
+    "fieldRequired": "Campo obrigatório.",
+    "numberInvalid": "Informe um número maior ou igual a zero.",
+    "tacoIdInvalid": "Informe um número inteiro."
   },
   "entities": {
     "loadingRecords": "Carregando registros...",
@@ -616,7 +627,8 @@
     "calories": "Calorias",
     "protein": "Proteína",
     "carbs": "Carboidratos",
-    "fat": "Gordura"
+    "fat": "Gordura",
+    "title": "Diário"
   },
   "eat": {
     "recipes": "Receitas",
@@ -727,7 +739,17 @@
     "confirmDeleteMsg": "Tem certeza de que deseja excluir o nutricionista",
     "cannotBeUndone": "Esta ação não pode ser desfeita.",
     "errorLoading": "Erro ao carregar lista de nutricionistas.",
-    "errorDeleting": "Erro ao excluir nutricionista."
+    "errorDeleting": "Erro ao excluir nutricionista.",
+    "doctorDetails": "Dados Pessoais & Profissionais",
+    "noProvinceFound": "Nenhum estado encontrado",
+    "selectProvinceFirst": "Selecione o estado primeiro",
+    "loadingCities": "Carregando cidades...",
+    "searchCity": "Selecione a cidade...",
+    "noCityFound": "Nenhuma cidade encontrada",
+    "editTitle": "Editar Médico",
+    "newTitle": "Cadastrar Novo Médico",
+    "contact": "Contato",
+    "location": "Localização"
   },
   "paymentDates": {
     "title": "Datas de Pagamento",
@@ -757,7 +779,13 @@
     "reversalsTitle": "{{count}} pagamento(s) revertido(s)",
     "reversalsHint": "O dinheiro voltou ao cliente (estorno ou contestação) e a cobrança voltou a ser devida, mantendo o vencimento original.",
     "reversalOn": "revertido em {{date}}",
-    "reversalsMore": "e mais {{count}}"
+    "reversalsMore": "e mais {{count}}",
+    "editPaymentDate": "Editar Data de Pagamento",
+    "firstDueDateRequired": "A data de vencimento é obrigatória.",
+    "customerRequired": "Selecione o cliente.",
+    "firstDueDateLabel": "Primeira Data de Vencimento",
+    "selectCustomer": "Selecione um cliente",
+    "selectPlan": "Selecione um plano"
   },
   "mealPointTiers": {
     "title": "Níveis de Pontos (Gamificação)",
@@ -770,7 +798,13 @@
     "dailyMeal": "Refeição Diária",
     "deadlineTime": "Horário Limite",
     "points": "Pontos",
-    "editRecord": "Editar Nível"
+    "editRecord": "Editar Nível",
+    "editTier": "Editar Nível de Pontos",
+    "dailyMealRequired": "Selecione a refeição diária.",
+    "deadlineRequired": "O horário limite é obrigatório.",
+    "pointsInvalid": "Informe os pontos como um número inteiro.",
+    "selectDailyMeal": "Selecione uma refeição",
+    "pointsPlaceholder": "Ex: 10"
   },
   "customerProfile": {
     "title": "Meu Perfil",
@@ -858,7 +892,14 @@
     "qtyPlaceholder": "Qtd",
     "submitRegister": "Cadastrar Plano",
     "mainOption": "Opção Principal",
-    "optionPrefix": "Opção "
+    "optionPrefix": "Opção ",
+    "selectIngredient": "Ingrediente...",
+    "noIngredientFound": "Nenhum ingrediente",
+    "selectUnit": "Unidade...",
+    "noUnitFound": "Nenhuma unidade",
+    "removeOption": "Remover opção",
+    "loadError": "Não foi possível carregar o plano alimentar.",
+    "nutritionistNote": "Observação do nutricionista"
   },
   "sysAdminDashboard": {
     "title": "Visão Geral do Sistema",
@@ -1031,7 +1072,9 @@
     "taxId": "CPF ou CNPJ",
     "taxIdPlaceholder": "000.000.000-00",
     "taxIdRequired": "Precisamos do seu CPF para emitir a cobrança. Ele é solicitado uma única vez.",
-    "noMethodsOffered": "Esta clínica ainda não aceita pagamentos pelo aplicativo. Fale com a recepção."
+    "noMethodsOffered": "Esta clínica ainda não aceita pagamentos pelo aplicativo. Fale com a recepção.",
+    "invoice": "fatura",
+    "invoices": "faturas"
   },
   "paymentSettings": {
     "title": "Formas de pagamento",
@@ -1298,7 +1341,8 @@
       "state": "Use a sigla com 2 letras.",
       "accept": "É necessário aceitar os termos."
     },
-    "selectState": "Selecione o estado"
+    "selectState": "Selecione o estado",
+    "loadingPlan": "Carregando o plano…"
   },
   "planOrders": {
     "title": "Pedidos de contratação",
@@ -1325,5 +1369,118 @@
     "breadcrumb": "Pedidos",
     "detailLoadError": "Não foi possível carregar o pedido.",
     "dueDateRequired": "Campo obrigatório."
+  },
+  "clinicalPlans": {
+    "newPlan": "Novo Plano Clínico",
+    "editPlan": "Editar Plano Clínico",
+    "emptyStateTitle": "Nenhum plano clínico encontrado.",
+    "emptyStateBtn": "Cadastrar Primeiro Plano",
+    "planName": "Nome do Plano",
+    "planNamePlaceholder": "Ex: Plano Trimestral Premium",
+    "price": "Preço (R$)",
+    "renewPeriod": "Período de Rotação/Renovação (dias)",
+    "renewPlaceholder": "Ex: 30",
+    "days": "{{count}} dias",
+    "nameRequired": "O nome do plano clínico é obrigatório.",
+    "priceInvalid": "Informe um preço válido.",
+    "renewInvalid": "Informe um número inteiro maior que zero."
+  },
+  "mealPlanAdmin": {
+    "title": "Planos Alimentares",
+    "subtitle": "Prescrição nutricional, gestão de dietas e metas calóricas",
+    "searchPlaceholder": "Buscar plano alimentar por nome ou categoria...",
+    "newPlan": "Novo Plano Alimentar",
+    "empty": "Nenhum plano alimentar encontrado",
+    "emptyHint": "Tente ajustar os filtros de busca ou crie um novo plano.",
+    "loading": "Carregando planos alimentares...",
+    "mealsCount": "{{count}} refeição(ões)",
+    "deleteTitle": "Excluir plano alimentar",
+    "deleteConfirm": "Tem certeza que deseja excluir o plano \"{{name}}\"?",
+    "deleted": "Plano alimentar excluído com sucesso.",
+    "created": "Plano alimentar criado com sucesso!",
+    "updated": "Plano alimentar atualizado com sucesso!",
+    "deleteError": "Não foi possível excluir o plano alimentar.",
+    "loadError": "Não foi possível carregar os planos alimentares.",
+    "total": "Total de {{total}} plano(s) — Página {{page}} de {{pages}}",
+    "favorite": "Favoritar",
+    "plans": "plano(s)"
+  },
+  "recipeAdmin": {
+    "title": "Receitas (Eat)",
+    "subtitle": "Gestão do catálogo de pratos, rendimento e tabelas nutricionais",
+    "searchPlaceholder": "Buscar receita por nome ou descrição...",
+    "newRecipe": "Nova Receita",
+    "editRecipe": "Editar Receita",
+    "empty": "Nenhuma receita encontrada",
+    "emptyHint": "Tente ajustar os filtros de busca ou crie uma nova receita.",
+    "loading": "Carregando receitas...",
+    "allPeriods": "Período: Todos",
+    "allHighlights": "Destaque: Todos",
+    "onlyHighlight": "Apenas Novidade/Destaque",
+    "normal": "Normais",
+    "perPage": "{{count}} por pg",
+    "deleteTitle": "Excluir receita",
+    "deleteConfirm": "Tem certeza que deseja excluir a receita \"{{name}}\"?",
+    "deleted": "Receita excluída com sucesso.",
+    "created": "Receita criada com sucesso!",
+    "updated": "Receita atualizada com sucesso!",
+    "deleteError": "Não foi possível excluir a receita.",
+    "loadError": "Não foi possível carregar as receitas.",
+    "formLoadError": "Não foi possível carregar a receita.",
+    "serves": "Serve: {{count}} porção(ões)",
+    "minutes": "{{count}} min",
+    "total": "Total de {{total}} receita(s) — Página {{page}} de {{pages}}",
+    "name": "Nome da Receita",
+    "namePlaceholder": "Ex: Omelete Fit de Ervas Finas",
+    "nameRequired": "O nome da receita é obrigatório.",
+    "price": "Preço (R$)",
+    "photo": "Foto da Receita (Upload S3)",
+    "changeImage": "Alterar Imagem",
+    "uploadImage": "Upload Imagem",
+    "video": "URL do Vídeo (YouTube)",
+    "time": "Tempo Prep. (min)",
+    "portion": "Rendimento (porções)",
+    "period": "Período Recomendado",
+    "highlight": "Destaque / Novidade",
+    "description": "Descrição Detalhada",
+    "descriptionPlaceholder": "Descreva a receita...",
+    "ingredients": "Ingredientes da Receita",
+    "addIngredient": "Adicionar ingrediente",
+    "noIngredients": "Nenhum ingrediente adicionado.",
+    "steps": "Etapas de Preparo",
+    "addStep": "Adicionar etapa",
+    "noSteps": "Nenhuma etapa adicionada.",
+    "stepPlaceholder": "Ex: Misture os ovos e adicione as ervas finas...",
+    "restrictions": "Restrições (separadas por vírgula)",
+    "restrictionsPlaceholder": "Sem Glúten, Sem Lactose",
+    "tags": "Tags (separadas por vírgula)",
+    "tagsPlaceholder": "Proteico, Rápido, Low Carb",
+    "invalidImage": "Por favor, selecione uma imagem válida (JPG, PNG).",
+    "imageTooLarge": "A foto de capa deve ter no máximo 5MB.",
+    "saveError": "Erro ao salvar receita. Verifique os dados fornecidos.",
+    "removeStep": "Remover etapa",
+    "step": "Etapa {{n}}",
+    "items": "receita(s)"
+  },
+  "select": {
+    "placeholder": "Selecione...",
+    "search": "Buscar...",
+    "noOptions": "Nenhuma opção encontrada.",
+    "itemsSelected": "{{count}} item(ns) selecionado(s)",
+    "selectedCount_one": "{{count}} selecionada",
+    "selectedCount_other": "{{count}} selecionadas",
+    "remove": "Remover",
+    "clearSelection": "Limpar seleção",
+    "clearSearch": "Limpar busca",
+    "optionsCount": "{{shown}} de {{total}} opções",
+    "selectAll": "Selecionar Todos",
+    "clearAll": "Limpar"
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "text": "O endereço que você acessou não existe ou foi movido.",
+    "home": "Ir para o início",
+    "login": "Ir para o login",
+    "code": "404"
   }
 }

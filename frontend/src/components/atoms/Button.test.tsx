@@ -8,7 +8,7 @@ describe('Button', () => {
     const onClick = vi.fn();
     render(<Button variant="accent" onClick={onClick}>Atualizar</Button>);
     const button = screen.getByRole('button', { name: 'Atualizar' });
-    expect(button).toHaveClass('btn-action-accent');
+    expect(button).toHaveClass('bg-[var(--accent-secondary)]');
     await userEvent.click(button);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
@@ -23,5 +23,11 @@ describe('Button', () => {
   it('vira link quando recebe `to`', () => {
     render(<MemoryRouter><Button to="/x">Abrir</Button></MemoryRouter>);
     expect(screen.getByRole('link', { name: 'Abrir' })).toHaveAttribute('href', '/x');
+  });
+
+  it('mantém título e rótulo de acessibilidade também quando vira link', () => {
+    render(<MemoryRouter><Button to="/x" title="Editar" aria-label="Editar item"><span>i</span></Button></MemoryRouter>);
+    const link = screen.getByRole('link', { name: 'Editar item' });
+    expect(link).toHaveAttribute('title', 'Editar');
   });
 });

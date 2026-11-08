@@ -3,6 +3,11 @@ import type { CreatePlanOrderPayload, PlanOrder, Province, PublicPlan } from '..
 
 export const planOrderService = {
   // Públicos (tela de contratação)
+  async getPublicPlans(): Promise<PublicPlan[]> {
+    const response = await api.get('/public/business-plans');
+    return response.data;
+  },
+
   async getPublicPlan(uuid: string): Promise<PublicPlan> {
     const response = await api.get(`/public/business-plans/${uuid}`);
     return response.data;

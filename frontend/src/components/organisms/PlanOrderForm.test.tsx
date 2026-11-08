@@ -1,8 +1,12 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render as rtlRender, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import type { ReactElement } from 'react';
 import userEvent from '@testing-library/user-event';
 import { PlanOrderForm } from './PlanOrderForm';
 
 vi.mock('react-i18next', async () => (await import('../../test/render')).i18nMock);
+
+const render = (ui: ReactElement) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 
 const provinces = [{ acronym: 'SP', name: 'São Paulo' }, { acronym: 'RJ', name: 'Rio de Janeiro' }];
 
@@ -13,6 +17,14 @@ const fill = async (labels: Record<string, string>) => {
 };
 
 describe('PlanOrderForm', () => {
+  it('tem cancelar à esquerda, voltando ao site, e enviar à direita', () => {
+    render(<PlanOrderForm provinces={provinces} submitting={false} error="" onSubmit={vi.fn()} />);
+    expect(screen.getByRole('link', { name: 'common.cancel' })).toHaveAttribute('href', '/');
+    const footerItems = screen.getByRole('contentinfo').children;
+    expect(footerItems[0]).toHaveTextContent('common.cancel');
+    expect(footerItems[footerItems.length - 1]).toHaveTextContent('order.submit');
+  });
+
   it('não envia e mostra erros quando vazio', async () => {
     const onSubmit = vi.fn();
     render(<PlanOrderForm provinces={provinces} submitting={false} error="" onSubmit={onSubmit} />);

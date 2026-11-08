@@ -1,13 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { Button } from '../../components/atoms/Button';
 import { TextField } from '../../components/atoms/TextField';
 import { Breadcrumb } from '../../components/molecules/Breadcrumb';
+import { ConfirmDialog } from '../../components/molecules/ConfirmDialog';
+import { ErrorAlert } from '../../components/molecules/ErrorAlert';
 import { FormCard } from '../../components/molecules/FormCard';
 import { cancelPlanOrder, convertPlanOrder, fetchPlanOrder } from '../../store/planOrderSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -25,50 +27,47 @@ export const PlanOrderDetailPage = () => {
   const { current: order, loading, error } = useAppSelector((state) => state.planOrder);
 
   const schema = yup.object({ paymentDate: yup.string().required(t('planOrders.dueDateRequired')) });
-  const { register, handleSubmit, formState: { errors } } = useForm<{ paymentDate: string }>({
+  const { register, handleSubmit, getValues, formState: { errors } } = useForm<{ paymentDate: string }>({
     resolver: yupResolver(schema),
     defaultValues: { paymentDate: today() },
   });
 
   useEffect(() => { dispatch(fetchPlanOrder(uuid)); }, [dispatch, uuid]);
 
-  const confirmed = (key: string) => Boolean(order) && window.confirm(t(key, { name: order?.name }));
+  const [pending, setPending] = useState<{ action: 'convert' | 'cancel'; paymentDate: string } | null>(null);
 
-  const convert = async ({ paymentDate }: { paymentDate: string }) => {
-    if (!confirmed('planOrders.convertConfirm')) return;
-    const result = await dispatch(convertPlanOrder({ uuid, paymentDate }));
-    if (convertPlanOrder.fulfilled.match(result)) navigate(PATHS.PLAN_ORDERS);
-  };
-
-  const cancel = async () => {
-    if (!confirmed('planOrders.cancelConfirm')) return;
-    const result = await dispatch(cancelPlanOrder(uuid));
-    if (cancelPlanOrder.fulfilled.match(result)) navigate(PATHS.PLAN_ORDERS);
+  const run = async () => {
+    if (!pending) return;
+    const result = pending.action === 'convert'
+      ? await dispatch(convertPlanOrder({ uuid, paymentDate: pending.paymentDate }))
+      : await dispatch(cancelPlanOrder(uuid));
+    setPending(null);
+    if (result.meta.requestStatus === 'fulfilled') navigate(PATHS.PLAN_ORDERS);
   };
 
   return (
-    <div className="business-plan-form-page">
+    <div className="w-full">
       <Breadcrumb items={[{ label: t('planOrders.breadcrumb'), to: PATHS.PLAN_ORDERS }, { label: order?.name ?? '...' }]} />
 
-      {error && <div className="dashboard-error-state" role="alert"><span><AlertCircle size={18} /> {error}</span></div>}
+      {error && <ErrorAlert message={error} onRetry={() => { dispatch(fetchPlanOrder(uuid)); }} />}
 
       {!order ? (
-        loading && <div className="table-loading-state"><RefreshCw size={24} className="spin-icon" /><p>{t('common.loading')}</p></div>
+        loading && <p role="status" className="flex items-center justify-center gap-2 p-10 text-[var(--text-body)]"><RefreshCw size={22} className="animate-spin" />{t('common.loading')}</p>
       ) : (
-        <form noValidate onSubmit={handleSubmit(convert)}>
+        <form noValidate onSubmit={handleSubmit(({ paymentDate }) => setPending({ action: 'convert', paymentDate }))}>
           <FormCard
-            header={<><h2 className="section-title m-0">{order.name}</h2><span>{t(`planOrders.statuses.${order.status}`)}</span></>}
+            header={<><h2 className="m-0 text-[1.3rem] font-medium text-[var(--text-heading)]">{order.name}</h2><span>{t(`planOrders.statuses.${order.status}`)}</span></>}
             footer={
               <>
+                <Button variant="outline" onClick={() => navigate(PATHS.PLAN_ORDERS)}>{t('common.close')}</Button>
                 <div className="flex flex-wrap gap-[10px]">
                   {order.status === 'pending' && (
                     <>
+                      <Button variant="outline" disabled={loading} onClick={() => setPending({ action: 'cancel', paymentDate: getValues('paymentDate') })}>{t('planOrders.cancel')}</Button>
                       <Button type="submit" disabled={loading}>{t('planOrders.convert')}</Button>
-                      <Button variant="outline" disabled={loading} onClick={cancel}>{t('planOrders.cancel')}</Button>
                     </>
                   )}
                 </div>
-                <Button variant="outline" onClick={() => navigate(PATHS.PLAN_ORDERS)}>{t('common.close')}</Button>
               </>
             }
           >
@@ -80,6 +79,18 @@ export const PlanOrderDetailPage = () => {
             )}
           </FormCard>
         </form>
+      )}
+
+      {pending && order && (
+        <ConfirmDialog
+          title={t(pending.action === 'convert' ? 'planOrders.convert' : 'planOrders.cancel')}
+          message={t(pending.action === 'convert' ? 'planOrders.convertConfirm' : 'planOrders.cancelConfirm', { name: order.name })}
+          confirmLabel={t(pending.action === 'convert' ? 'planOrders.convert' : 'planOrders.cancel')}
+          tone={pending.action === 'convert' ? 'primary' : 'danger'}
+          busy={loading}
+          onConfirm={run}
+          onCancel={() => setPending(null)}
+        />
       )}
     </div>
   );

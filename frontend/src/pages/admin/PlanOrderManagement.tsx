@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, Filter, Inbox, RefreshCw } from 'lucide-react';
+import { Filter, Inbox, RefreshCw } from 'lucide-react';
 import { Button } from '../../components/atoms/Button';
+import { Breadcrumb } from '../../components/molecules/Breadcrumb';
+import { ErrorAlert } from '../../components/molecules/ErrorAlert';
 import { FilterableMultiSelect } from '../../components/common/FilterableMultiSelect';
 import { fetchPlanOrders } from '../../store/planOrderSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -23,15 +25,20 @@ export const PlanOrderManagement = () => {
   const statusOptions = STATUSES.map((id) => ({ id, name: t(`planOrders.statuses.${id}`) }));
   const date = (value: string) => new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'pt-BR').format(new Date(`${value}Z`));
 
+  const load = () => { dispatch(fetchPlanOrders()); };
+  const cell = 'px-4 py-3';
+
   return (
-    <div className="business-plan-management-page">
-      <header className="management-header">
-        <div><h2 className="section-title">{t('planOrders.title')}</h2><p className="section-subtitle">{t('planOrders.subtitle')}</p></div>
-        <div className="header-action-buttons">
-          <Button variant="accent" onClick={() => dispatch(fetchPlanOrders())} disabled={loading}>
-            <RefreshCw size={16} className={loading ? 'spin-icon' : ''} /> {t('common.refresh')}
-          </Button>
+    <div className="w-full">
+      <Breadcrumb items={[{ label: t('planOrders.title') }]} />
+      <header className="mb-5 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="m-0 text-[1.5rem] font-medium text-[var(--text-heading)]">{t('planOrders.title')}</h2>
+          <p className="m-0 text-[.9rem] text-[var(--text-body)]">{t('planOrders.subtitle')}</p>
         </div>
+        <Button variant="outline" onClick={load} disabled={loading}>
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {t('common.refresh')}
+        </Button>
       </header>
 
       <div className="mb-4 max-w-80">
@@ -47,33 +54,35 @@ export const PlanOrderManagement = () => {
         />
       </div>
 
-      {error && <div className="dashboard-error-state" role="alert"><span><AlertCircle size={18} /> {error}</span></div>}
+      {error && <ErrorAlert message={error} onRetry={load} />}
 
-      <section className="table-card">
+      <div className="overflow-x-auto rounded-2xl border border-[var(--border-color)] bg-white">
         {loading ? (
-          <div className="table-loading-state"><RefreshCw size={24} className="spin-icon" /><p>{t('common.loading')}</p></div>
+          <p role="status" className="flex items-center justify-center gap-2 p-10 text-[var(--text-body)]"><RefreshCw size={22} className="animate-spin" />{t('common.loading')}</p>
         ) : orders.length === 0 ? (
-          <div className="table-empty-state"><Inbox size={34} /><p>{t('planOrders.empty')}</p></div>
+          <div className="flex flex-col items-center gap-3 p-10 text-center text-[var(--text-body)]"><Inbox size={34} /><p className="m-0">{t('planOrders.empty')}</p></div>
         ) : (
-          <div className="responsive-table-wrap">
-            <table className="management-table">
-              <thead><tr>
-                <th>{t('planOrders.date')}</th><th>{t('planOrders.customer')}</th><th>{t('planOrders.plan')}</th>
-                <th>{t('planOrders.status')}</th><th>{t('common.actions', 'Actions')}</th>
-              </tr></thead>
-              <tbody>{orders.map((order) => (
-                <tr key={order.uuid}>
-                  <td>{date(order.createdAt)}</td>
-                  <td><strong>{order.name}</strong><small className="table-secondary-text">{maskTaxId(order.taxId)} · {order.email}</small></td>
-                  <td>{order.planName}<small className="table-secondary-text">{formatPrice(order.priceInCents, lang)}</small></td>
-                  <td>{t(`planOrders.statuses.${order.status}`)}</td>
-                  <td><Button to={PATHS.PLAN_ORDER_DETAIL.replace(':uuid', order.uuid)}>{t('planOrders.open')}</Button></td>
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-b border-[var(--border-color)] bg-slate-50 text-[.8rem] text-[var(--text-body)]">
+                {['planOrders.date', 'planOrders.customer', 'planOrders.plan', 'planOrders.status'].map((key) => <th key={key} className={cell}>{t(key)}</th>)}
+                <th className={`${cell} text-right`}>{t('common.actions', 'Actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.uuid} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50">
+                  <td className={cell}>{date(order.createdAt)}</td>
+                  <td className={cell}><strong>{order.name}</strong><small className="block text-slate-500">{maskTaxId(order.taxId)} · {order.email}</small></td>
+                  <td className={cell}>{order.planName}<small className="block text-slate-500">{formatPrice(order.priceInCents, lang)}</small></td>
+                  <td className={cell}>{t(`planOrders.statuses.${order.status}`)}</td>
+                  <td className={`${cell} text-right`}><Button to={PATHS.PLAN_ORDER_DETAIL.replace(':uuid', order.uuid)}>{t('planOrders.open')}</Button></td>
                 </tr>
-              ))}</tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         )}
-      </section>
+      </div>
     </div>
   );
 };

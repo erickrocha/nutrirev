@@ -1,0 +1,28 @@
+/* Tokens de cor (NutriRev — azul, amarelo e branco). Amarelo é só acento/fundo de badge:
+   nunca como texto sobre branco (reprova no contraste AA). */
+:root {
+  --bg-primary: #F7FAFF;
+  --bg-alt: #FFFFFF;
+  --bg-dark: #12467F;
+  --text-heading: #0F2A47;
+  --text-body: #5A6B80;
+  --accent-primary: #1D6FD1;
+  --accent-hover: #155BAE;
+  --accent-secondary: #FFC629;
+  --accent-secondary-hover: #F2B300;
+  --border-color: #DCE6F2;
+  --badge-bg: #EDF3FC;
+  --badge-accent-bg: #FFF4D1;
+  --font-family: 'Jost', 'Poppins', sans-serif;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-body);
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}

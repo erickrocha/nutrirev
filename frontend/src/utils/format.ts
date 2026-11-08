@@ -29,3 +29,19 @@ export const maskPhone = (value: unknown): string => {
 };
 
 export const maskPostalCode = (value: unknown): string => onlyDigits(value, 8).replace(/^(\d{5})(\d)/, '$1-$2');
+
+const isBrazil = (countryCode: unknown): boolean => String(countryCode ?? '').trim().toUpperCase() === 'BR';
+
+/** Display form: the CEP mask only applies to Brazilian addresses. */
+export const displayPostalCode = (value: unknown, countryCode: unknown): string =>
+  isBrazil(countryCode) ? maskPostalCode(value) : String(value ?? '');
+
+/** Stored form: Brazilian CEPs are saved as digits only, other countries are kept as typed. */
+export const storedPostalCode = (value: unknown, countryCode: unknown): string | null => {
+  const stored = isBrazil(countryCode) ? onlyDigits(value, 8) : String(value ?? '').trim();
+  return stored || null;
+};
+
+/** Valor em reais sempre com duas casas ("R$ 149,00"), ao contrário de `formatPrice`. */
+export const formatCurrency = (cents: unknown, lang: Lang): string =>
+  new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'pt-BR', { style: 'currency', currency: 'BRL' }).format((Number(cents) || 0) / 100);
