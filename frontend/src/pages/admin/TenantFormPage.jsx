@@ -5,7 +5,7 @@ import { ArrowLeft, Building, ChevronRight, MapPin, Save, X } from 'lucide-react
 import { createTenant, updateTenant } from '../../store/tenantSlice';
 import { cityService, provinceService } from '../../services';
 import { FilterableMultiSelect } from '../../components/common/FilterableMultiSelect';
-import { maskTaxId } from '../../utils/format';
+import { maskPhone, maskPostalCode, maskTaxId, onlyDigits } from '../../utils/format';
 import { isValidTaxId } from '../../utils/taxId';
 
 const emptyTenantForm = {
@@ -109,12 +109,12 @@ export const TenantFormPage = ({ editingTenant = null, onBack, onSaveSuccess }) 
         name: editingTenant.name || '',
         taxId: maskTaxId(editingTenant.taxId),
         email: editingTenant.email || '',
-        phone: editingTenant.phone || '',
+        phone: maskPhone(editingTenant.phone),
         addressLine1: editingTenant.addressLine1 || '',
         addressLine2: editingTenant.addressLine2 || '',
         administrativeArea,
         locality: editingTenant.locality || editingTenant.city || '',
-        postalCode: editingTenant.postalCode || editingTenant.zipcode || '',
+        postalCode: maskPostalCode(editingTenant.postalCode || editingTenant.zipcode),
         countryCode,
       } : { ...emptyTenantForm, countryCode });
 
@@ -158,8 +158,10 @@ export const TenantFormPage = ({ editingTenant = null, onBack, onSaveSuccess }) 
       return;
     }
 
+    // máscara é só de exibição: persiste apenas os dígitos
+    const digitFields = ['taxId', 'phone', 'postalCode'];
     const tenantData = Object.fromEntries(
-      Object.entries(formData).map(([key, value]) => [key, value.trim() || null])
+      Object.entries(formData).map(([key, value]) => [key, (digitFields.includes(key) ? onlyDigits(value) : value.trim()) || null])
     );
     const result = editingTenant
       ? await dispatch(updateTenant({ id: editingTenant.id, tenantData }))
@@ -208,7 +210,7 @@ export const TenantFormPage = ({ editingTenant = null, onBack, onSaveSuccess }) 
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
             <div><label style={labelStyle}>{t('common.email')}</label><input style={fieldStyle} type="email" value={formData.email} onChange={(event) => setFormData({ ...formData, email: event.target.value })} /></div>
-            <div><label style={labelStyle}>{t('tenants.phone')}</label><input style={fieldStyle} type="tel" value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: event.target.value })} /></div>
+            <div><label style={labelStyle}>{t('tenants.phone')}</label><input style={fieldStyle} type="tel" inputMode="tel" placeholder="(00) 00000-0000" value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: maskPhone(event.target.value) })} /></div>
           </div>
         </section>
 
@@ -236,7 +238,7 @@ export const TenantFormPage = ({ editingTenant = null, onBack, onSaveSuccess }) 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
             <div><label style={labelStyle}>{t('address.addressLine1')}</label><input style={fieldStyle} value={formData.addressLine1} onChange={(event) => setFormData({ ...formData, addressLine1: event.target.value })} /></div>
             <div><label style={labelStyle}>{t('address.addressLine2')}</label><input style={fieldStyle} value={formData.addressLine2} onChange={(event) => setFormData({ ...formData, addressLine2: event.target.value })} /></div>
-            <div><label style={labelStyle}>{t('address.postalCode')}</label><input style={fieldStyle} value={formData.postalCode} onChange={(event) => setFormData({ ...formData, postalCode: event.target.value })} /></div>
+            <div><label style={labelStyle}>{t('address.postalCode')}</label><input style={fieldStyle} inputMode="numeric" placeholder="00000-000" value={formData.postalCode} onChange={(event) => setFormData({ ...formData, postalCode: maskPostalCode(event.target.value) })} /></div>
             <FilterableMultiSelect
               label={t('address.administrativeArea')}
               icon={MapPin}

@@ -16,7 +16,7 @@ class ApiConfig {
   /// longer carry the Android cleartext exemption.
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://snwi3up3h4.us-east-1.awsapprunner.com',
+    defaultValue: 'https://api.nutrirev.com.br',
   );
 
   static const Duration timeout = Duration(seconds: 20);
