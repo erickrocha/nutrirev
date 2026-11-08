@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use entity::{
-    clinical_conditions_entity, dietary_restriction_entity, ingredient_entity,
+    activity_factor_entity, formula_entity, objective_entity, physical_activity_level_entity,
+    bowel_function_entity, clinical_conditions_entity, dietary_restriction_entity, ingredient_entity,
     pre_existing_conditions_entity,
 };
 use sea_orm::{
@@ -13,6 +14,11 @@ use crate::domain::business_error::BusinessError;
 
 #[derive(Clone, Copy, Debug)]
 pub enum CatalogImportKind {
+    PhysicalActivityLevel,
+    Objective,
+    Formula,
+    ActivityFactor,
+    BowelFunction,
     ClinicalConditions,
     DietaryRestriction,
     Ingredient,
@@ -64,61 +70,79 @@ pub struct CatalogImportResult {
 pub struct CatalogCsvImportUseCase;
 
 impl CatalogCsvImportUseCase {
-    pub async fn tenant_exists(
-        db: &DatabaseConnection,
-        tenant_id: i32,
-    ) -> Result<bool, BusinessError> {
-        entity::tenant_entity::Entity::find_by_id(tenant_id)
-            .one(db)
-            .await
-            .map(|row| row.is_some())
-            .map_err(|error| BusinessError::new(format!("Database error: {error}")))
+    /// `None` when the lookup itself failed.
+    pub async fn tenant_exists(db: &DatabaseConnection, tenant_id: i32) -> Option<bool> {
+        log::info!("[CatalogCsvImportUseCase::tenant_exists] Executing for tenant: {tenant_id}");
+        match entity::tenant_entity::Entity::find_by_id(tenant_id).one(db).await {
+            Ok(row) => Some(row.is_some()),
+            Err(error) => {
+                log::error!("[CatalogCsvImportUseCase::tenant_exists] Database error: {error}");
+                None
+            }
+        }
     }
 
+    /// All-or-nothing: `None` means the import failed and no row was changed.
     pub async fn import(
         db: &DatabaseConnection,
         kind: CatalogImportKind,
         tenant_id: i32,
         rows: Vec<CatalogImportRow>,
-    ) -> Result<CatalogImportResult, BusinessError> {
+    ) -> Option<CatalogImportResult> {
+        log::info!(
+            "[CatalogCsvImportUseCase::import] Executing for tenant: {tenant_id}, kind: {kind:?}, rows: {}",
+            rows.len()
+        );
+        // A second attempt covers transient failures such as deadlocks.
         for attempt in 0..2 {
-            let transaction = db
-                .begin()
-                .await
-                .map_err(|error| BusinessError::new(format!("Could not begin import: {error}")))?;
-
-            let result = match kind {
-                CatalogImportKind::ClinicalConditions => {
-                    import_clinical_conditions(&transaction, tenant_id, &rows).await
-                }
-                CatalogImportKind::DietaryRestriction => {
-                    import_dietary_restrictions(&transaction, tenant_id, &rows).await
-                }
-                CatalogImportKind::Ingredient => {
-                    import_ingredients(&transaction, tenant_id, &rows).await
-                }
-                CatalogImportKind::PreExistingConditions => {
-                    import_pre_existing_conditions(&transaction, tenant_id, &rows).await
-                }
-            };
-
-            match result {
-                Ok(result) => {
-                    transaction.commit().await.map_err(|error| {
-                        BusinessError::new(format!("Could not commit import: {error}"))
-                    })?;
-                    return Ok(result);
-                }
-                Err(error) => {
-                    let _ = transaction.rollback().await;
-                    if attempt == 1 {
-                        return Err(error);
-                    }
-                }
+            match Self::import_once(db, kind, tenant_id, &rows).await {
+                Ok(result) => return Some(result),
+                Err(error) => log::error!(
+                    "[CatalogCsvImportUseCase::import] Attempt {} failed: {}",
+                    attempt + 1,
+                    error.message
+                ),
             }
         }
+        None
+    }
 
-        unreachable!("the import loop always returns on its final attempt")
+    async fn import_once(
+        db: &DatabaseConnection,
+        kind: CatalogImportKind,
+        tenant_id: i32,
+        rows: &[CatalogImportRow],
+    ) -> Result<CatalogImportResult, BusinessError> {
+        let transaction = db
+            .begin()
+            .await
+            .map_err(|error| BusinessError::new(format!("Could not begin import: {error}")))?;
+
+        let result = match kind {
+            CatalogImportKind::ActivityFactor => import_activity_factors(&transaction, tenant_id, rows).await,
+            CatalogImportKind::BowelFunction => import_bowel_functions(&transaction, tenant_id, rows).await,
+            CatalogImportKind::ClinicalConditions => import_clinical_conditions(&transaction, tenant_id, rows).await,
+            CatalogImportKind::DietaryRestriction => import_dietary_restrictions(&transaction, tenant_id, rows).await,
+            CatalogImportKind::Formula => import_formulas(&transaction, tenant_id, rows).await,
+            CatalogImportKind::Ingredient => import_ingredients(&transaction, tenant_id, rows).await,
+            CatalogImportKind::Objective => import_objectives(&transaction, tenant_id, rows).await,
+            CatalogImportKind::PhysicalActivityLevel => import_physical_activity_levels(&transaction, tenant_id, rows).await,
+            CatalogImportKind::PreExistingConditions => import_pre_existing_conditions(&transaction, tenant_id, rows).await,
+        };
+
+        match result {
+            Ok(result) => {
+                transaction
+                    .commit()
+                    .await
+                    .map_err(|error| BusinessError::new(format!("Could not commit import: {error}")))?;
+                Ok(result)
+            }
+            Err(error) => {
+                let _ = transaction.rollback().await;
+                Err(error)
+            }
+        }
     }
 }
 
@@ -194,6 +218,11 @@ macro_rules! import_named_catalog {
     };
 }
 
+import_named_catalog!(import_activity_factors, activity_factor_entity);
+import_named_catalog!(import_formulas, formula_entity);
+import_named_catalog!(import_objectives, objective_entity);
+import_named_catalog!(import_physical_activity_levels, physical_activity_level_entity);
+import_named_catalog!(import_bowel_functions, bowel_function_entity);
 import_named_catalog!(import_clinical_conditions, clinical_conditions_entity);
 import_named_catalog!(import_dietary_restrictions, dietary_restriction_entity);
 import_named_catalog!(

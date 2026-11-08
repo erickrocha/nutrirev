@@ -31,7 +31,7 @@ pub struct CsvImportQuery {
     params(CsvImportQuery),
     request_body(content = String, content_type = "multipart/form-data", description = "CSV file in multipart field 'file'"),
     responses(
-        (status = 200, body = CsvImportResponseJson),
+        (status = 201, body = CsvImportResponseJson),
         (status = 400, body = CsvImportErrorResponseJson),
         (status = 403, body = CsvImportErrorResponseJson),
         (status = 404, body = CsvImportErrorResponseJson),
@@ -58,12 +58,172 @@ pub async fn import_clinical_conditions(
 
 #[utoipa::path(
     post,
+    tag = "Bowel Function",
+    path = "/bowel-function/import",
+    params(CsvImportQuery),
+    request_body(content = String, content_type = "multipart/form-data", description = "CSV file in multipart field 'file'"),
+    responses(
+        (status = 201, body = CsvImportResponseJson),
+        (status = 400, body = CsvImportErrorResponseJson),
+        (status = 403, body = CsvImportErrorResponseJson),
+        (status = 404, body = CsvImportErrorResponseJson),
+        (status = 413, description = "CSV exceeds the upload limit"),
+        (status = 500, body = CsvImportErrorResponseJson)
+    ),
+    security(("bearer_auth" = []))
+)]
+pub async fn import_bowel_functions(
+    state: State<AppState>,
+    Extension(user): Extension<User>,
+    Query(query): Query<CsvImportQuery>,
+    multipart: Multipart,
+) -> Response {
+    import_catalog(
+        state,
+        user,
+        query,
+        multipart,
+        CatalogImportKind::BowelFunction,
+    )
+    .await
+}
+
+#[utoipa::path(
+    post,
+    tag = "Activity Factor",
+    path = "/activity-factor/import",
+    params(CsvImportQuery),
+    request_body(content = String, content_type = "multipart/form-data", description = "CSV file in multipart field 'file'"),
+    responses(
+        (status = 201, body = CsvImportResponseJson),
+        (status = 400, body = CsvImportErrorResponseJson),
+        (status = 403, body = CsvImportErrorResponseJson),
+        (status = 404, body = CsvImportErrorResponseJson),
+        (status = 413, description = "CSV exceeds the upload limit"),
+        (status = 500, body = CsvImportErrorResponseJson)
+    ),
+    security(("bearer_auth" = []))
+)]
+pub async fn import_activity_factors(
+    state: State<AppState>,
+    Extension(user): Extension<User>,
+    Query(query): Query<CsvImportQuery>,
+    multipart: Multipart,
+) -> Response {
+    import_catalog(
+        state,
+        user,
+        query,
+        multipart,
+        CatalogImportKind::ActivityFactor,
+    )
+    .await
+}
+
+#[utoipa::path(
+    post,
+    tag = "Formula",
+    path = "/formula/import",
+    params(CsvImportQuery),
+    request_body(content = String, content_type = "multipart/form-data", description = "CSV file in multipart field 'file'"),
+    responses(
+        (status = 201, body = CsvImportResponseJson),
+        (status = 400, body = CsvImportErrorResponseJson),
+        (status = 403, body = CsvImportErrorResponseJson),
+        (status = 404, body = CsvImportErrorResponseJson),
+        (status = 413, description = "CSV exceeds the upload limit"),
+        (status = 500, body = CsvImportErrorResponseJson)
+    ),
+    security(("bearer_auth" = []))
+)]
+pub async fn import_formulas(
+    state: State<AppState>,
+    Extension(user): Extension<User>,
+    Query(query): Query<CsvImportQuery>,
+    multipart: Multipart,
+) -> Response {
+    import_catalog(
+        state,
+        user,
+        query,
+        multipart,
+        CatalogImportKind::Formula,
+    )
+    .await
+}
+
+#[utoipa::path(
+    post,
+    tag = "Objective",
+    path = "/objective/import",
+    params(CsvImportQuery),
+    request_body(content = String, content_type = "multipart/form-data", description = "CSV file in multipart field 'file'"),
+    responses(
+        (status = 201, body = CsvImportResponseJson),
+        (status = 400, body = CsvImportErrorResponseJson),
+        (status = 403, body = CsvImportErrorResponseJson),
+        (status = 404, body = CsvImportErrorResponseJson),
+        (status = 413, description = "CSV exceeds the upload limit"),
+        (status = 500, body = CsvImportErrorResponseJson)
+    ),
+    security(("bearer_auth" = []))
+)]
+pub async fn import_objectives(
+    state: State<AppState>,
+    Extension(user): Extension<User>,
+    Query(query): Query<CsvImportQuery>,
+    multipart: Multipart,
+) -> Response {
+    import_catalog(
+        state,
+        user,
+        query,
+        multipart,
+        CatalogImportKind::Objective,
+    )
+    .await
+}
+
+#[utoipa::path(
+    post,
+    tag = "Physical Activity Level",
+    path = "/physical-activity-level/import",
+    params(CsvImportQuery),
+    request_body(content = String, content_type = "multipart/form-data", description = "CSV file in multipart field 'file'"),
+    responses(
+        (status = 201, body = CsvImportResponseJson),
+        (status = 400, body = CsvImportErrorResponseJson),
+        (status = 403, body = CsvImportErrorResponseJson),
+        (status = 404, body = CsvImportErrorResponseJson),
+        (status = 413, description = "CSV exceeds the upload limit"),
+        (status = 500, body = CsvImportErrorResponseJson)
+    ),
+    security(("bearer_auth" = []))
+)]
+pub async fn import_physical_activity_levels(
+    state: State<AppState>,
+    Extension(user): Extension<User>,
+    Query(query): Query<CsvImportQuery>,
+    multipart: Multipart,
+) -> Response {
+    import_catalog(
+        state,
+        user,
+        query,
+        multipart,
+        CatalogImportKind::PhysicalActivityLevel,
+    )
+    .await
+}
+
+#[utoipa::path(
+    post,
     tag = "Dietary Restriction",
     path = "/dietary-restriction/import",
     params(CsvImportQuery),
     request_body(content = String, content_type = "multipart/form-data", description = "CSV file in multipart field 'file'"),
     responses(
-        (status = 200, body = CsvImportResponseJson),
+        (status = 201, body = CsvImportResponseJson),
         (status = 400, body = CsvImportErrorResponseJson),
         (status = 403, body = CsvImportErrorResponseJson),
         (status = 404, body = CsvImportErrorResponseJson),
@@ -95,7 +255,7 @@ pub async fn import_dietary_restrictions(
     params(CsvImportQuery),
     request_body(content = String, content_type = "multipart/form-data", description = "CSV file in multipart field 'file'"),
     responses(
-        (status = 200, body = CsvImportResponseJson),
+        (status = 201, body = CsvImportResponseJson),
         (status = 400, body = CsvImportErrorResponseJson),
         (status = 403, body = CsvImportErrorResponseJson),
         (status = 404, body = CsvImportErrorResponseJson),
@@ -120,7 +280,7 @@ pub async fn import_ingredients(
     params(CsvImportQuery),
     request_body(content = String, content_type = "multipart/form-data", description = "CSV file in multipart field 'file'"),
     responses(
-        (status = 200, body = CsvImportResponseJson),
+        (status = 201, body = CsvImportResponseJson),
         (status = 400, body = CsvImportErrorResponseJson),
         (status = 403, body = CsvImportErrorResponseJson),
         (status = 404, body = CsvImportErrorResponseJson),
@@ -158,8 +318,8 @@ async fn import_catalog(
     };
 
     match CatalogCsvImportUseCase::tenant_exists(&state.conn, tenant_id).await {
-        Ok(true) => {}
-        Ok(false) => {
+        Some(true) => {}
+        Some(false) => {
             return error_response(
                 StatusCode::NOT_FOUND,
                 "TENANT_NOT_FOUND",
@@ -167,7 +327,7 @@ async fn import_catalog(
                 vec![],
             )
         }
-        Err(_) => {
+        None => {
             return error_response(
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "IMPORT_FAILED",
@@ -227,13 +387,16 @@ async fn import_catalog(
     };
 
     match CatalogCsvImportUseCase::import(&state.conn, kind, tenant_id, rows).await {
-        Ok(result) => Json(CsvImportResponseJson {
-            total: result.total,
-            created: result.created,
-            updated: result.updated,
-        })
-        .into_response(),
-        Err(_) => error_response(
+        Some(result) => (
+            StatusCode::CREATED,
+            Json(CsvImportResponseJson {
+                total: result.total,
+                created: result.created,
+                updated: result.updated,
+            }),
+        )
+            .into_response(),
+        None => error_response(
             StatusCode::INTERNAL_SERVER_ERROR,
             "IMPORT_FAILED",
             "The import could not be completed and no rows were changed.",
