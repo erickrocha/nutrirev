@@ -6,6 +6,8 @@ interface PlanOrderState {
   orders: PlanOrder[];
   current: PlanOrder | null;
   publicPlan: PublicPlan | null;
+  // Catálogo da landing; null = ainda não carregado (ou falhou).
+  publicPlans: PublicPlan[] | null;
   provinces: Province[];
   createdOrderUuid: string | null;
   loading: boolean;
@@ -67,6 +69,14 @@ export const fetchPublicPlan = createAsyncThunk('planOrder/fetchPublicPlan', asy
   }
 });
 
+export const fetchPublicPlans = createAsyncThunk('planOrder/fetchPublicPlans', async (_: void, { rejectWithValue }) => {
+  try {
+    return await planOrderService.getPublicPlans();
+  } catch (err) {
+    return rejectWithValue(reject(err, 'Falha ao buscar planos'));
+  }
+});
+
 export const fetchProvinces = createAsyncThunk('planOrder/fetchProvinces', async (_: void, { rejectWithValue }) => {
   try {
     return await planOrderService.getProvinces();
@@ -90,6 +100,7 @@ const initialState: PlanOrderState = {
   orders: [],
   current: null,
   publicPlan: null,
+  publicPlans: null,
   provinces: [],
   createdOrderUuid: null,
   loading: false,
@@ -120,6 +131,9 @@ const planOrderSlice = createSlice({
       })
       .addCase(fetchPublicPlan.fulfilled, (state, { payload }) => {
         state.publicPlan = payload;
+      })
+      .addCase(fetchPublicPlans.fulfilled, (state, { payload }) => {
+        state.publicPlans = Array.isArray(payload) ? [...payload].sort((a, b) => a.priceInCents - b.priceInCents) : [];
       })
       .addCase(fetchProvinces.fulfilled, (state, { payload }) => {
         state.provinces = Array.isArray(payload) ? payload : [];

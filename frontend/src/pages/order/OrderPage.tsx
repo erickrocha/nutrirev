@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle2 } from 'lucide-react';
-import { Logo } from '../../components/brand/Logo';
-import { LanguageToggle } from '../../components/common/LanguageSwitcher';
+import { Breadcrumb } from '../../components/molecules/Breadcrumb';
+import { Container } from '../../components/landing/Container';
+import { PublicHeader } from '../../components/landing/PublicHeader';
+import { BTN_PRIMARY, CARD, HEADING } from '../../components/landing/styles';
 import { PlanSummary } from '../../components/organisms/PlanSummary';
 import { PlanOrderForm, type PlanOrderFormValues } from '../../components/organisms/PlanOrderForm';
 import { createPlanOrder, fetchProvinces, fetchPublicPlan } from '../../store/planOrderSlice';
@@ -38,37 +40,40 @@ export const OrderPage = () => {
 
   const planNotFound = planLoaded && !plan && !loading && Boolean(error);
 
+  const crumbs = [{ label: t('site.nav.home'), to: '/' }, { label: t('order.title') }];
+
   return (
-    <div className="landing-page lp-order-page">
-      <header className="lp-header">
-        <div className="container lp-header-inner">
-          <Link to="/" className="lp-brand" aria-label={t('site.nav.home')}><Logo /></Link>
-          <LanguageToggle className="lp-lang" />
-        </div>
-      </header>
+    <div className="min-h-screen bg-[var(--bg-alt)] text-[var(--text-body)]">
+      <PublicHeader />
 
-      <main className="container relative pb-[72px] pt-10">
-        {planNotFound && <p role="alert">{t('order.planNotFound')} <Link to="/">{t('order.back')}</Link></p>}
+      <main>
+        <Container className="relative pb-[72px] pt-10">
+          <Breadcrumb items={crumbs} />
 
-        {createdOrderUuid && (
-          <section className="lp-card mx-auto my-6 flex max-w-[560px] flex-col items-center gap-3 text-center" role="status">
-            <CheckCircle2 size={36} aria-hidden="true" className="text-[var(--accent-primary)]" />
-            <h1>{t('order.doneTitle')}</h1>
-            <p>{t('order.doneText', { email: submittedEmail })}</p>
-            <p><small>{t('order.orderNumber')}: {createdOrderUuid}</small></p>
-            <Link to="/" className="lp-btn lp-btn-primary">{t('order.back')}</Link>
-          </section>
-        )}
+          {!planLoaded && <p role="status" className="m-0">{t('order.loadingPlan')}</p>}
 
-        {plan && !createdOrderUuid && (
-          <>
-            <h1 className="mb-6">{t('order.title')}</h1>
-            <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-[minmax(260px,340px)_minmax(0,1fr)]">
-              <PlanSummary plan={plan} lang={lang} />
-              <PlanOrderForm provinces={provinces} submitting={loading} error={submitError} onSubmit={submit} />
-            </div>
-          </>
-        )}
+          {planNotFound && <p role="alert" className="m-0">{t('order.planNotFound')} <Link to="/" className="font-semibold text-[var(--accent-primary)]">{t('order.back')}</Link></p>}
+
+          {createdOrderUuid && (
+            <section className={`${CARD} mx-auto my-6 max-w-[560px] items-center gap-3 text-center`} role="status">
+              <CheckCircle2 size={36} aria-hidden="true" className="text-[var(--accent-primary)]" />
+              <h1 className={`${HEADING} m-0 text-2xl font-medium`}>{t('order.doneTitle')}</h1>
+              <p className="m-0">{t('order.doneText', { email: submittedEmail })}</p>
+              <p className="m-0"><small>{t('order.orderNumber')}: {createdOrderUuid}</small></p>
+              <Link to="/" className={BTN_PRIMARY}>{t('order.back')}</Link>
+            </section>
+          )}
+
+          {plan && !createdOrderUuid && (
+            <>
+              <h1 className={`${HEADING} mb-6 mt-0 text-[clamp(1.6rem,3.4vw,2.3rem)] font-medium`}>{t('order.title')}</h1>
+              <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-[minmax(260px,340px)_minmax(0,1fr)]">
+                <PlanSummary plan={plan} lang={lang} />
+                <PlanOrderForm provinces={provinces} submitting={loading} error={submitError} onSubmit={submit} />
+              </div>
+            </>
+          )}
+        </Container>
       </main>
     </div>
   );

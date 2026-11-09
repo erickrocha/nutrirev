@@ -3,7 +3,7 @@ import type { Lang } from './format';
 export interface IngredientLike {
   id: number;
   name: string;
-  nameEn?: string;
+  nameEn?: string | null;
   kcal?: number;
   protein?: number;
   carbs?: number;

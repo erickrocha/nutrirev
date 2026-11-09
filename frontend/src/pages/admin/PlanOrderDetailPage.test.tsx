@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithApp } from '../../test/render';
 import { PlanOrderDetailPage } from './PlanOrderDetailPage';
@@ -17,14 +17,12 @@ const order = (status: string) => ({
 const open = () => renderWithApp(<PlanOrderDetailPage />, { route: '/admin/orders/a', path: '/admin/orders/:uuid' });
 
 describe('PlanOrderDetailPage', () => {
-  beforeEach(() => { vi.spyOn(window, 'confirm').mockReturnValue(true); });
-
-  it('mantém as ações no rodapé: converter e cancelar à esquerda, fechar à direita', async () => {
+  it('rodapé: fechar à esquerda; cancelar pedido e converter à direita', async () => {
     vi.mocked(planOrderService.getOrder).mockResolvedValue(order('pending') as never);
     open();
     const footer = (await screen.findByRole('contentinfo'));
     const buttons = Array.from(footer.querySelectorAll('button')).map((b) => b.textContent);
-    expect(buttons).toEqual(['planOrders.convert', 'planOrders.cancel', 'common.close']);
+    expect(buttons).toEqual(['common.close', 'planOrders.cancel', 'planOrders.convert']);
   });
 
   it('converte com a data informada e volta para a lista', async () => {
@@ -32,16 +30,28 @@ describe('PlanOrderDetailPage', () => {
     vi.mocked(planOrderService.convertOrder).mockResolvedValue();
     open();
     await userEvent.click(await screen.findByRole('button', { name: 'planOrders.convert' }));
+    await userEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'planOrders.convert' }));
     await waitFor(() => expect(planOrderService.convertOrder).toHaveBeenCalledWith('a', expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/)));
     expect(await screen.findByTestId('elsewhere')).toBeInTheDocument();
   });
 
   it('não converte se o usuário não confirmar', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
     vi.mocked(planOrderService.getOrder).mockResolvedValue(order('pending') as never);
     open();
     await userEvent.click(await screen.findByRole('button', { name: 'planOrders.convert' }));
+    await userEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'common.cancel' }));
     expect(planOrderService.convertOrder).not.toHaveBeenCalled();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('cancela o pedido depois de confirmar e volta para a lista', async () => {
+    vi.mocked(planOrderService.getOrder).mockResolvedValue(order('pending') as never);
+    vi.mocked(planOrderService.cancelOrder).mockResolvedValue();
+    open();
+    await userEvent.click(await screen.findByRole('button', { name: 'planOrders.cancel' }));
+    await userEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'planOrders.cancel' }));
+    await waitFor(() => expect(planOrderService.cancelOrder).toHaveBeenCalledWith('a'));
+    expect(await screen.findByTestId('elsewhere')).toBeInTheDocument();
   });
 
   it('esconde as ações de pedidos já convertidos', async () => {

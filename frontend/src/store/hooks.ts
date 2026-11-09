@@ -1,10 +1,62 @@
 import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux';
 import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit';
 import type { PlanOrderState } from './planOrderSlice';
+import type { CustomerState } from './customerSlice';
+import type { CustomerFormState } from './customerFormSlice';
+import type { CatalogState } from './catalogSlice';
+import type { CsvImportState } from './csvImportSlice';
+import type { CrudState } from './createCrudSlice';
+import type { PaymentDateState } from './paymentDateSlice';
+import type { PaymentSettingsState } from './paymentSettingsSlice';
+import type { IngredientCatalogState } from './ingredientCatalogSlice';
+import type { CustomerListState } from './customerListSlice';
+import type { GoalState } from './goalSlice';
+import type { ManualMealState } from './manualMealSlice';
+import type { BusinessPlanState } from './businessPlanSlice';
+import type { AddressState } from './addressSlice';
+import type { TenantState } from './tenantSlice';
+import type { AuthState } from './authSlice';
+import type { UserState } from './userSlice';
+import type { PaymentConnectionState } from './paymentConnectionSlice';
+import type { DoctorState } from './doctorSlice';
+import type { PaymentState } from './paymentSlice';
+import type { CustomerAppState } from './customerAppSlice';
+import type { DashboardState } from './dashboardSlice';
+import type { MealPlanState } from './mealPlanSlice';
+import type { RecipeState } from './recipeSlice';
+import type { IngredientState } from './ingredientSlice';
+import type { TenantPlanState } from './tenantPlanSlice';
+import type { ClinicalPlan, MealPointTier } from '../types/clinical';
 
 // O store.js ainda é JS; tipamos só as fatias já migradas.
 export interface RootState {
   planOrder: PlanOrderState;
+  customerForm: CustomerFormState;
+  catalog: CatalogState;
+  csvImport: CsvImportState;
+  clinicalPlan: CrudState<ClinicalPlan>;
+  mealPointTier: CrudState<MealPointTier>;
+  paymentDate: PaymentDateState;
+  paymentSettings: PaymentSettingsState;
+  ingredientCatalog: IngredientCatalogState;
+  customerList: CustomerListState;
+  goal: GoalState;
+  manualMeal: ManualMealState;
+  businessPlan: BusinessPlanState;
+  address: AddressState;
+  customer: CustomerState;
+  auth: AuthState;
+  tenant: TenantState;
+  user: UserState;
+  paymentConnection: PaymentConnectionState;
+  doctor: DoctorState;
+  payment: PaymentState;
+  customerApp: CustomerAppState;
+  dashboard: DashboardState;
+  mealPlan: MealPlanState;
+  recipe: RecipeState;
+  ingredient: IngredientState;
+  tenantPlan: TenantPlanState;
 }
 export type AppDispatch = ThunkDispatch<RootState, undefined, UnknownAction>;
 

@@ -75,10 +75,10 @@ export const PlanOrderForm = ({ provinces, submitting, error, onSubmit }: Props)
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <FormCard
-        header={<h2 className="m-0 text-[1.1rem]">{t('order.yourData')}</h2>}
+        header={<h2 className="m-0 text-[1.1rem] text-[var(--text-heading)]">{t('order.yourData')}</h2>}
         footer={
           <>
-            <div role="alert" className="text-[#B3261E]">{error}</div>
+            <Button to="/" variant="outline">{t('common.cancel')}</Button>
             <Button type="submit" variant="landing" disabled={submitting}>{submitting ? t('order.sending') : t('order.submit')}</Button>
           </>
         }
@@ -90,7 +90,7 @@ export const PlanOrderForm = ({ provinces, submitting, error, onSubmit }: Props)
           <TextField id="phone" className="col-span-12 md:col-span-5" type="tel" label={t('order.phone')} autoComplete="tel" placeholder="(00) 00000-0000" error={errors.phone?.message} {...masked('phone', maskPhone)} />
         </div>
 
-        <h2 className="mb-[14px] mt-6 text-[1.1rem]">{t('order.address')}</h2>
+        <h2 className="mb-[14px] mt-6 text-[1.1rem] text-[var(--text-heading)]">{t('order.address')}</h2>
         <div className="grid grid-cols-12 gap-[14px]">
           <TextField id="postalCode" className="col-span-12 sm:col-span-4 md:col-span-3" label={t('order.postalCode')} inputMode="numeric" autoComplete="postal-code" placeholder="00000-000" error={errors.postalCode?.message} {...masked('postalCode', maskPostalCode)} />
           <TextField id="street" className="col-span-12 sm:col-span-8 md:col-span-9" label={t('order.street')} autoComplete="address-line1" error={errors.street?.message} {...register('street')} />
@@ -125,11 +125,12 @@ export const PlanOrderForm = ({ provinces, submitting, error, onSubmit }: Props)
         <label className="mt-5 flex items-start gap-[10px] text-[.88rem]">
           <input type="checkbox" className="mt-1" {...register('accepted')} />
           <span>
-            {t('order.acceptPrefix')} <a href="/termos-de-uso" target="_blank" rel="noreferrer">{t('site.footer.terms')}</a> {t('order.acceptAnd')}{' '}
-            <a href="/politica-de-privacidade" target="_blank" rel="noreferrer">{t('site.footer.privacy')}</a>.
+            {t('order.acceptPrefix')} <a href="/termos-de-uso" target="_blank" rel="noreferrer" className="font-semibold text-[var(--accent-primary)]">{t('site.footer.terms')}</a> {t('order.acceptAnd')}{' '}
+            <a href="/politica-de-privacidade" target="_blank" rel="noreferrer" className="font-semibold text-[var(--accent-primary)]">{t('site.footer.privacy')}</a>.
           </span>
         </label>
         {errors.accepted && <small role="alert" className="text-[.72rem] text-red-700">{errors.accepted.message}</small>}
+        {error && <div role="alert" className="mt-3 text-[#B3261E]">{error}</div>}
       </FormCard>
     </form>
   );
