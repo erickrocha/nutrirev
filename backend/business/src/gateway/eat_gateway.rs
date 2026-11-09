@@ -1,6 +1,6 @@
 use crate::commons::entity_mapper::EntityMapper;
 use crate::commons::functions::string_to_bytes;
-use crate::commons::gateway::{tenant_delete, tenant_select, Gateway};
+use crate::commons::gateway::{tenant_delete, tenant_or_global_select, Gateway};
 use crate::domain::eat::{Eat, EatEntityMapper};
 use entity::{
     eat_biotype_entity, eat_entity, eat_meal_entity, eat_restriction_entity, eat_tag_entity,
@@ -26,24 +26,26 @@ impl EatGateway {
         &self.db
     }
 
-    pub async fn increment_views(&self, id: i32) -> Result<(), DbErr> {
-        if let Some(model) = self.find_by_id(id).await? {
-            let mut active: eat_entity::ActiveModel = model.into();
-            let current = active.views.take().unwrap_or(0);
-            active.views = Set(current + 1);
-            active.save(&self.db).await?;
+    /// Soma 1 em `column` por UPDATE direto: salvar o modelo passaria pelo `before_save`, que gravaria o
+    /// tenant do usuário numa receita global. A leitura prévia garante que a receita é visível ao usuário.
+    async fn increment(&self, id: i32, column: eat_entity::Column) -> Result<(), DbErr> {
+        use sea_orm::ExprTrait;
+        if self.find_by_id(id).await?.is_some() {
+            EatQuery::update_many()
+                .col_expr(column, sea_orm::sea_query::Expr::col(column).add(1))
+                .filter(eat_entity::Column::Id.eq(id))
+                .exec(&self.db)
+                .await?;
         }
         Ok(())
     }
 
+    pub async fn increment_views(&self, id: i32) -> Result<(), DbErr> {
+        self.increment(id, eat_entity::Column::Views).await
+    }
+
     pub async fn increment_additions(&self, id: i32) -> Result<(), DbErr> {
-        if let Some(model) = self.find_by_id(id).await? {
-            let mut active: eat_entity::ActiveModel = model.into();
-            let current = active.additions.take().unwrap_or(0);
-            active.additions = Set(current + 1);
-            active.save(&self.db).await?;
-        }
-        Ok(())
+        self.increment(id, eat_entity::Column::Additions).await
     }
 
     pub async fn find_paginated(
@@ -56,7 +58,7 @@ impl EatGateway {
     ) -> Result<(Vec<eat_entity::Model>, u64, u64), DbErr> {
         use sea_orm::{ExprTrait, PaginatorTrait, QueryOrder};
 
-        let mut query = tenant_select(EatQuery::find(), eat_entity::Column::TenantId);
+        let mut query = tenant_or_global_select(EatQuery::find(), eat_entity::Column::TenantId);
 
         if let Some(s) = search
             && !s.trim().is_empty() {
@@ -169,20 +171,20 @@ impl Gateway<Eat, eat_entity::Model, eat_entity::ActiveModel> for EatGateway {
     }
 
     async fn find_by_id(&self, id: i32) -> Result<Option<eat_entity::Model>, DbErr> {
-        tenant_select(EatQuery::find(), eat_entity::Column::TenantId)
+        tenant_or_global_select(EatQuery::find(), eat_entity::Column::TenantId)
             .filter(eat_entity::Column::Id.eq(id))
             .one(&self.db)
             .await
     }
 
     async fn find_by_uuid(&self, uuid: String) -> Result<Option<eat_entity::Model>, DbErr> {
-        tenant_select(EatQuery::find(), eat_entity::Column::TenantId)
+        tenant_or_global_select(EatQuery::find(), eat_entity::Column::TenantId)
             .filter(eat_entity::Column::Uuid.eq(string_to_bytes(&uuid)))
             .one(&self.db)
             .await
     }
 
     async fn find_all(&self) -> Result<Vec<eat_entity::Model>, DbErr> {
-        tenant_select(EatQuery::find(), eat_entity::Column::TenantId).all(&self.db).await
+        tenant_or_global_select(EatQuery::find(), eat_entity::Column::TenantId).all(&self.db).await
     }
 }
