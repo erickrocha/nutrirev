@@ -150,6 +150,12 @@ impl EatUseCase {
                 return Err(err);
             }
         };
+        // Receita global (sem tenant) é somente leitura para as clínicas.
+        if existing.tenant_id.is_none() && matches!(entity::audit::tenant_scope(), entity::audit::TenantScope::Tenant(_)) {
+            let msg = format!("Recipe not found with id {}", id);
+            log::error!("[EatUseCase::update] Global recipe is read-only for tenants: {}", msg);
+            return Err(BusinessError::new(msg));
+        }
         entity.id = Some(id);
         entity.uuid = existing.uuid;
 

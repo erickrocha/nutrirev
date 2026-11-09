@@ -1,3 +1,4 @@
+import { matchPath } from 'react-router-dom';
 import { ROLES } from '../utils/enums';
 
 // Single source of truth for the URL path each former tab-id now maps to.
@@ -116,3 +117,7 @@ export const DEFAULT_PATH_BY_ROLE: Record<string, string> & { default: string } 
   [ROLES.SYS_ADMIN]: PATHS.SYSADMIN_DASHBOARD,
   default: PATHS.TENANT_DASHBOARD,
 };
+
+/** O endereço é uma tela interna de algum perfil? (usado para mandar o visitante deslogado ao login em vez do 404) */
+export const isAppPath = (pathname: string): boolean =>
+  Object.values(ROLE_ALLOWED_PATHS).some((patterns) => patterns.some((pattern) => matchPath({ path: pattern, end: true }, pathname)));

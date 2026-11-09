@@ -1,0 +1,51 @@
+code,name,description,time,portion,meals,tags,restrictions
+fit01,Panqueca de banana e aveia,"Panqueca de três ingredientes, sem farinha branca nem açúcar: a banana adoça e a aveia dá fibras.",15,2,Café da manhã,Fit;Rápido,Vegetariano;Sem lactose
+fit02,Omelete de espinafre e queijo minas,"Omelete alto em proteína, com folhas verdes e queijo branco.",10,1,Café da manhã;Jantar,Fit;Alto em proteína;Low carb;Rápido,Vegetariano;Sem glúten
+fit03,Overnight oats com chia e morango,Aveia hidratada na geladeira durante a noite: pronta para levar ao trabalho.,5,1,Café da manhã,Fit;Rápido,Vegetariano
+fit04,Tapioca de cottage com tomate,"Tapioca leve e sem glúten, recheada com queijo cottage.",10,1,Café da manhã;Lanche,Fit;Rápido,Vegetariano;Sem glúten
+fit05,Crepioca de frango,Mistura de ovo e tapioca com recheio de frango desfiado e ricota.,10,1,Café da manhã;Lanche,Fit;Alto em proteína;Low carb;Rápido,Sem glúten
+fit06,Mingau proteico de aveia e banana,"Mingau cremoso com whey, ótimo antes do treino.",10,1,Café da manhã,Fit;Alto em proteína;Rápido,Vegetariano
+fit07,Ovo mexido com abacate no pão integral,Gorduras boas do abacate com proteína do ovo e fibras do pão integral.,10,1,Café da manhã,Fit;Rápido,Vegetariano;Sem lactose
+fit08,Smoothie verde de abacaxi e couve,"Bebida refrescante, hidratante e rica em fibras.",5,1,Café da manhã;Lanche,Fit;Rápido,Vegetariano;Vegano;Sem lactose;Sem glúten
+fit09,Iogurte com granola caseira e mamão,"Granola simples de aveia, castanha e linhaça sobre iogurte e fruta.",5,1,Café da manhã;Lanche,Fit;Rápido,Vegetariano
+fit10,Muffin de ovo com legumes,"Muffins salgados sem farinha, perfeitos para preparar no domingo e congelar.",30,2,Café da manhã;Lanche,Fit;Low carb,Vegetariano;Sem glúten
+fit11,Cuscuz nordestino com ovo e queijo minas,"Café da manhã tradicional, saciante e com pouca gordura.",10,1,Café da manhã,Fit;Rápido,Vegetariano;Sem glúten
+fit12,Frango grelhado com arroz integral e brócolis,"O prato clássico fit: proteína magra, carboidrato complexo e legume.",25,1,Almoço;Jantar,Fit;Alto em proteína,Sem lactose;Sem glúten
+fit13,Strogonoff fit de frango,Versão leve com iogurte natural no lugar do creme de leite.,30,4,Almoço;Jantar,Fit;Alto em proteína;Low carb,Sem glúten
+fit14,Escondidinho de batata-doce com carne moída,"Purê de batata-doce sobre recheio de carne magra, gratinado com mozarela.",45,4,Almoço;Jantar,Fit;Alto em proteína,Sem glúten
+fit15,Salada de quinoa com grão-de-bico,"Salada fria completa, boa para marmita.",20,3,Almoço,Fit,Vegetariano;Vegano;Sem lactose;Sem glúten
+fit16,Bowl de salmão com arroz e legumes,"Bowl inspirado na culinária japonesa, rico em ômega-3.",20,1,Almoço;Jantar,Fit;Alto em proteína,Sem lactose
+fit17,Almôndegas de patinho ao molho de tomate,"Almôndegas assadas, sem fritura, com aveia no lugar da farinha de rosca.",35,4,Almoço;Jantar,Fit;Alto em proteína;Low carb,Sem lactose
+fit18,Lentilha com legumes e ovo cozido,Prato vegetariano rico em ferro e fibras.,30,2,Almoço,Fit,Vegetariano;Sem lactose;Sem glúten
+fit19,Merluza assada com legumes,Peixe branco assado na própria assadeira com legumes.,35,2,Almoço;Jantar,Fit;Alto em proteína;Low carb,Sem lactose;Sem glúten
+fit20,Panqueca integral de frango com ricota,"Massa de aveia e ovo recheada com frango, coberta com molho de tomate.",40,3,Almoço;Jantar,Fit;Alto em proteína;Low carb,
+fit21,Arroz de couve-flor com frango,Low carb: a couve-flor ralada substitui o arroz.,30,3,Almoço;Jantar,Fit;Alto em proteína;Low carb,Sem lactose;Sem glúten
+fit22,Hambúrguer caseiro com batata-doce assada,"Hambúrguer de patinho sem pão, acompanhado de batata-doce e salada.",40,3,Almoço;Jantar,Fit;Alto em proteína,Sem lactose;Sem glúten
+fit23,Camarão com espaguete de abobrinha,Massa de abobrinha com camarão e tomate: leve e rápido.,20,2,Almoço;Jantar,Fit;Alto em proteína;Low carb,Sem lactose;Sem glúten
+fit24,Salada de atum com feijão branco,"Salada fria e proteica, de preparo rápido.",10,2,Almoço;Lanche,Fit;Low carb;Rápido,Sem lactose;Sem glúten
+fit25,Frango xadrez fit,Frango salteado com pimentões e castanha de caju.,30,3,Almoço;Jantar,Fit;Alto em proteína;Low carb,Sem lactose
+fit26,Frango desfiado com purê de batata-doce,Marmita simples para o pós-treino.,25,1,Almoço;Jantar,Fit;Alto em proteína,Sem lactose;Sem glúten
+fit27,Sopa de abóbora com frango desfiado,"Sopa cremosa sem creme de leite, que fica saciante com a proteína do frango.",30,3,Jantar,Fit;Low carb,Sem lactose;Sem glúten
+fit28,Caldo verde fit,"Versão leve do caldo verde, sem linguiça e com frango.",35,3,Jantar,Fit;Low carb,Sem lactose;Sem glúten
+fit29,Omelete de forno com brócolis e ricota,"Omelete assado, firme e fácil de dividir.",30,2,Jantar;Almoço,Fit;Alto em proteína;Low carb,Vegetariano;Sem glúten
+fit30,Filé de frango com purê de couve-flor,Purê low carb com textura cremosa.,30,2,Jantar;Almoço,Fit;Alto em proteína;Low carb,Sem glúten
+fit31,Berinjela recheada com carne moída,Berinjelas assadas recheadas com carne e queijo.,45,2,Jantar;Almoço,Fit;Alto em proteína;Low carb,Sem glúten
+fit32,Salmão assado com aspargos e batata-doce,Jantar completo em uma única assadeira.,30,2,Jantar;Almoço,Fit;Alto em proteína,Sem lactose;Sem glúten
+fit33,Torta de frango de liquidificador,"Massa de aveia batida no liquidificador, sem farinha de trigo.",50,4,Jantar;Almoço,Fit;Alto em proteína;Low carb,
+fit34,Estrogonofe de tofu e cogumelos,"Opção vegana, cremosa graças ao leite de coco.",30,3,Jantar;Almoço,Fit;Low carb,Vegetariano;Vegano;Sem lactose
+fit35,Cookies de aveia e banana,"Cookies sem açúcar nem farinha, adoçados pela banana.",25,6,Lanche,Fit,Vegetariano;Vegano;Sem lactose
+fit36,Homus caseiro com palitos de cenoura,"Pasta de grão-de-bico com tahine, boa para lanches da tarde.",10,3,Lanche,Fit;Rápido,Vegetariano;Vegano;Sem lactose;Sem glúten
+fit37,Bolo de caneca de banana e cacau,"Bolo individual no micro-ondas, pronto em 2 minutos.",5,1,Lanche;Sobremesa,Fit;Rápido,Vegetariano;Sem lactose
+fit38,Guacamole fit com palitos de pepino,Pasta de abacate com tomate e limão.,10,3,Lanche,Fit;Low carb;Rápido,Vegetariano;Vegano;Sem lactose;Sem glúten
+fit39,Ovos cozidos recheados,Gemas misturadas com iogurte e mostarda no lugar da maionese.,20,2,Lanche,Fit;Low carb,Vegetariano;Sem glúten
+fit40,Chips de batata-doce assada,"Crocantes e assados, sem fritura.",35,2,Lanche,Fit,Vegetariano;Vegano;Sem lactose;Sem glúten
+fit41,Iogurte batido com mamão e linhaça,Lanche rápido e rico em fibras.,5,1,Lanche;Café da manhã,Fit;Rápido,Vegetariano;Sem glúten
+fit42,Torrada integral com ricota e tomate,Lanche simples e leve.,5,1,Lanche,Fit;Rápido,Vegetariano
+fit43,Mousse de abacate com cacau,"Sobremesa cremosa, sem açúcar refinado.",10,2,Sobremesa,Fit;Low carb;Rápido,Vegetariano;Sem glúten
+fit44,Sorvete de banana e morango,"Sorvete de fruta congelada, sem açúcar, leite ou creme.",10,2,Sobremesa,Fit;Rápido,Vegetariano;Vegano;Sem lactose;Sem glúten
+fit45,Pudim de chia com manga,"Pudim feito na geladeira, rico em fibras e ômega-3.",5,1,Sobremesa;Café da manhã,Fit;Rápido,Vegetariano;Sem lactose;Sem glúten
+fit46,Brigadeiro fit de whey e cacau,"Docinho proteico, sem leite condensado.",15,6,Sobremesa,Fit;Low carb;Rápido,Vegetariano;Sem glúten
+fit47,Vitamina pós-treino de banana com whey,Shake de recuperação com carboidrato e proteína.,5,1,Lanche,Fit;Alto em proteína;Rápido,Vegetariano
+fit48,Panqueca de claras com mirtilo,"Quase só proteína, com mirtilos por cima.",10,1,Café da manhã;Lanche,Fit;Rápido,Vegetariano;Sem lactose
+fit49,Bolo de laranja fit,Bolo de liquidificador com aveia e suco de laranja.,50,8,Sobremesa;Lanche,Fit;Low carb,Vegetariano;Sem lactose
+fit50,Salada de frutas com iogurte e chia,Frutas frescas com iogurte e sementes.,10,2,Sobremesa;Café da manhã,Fit;Rápido,Vegetariano;Sem glúten

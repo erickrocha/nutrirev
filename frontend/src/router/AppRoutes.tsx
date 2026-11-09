@@ -49,11 +49,11 @@ const CustomerPaymentsPage = lazy(() => import('../pages/payments/CustomerPaymen
 const IngredientListPage = lazy(() => import('../pages/clinical/IngredientListPage').then((module) => ({ default: module.IngredientListPage })));
 const IngredientFormPage = lazy(() => import('../pages/clinical/IngredientFormPage').then((module) => ({ default: module.IngredientFormPage })));
 
-// "/" leva à página inicial do perfil; qualquer outro endereço sem rota é um 404.
+// "/" e "/login" (ex.: logo após entrar) levam à página inicial do perfil; qualquer outro endereço sem rota é um 404.
 const UnknownRoute = () => {
   const { pathname } = useLocation();
   const role = useAppSelector((state) => state.auth.user?.role);
-  if (pathname !== '/') return <NotFoundPage homePath="/" />;
+  if (pathname !== '/' && pathname !== '/login') return <NotFoundPage homePath="/" />;
   return <Navigate to={(DEFAULT_PATH_BY_ROLE as Record<string, string>)[role ?? ''] ?? DEFAULT_PATH_BY_ROLE.default} replace />;
 };
 
