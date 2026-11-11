@@ -85,7 +85,7 @@ impl CardOnFileUseCase {
         let saved = token::ActiveModel {
             tenant_id: Set(tenant_id),
             customer_id: Set(customer_id),
-            provider: Set("asaas".into()),
+            provider: Set(tokenizer.provider_name().into()),
             provider_token: Set(stored.provider_token),
             brand: Set(stored.brand),
             last4: Set(stored.last4),
@@ -235,6 +235,11 @@ impl CardOnFileUseCase {
             // cannot store cards. Either way the worker stops charging: the
             // charge stays open and the patient pays it by hand.
             return Err(error("Recurring billing is not enabled for this clinic"));
+        }
+        if due.merchant_provider != tokenizer.provider_name() {
+            // The card was stored with a previous acquirer. Its token means
+            // nothing to the current one; the patient must save the card again.
+            return Err(error("Stored card belongs to a different acquirer"));
         }
 
         let attempt = CardPaymentUseCase::prepare_unattended(

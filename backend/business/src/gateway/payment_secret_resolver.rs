@@ -10,6 +10,10 @@ pub struct AsaasCredentials {
     pub api_key: Zeroizing<String>,
 }
 
+pub struct StripeCredentials {
+    pub secret_key: Zeroizing<String>,
+}
+
 pub trait PaymentSecretResolver: Send + Sync {
     fn rede_sandbox(&self, secret_ref: &str) -> Result<RedeCredentials, CardProcessorError>;
 
@@ -24,11 +28,23 @@ pub trait PaymentSecretResolver: Send + Sync {
     /// charge that was never paid. Resolving the tenant from our own row does not
     /// help — the forger picks the row.
     fn asaas_webhook_token(&self, secret_ref: &str) -> Result<Zeroizing<String>, CardProcessorError>;
+
+    /// The clinic's own Stripe secret key (`sk_test_...` / `sk_live_...`).
+    fn stripe(&self, secret_ref: &str) -> Result<StripeCredentials, CardProcessorError>;
+
+    /// The signing secret (`whsec_...`) of this clinic's Stripe webhook
+    /// endpoint. Per merchant, for the same reason as `asaas_webhook_token`.
+    fn stripe_webhook_secret(
+        &self,
+        secret_ref: &str,
+    ) -> Result<Zeroizing<String>, CardProcessorError>;
 }
 
 /// Environment-variable resolver. A reference such as `rede/clinic-a` maps to
 /// `PAYMENT_SECRET_REDE_CLINIC_A_*`, and `asaas/clinic-a` to
-/// `PAYMENT_SECRET_ASAAS_CLINIC_A_API_KEY` / `_WEBHOOK_TOKEN`.
+/// `PAYMENT_SECRET_ASAAS_CLINIC_A_API_KEY` / `_WEBHOOK_TOKEN`, and
+/// `stripe/clinic-a` to `PAYMENT_SECRET_STRIPE_CLINIC_A_SECRET_KEY` /
+/// `_WEBHOOK_SECRET`.
 ///
 /// Replace with the deployment secret manager before production; nothing outside
 /// this file knows where a credential comes from.
@@ -92,6 +108,21 @@ impl PaymentSecretResolver for EnvironmentPaymentSecretResolver {
         let prefix = env_prefix(secret_ref)?;
         required(&format!("{prefix}_WEBHOOK_TOKEN"))
     }
+
+    fn stripe(&self, secret_ref: &str) -> Result<StripeCredentials, CardProcessorError> {
+        let prefix = env_prefix(secret_ref)?;
+        Ok(StripeCredentials {
+            secret_key: required(&format!("{prefix}_SECRET_KEY"))?,
+        })
+    }
+
+    fn stripe_webhook_secret(
+        &self,
+        secret_ref: &str,
+    ) -> Result<Zeroizing<String>, CardProcessorError> {
+        let prefix = env_prefix(secret_ref)?;
+        required(&format!("{prefix}_WEBHOOK_SECRET"))
+    }
 }
 
 /// Compares two secrets without leaking their contents through timing.
@@ -119,6 +150,7 @@ mod tests {
     fn derives_the_variable_prefix_from_a_reference() {
         assert_eq!(env_prefix("rede/clinic-a").unwrap(), "PAYMENT_SECRET_REDE_CLINIC_A");
         assert_eq!(env_prefix("asaas/clinic-a").unwrap(), "PAYMENT_SECRET_ASAAS_CLINIC_A");
+        assert_eq!(env_prefix("stripe/clinic-a").unwrap(), "PAYMENT_SECRET_STRIPE_CLINIC_A");
     }
 
     #[test]

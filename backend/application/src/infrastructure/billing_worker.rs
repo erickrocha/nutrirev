@@ -1,6 +1,5 @@
-use business::gateway::asaas_processor::AsaasProcessor;
 use business::gateway::billing_gateway::BillingGateway;
-use business::gateway::payment_provider_factory::{active_connection, asaas_client};
+use business::gateway::payment_provider_factory::{active_connection, psp_client, PspClient};
 use business::gateway::payment_secret_resolver::EnvironmentPaymentSecretResolver;
 use business::sea_orm::{ConnectionTrait, DatabaseConnection, Statement, TryGetable};
 use business::use_cases::card_on_file_use_case::{CardOnFileUseCase, UnattendedReport};
@@ -121,7 +120,7 @@ async fn charge_stored_cards(
     // One client per clinic, resolved from that clinic's live connection and its
     // own secret. A clinic usually owes more than one charge, and each would
     // otherwise re-read the same secret.
-    let mut clients: HashMap<i32, Option<Arc<AsaasProcessor>>> = HashMap::new();
+    let mut clients: HashMap<i32, Option<Arc<PspClient>>> = HashMap::new();
 
     for due in BillingGateway::card_on_file_due(db, today).await? {
         if clients.contains_key(&due.tenant_id) {
@@ -129,7 +128,7 @@ async fn charge_stored_cards(
         }
         let client = match active_connection(db, due.tenant_id, &environment).await {
             Ok(connection) if connection.capabilities.recurring => {
-                asaas_client(&connection, &EnvironmentPaymentSecretResolver)
+                psp_client(&connection, &EnvironmentPaymentSecretResolver)
                     .ok()
                     .map(Arc::new)
             }

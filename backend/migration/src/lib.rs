@@ -62,6 +62,7 @@ mod m20260906_000001_dataload_taco_ingredients;
 mod m20260907_000001_ingredient_bilingual;
 mod m20260907_000002_dataload_usda_sr_legacy;
 mod m20260908_000001_dataload_fit_recipes;
+mod m20261111_000001_stripe_provider_support;
 
 pub struct Migrator;
 
@@ -129,6 +130,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260907_000001_ingredient_bilingual::Migration),
             Box::new(m20260907_000002_dataload_usda_sr_legacy::Migration),
             Box::new(m20260908_000001_dataload_fit_recipes::Migration),
+            Box::new(m20261111_000001_stripe_provider_support::Migration),
         ]
     }
 }

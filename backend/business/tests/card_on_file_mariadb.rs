@@ -135,6 +135,10 @@ impl CardTokenizer for StubTokenizer {
             Outcome::Unknown => Err(CardProcessorError::Unknown),
         }
     }
+
+    fn provider_name(&self) -> &'static str {
+        "asaas"
+    }
 }
 
 /// Charges are generated a month ahead of their due date. Billing every open

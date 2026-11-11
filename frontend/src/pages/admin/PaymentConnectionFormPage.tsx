@@ -20,7 +20,7 @@ import { PATHS } from '../../router/routeConfig';
 import { ROLES } from '../../utils/enums';
 import type { PaymentConnectionAdmin } from '../../types/clinical';
 
-const PROVIDERS = ['rede', 'asaas'];
+const PROVIDERS = ['rede', 'asaas', 'stripe'];
 const ENVIRONMENTS = ['sandbox', 'production'];
 const SECRET_REF = /^[A-Za-z0-9/_-]+$/;
 

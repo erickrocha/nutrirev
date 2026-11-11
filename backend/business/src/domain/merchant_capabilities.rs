@@ -13,6 +13,7 @@ use crate::domain::card_payment::PaymentMethod;
 pub enum Provider {
     Rede,
     Asaas,
+    Stripe,
 }
 
 impl Provider {
@@ -20,6 +21,7 @@ impl Provider {
         match self {
             Self::Rede => "rede",
             Self::Asaas => "asaas",
+            Self::Stripe => "stripe",
         }
     }
 
@@ -27,6 +29,7 @@ impl Provider {
         match value {
             "rede" => Some(Self::Rede),
             "asaas" => Some(Self::Asaas),
+            "stripe" => Some(Self::Stripe),
             _ => None,
         }
     }
@@ -37,12 +40,12 @@ impl Provider {
     /// once, in one place, is what keeps a clinic from switching on a method
     /// that would fail in front of a patient.
     pub fn supports_pix(self) -> bool {
-        matches!(self, Self::Asaas)
+        matches!(self, Self::Asaas | Self::Stripe)
     }
 
     /// Whether this acquirer can store a card for unattended charging.
     pub fn supports_tokenization(self) -> bool {
-        matches!(self, Self::Asaas)
+        matches!(self, Self::Asaas | Self::Stripe)
     }
 }
 
@@ -150,9 +153,16 @@ mod tests {
 
     #[test]
     fn providers_round_trip_through_their_stored_form() {
-        for provider in [Provider::Rede, Provider::Asaas] {
+        for provider in [Provider::Rede, Provider::Asaas, Provider::Stripe] {
             assert_eq!(Provider::parse(provider.as_str()), Some(provider));
         }
-        assert_eq!(Provider::parse("stripe"), None);
+        assert_eq!(Provider::parse("paypal"), None);
+    }
+
+    #[test]
+    fn stripe_offers_every_method() {
+        assert!(ALL.validate_for(Provider::Stripe).is_ok());
+        assert!(Provider::Stripe.supports_pix());
+        assert!(Provider::Stripe.supports_tokenization());
     }
 }

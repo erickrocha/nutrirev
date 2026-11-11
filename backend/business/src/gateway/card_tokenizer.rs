@@ -27,6 +27,12 @@ pub trait CardTokenizer: Send + Sync {
         provider_token: &str,
         request: &TokenChargeRequest,
     ) -> Result<CardProcessorResult, CardProcessorError>;
+
+    /// The `payment_token.provider` value for tokens this tokenizer issues.
+    ///
+    /// A token is only chargeable by the provider that issued it, so the row
+    /// must say which one that was.
+    fn provider_name(&self) -> &'static str;
 }
 
 /// Lets a shared handle stand in for the tokenizer itself.
@@ -50,5 +56,9 @@ impl<T: CardTokenizer + ?Sized> CardTokenizer for std::sync::Arc<T> {
         request: &TokenChargeRequest,
     ) -> Result<CardProcessorResult, CardProcessorError> {
         (**self).charge_token(provider_token, request).await
+    }
+
+    fn provider_name(&self) -> &'static str {
+        (**self).provider_name()
     }
 }

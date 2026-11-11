@@ -178,6 +178,16 @@ impl ProviderCustomerRegistry for AsaasProcessor {
         }
         Ok(created.id)
     }
+
+    /// Asaas payer ids are `cus_` followed only by digits (`cus_000005219613`).
+    fn owns_customer_id(&self, provider_customer_id: &str) -> bool {
+        is_asaas_customer_id(provider_customer_id)
+    }
+}
+
+pub fn is_asaas_customer_id(id: &str) -> bool {
+    id.strip_prefix("cus_")
+        .is_some_and(|rest| !rest.is_empty() && rest.bytes().all(|b| b.is_ascii_digit()))
 }
 
 #[async_trait::async_trait]
@@ -338,6 +348,10 @@ impl CardTokenizer for AsaasProcessor {
             }
             Err(PaymentFailure::Unknown) => Err(CardProcessorError::Unknown),
         }
+    }
+
+    fn provider_name(&self) -> &'static str {
+        "asaas"
     }
 }
 
@@ -532,6 +546,14 @@ mod tests {
         let result = payment.into_card_result();
         assert_eq!(result.last4.as_deref(), Some("8829"));
         assert_eq!(result.brand.as_deref(), Some("VISA"));
+    }
+
+    #[test]
+    fn recognises_its_own_customer_ids() {
+        assert!(is_asaas_customer_id("cus_000005219613"));
+        assert!(!is_asaas_customer_id("cus_NffrFeUfNV2Hib"));
+        assert!(!is_asaas_customer_id("cus_"));
+        assert!(!is_asaas_customer_id(""));
     }
 
     #[test]

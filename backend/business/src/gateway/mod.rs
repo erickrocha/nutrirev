@@ -41,3 +41,4 @@ pub mod card_tokenizer;
 pub mod asaas_processor;
 pub mod provider_customer;
 pub mod payment_provider_factory;
+pub mod stripe_processor;

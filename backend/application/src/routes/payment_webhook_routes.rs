@@ -1,4 +1,4 @@
-use crate::http::payment_webhook_controller::asaas;
+use crate::http::payment_webhook_controller::{asaas, stripe};
 use crate::AppState;
 use axum::routing::post;
 use axum::Router;
@@ -15,5 +15,7 @@ use axum::Router;
 /// The handler authenticates each callback itself, against the clinic's own
 /// per-merchant secret.
 pub fn payment_webhook_routes() -> Router<AppState> {
-    Router::new().route("/asaas", post(asaas))
+    Router::new()
+        .route("/asaas", post(asaas))
+        .route("/stripe", post(stripe))
 }
