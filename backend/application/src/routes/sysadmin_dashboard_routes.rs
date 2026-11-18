@@ -28,6 +28,7 @@ mod tests {
     async fn exact_sysadmin_dashboard_path_is_registered() {
         let state = AppState {
             conn: Arc::new(DatabaseConnection::default()),
+            payment_keys: Arc::new(Default::default()),
         };
         let app = sysadmin_dashboard_routes(state.clone()).with_state(state);
 

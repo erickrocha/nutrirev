@@ -9,7 +9,10 @@ pub struct Model {
     pub provider: String,
     pub environment: String,
     pub merchant_reference: String,
-    pub credentials_secret_ref: String,
+    pub credentials_secret_ref: Option<String>,
+    pub credentials: Option<Vec<u8>>,
+    pub key_version: Option<String>,
+    pub publishable_key: Option<String>,
     pub status: String,
     /// Which methods this clinic offers through this connection. `active_flag`
     /// exists in the table too but is deliberately absent here: it is a

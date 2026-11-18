@@ -1,41 +1,49 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Frontend: Vite + React",
-            "url": "http://localhost:5173",
-            "webRoot": "${workspaceFolder}/frontend",
-            "preLaunchTask": "Start Frontend (Vite)"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Backend: Rust",
-            "cargo": {
-                "args": [
-                    "build",
-                    "--bin=nutrirev",
-                    "--package=application",
-                    "--manifest-path=${workspaceFolder}/backend/Cargo.toml"
-                ],
-                "filter": {
-                    "name": "nutrirev",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}/backend"
-        }
-    ],
-    "compounds": [
-        {
-            "name": "Fullstack: Rust + React",
-            "configurations": [
-                "Backend: Rust",
-                "Frontend: Vite + React"
-            ]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug Backend (Rust)",
+      "program": "${workspaceFolder}/backend/target/debug/nutrirev",
+      "args": [],
+      "cwd": "${workspaceFolder}/backend",
+      "envFile": "${workspaceFolder}/backend/.env",
+      "preLaunchTask": "build backend",
+      "stopOnEntry": false
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug Frontend (Chrome)",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend",
+      "sourceMaps": true,
+      "preLaunchTask": "start frontend"
+    },
+    {
+      "type": "chrome",
+      "request": "attach",
+      "name": "Attach to Frontend (Chrome)",
+      "port": 9222,
+      "urlFilter": "http://localhost:5173/*",
+      "webRoot": "${workspaceFolder}/frontend"
+    },
+    {
+      "type": "dart",
+      "request": "launch",
+      "name": "Debug Mobile (Flutter)",
+      "cwd": "${workspaceFolder}/mobile"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Fullstack: Backend + Frontend",
+      "configurations": [
+        "Debug Backend (Rust)",
+        "Debug Frontend (Chrome)"
+      ],
+      "stopAll": true
+    }
+  ]
 }

@@ -42,6 +42,7 @@ mod tests {
     async fn test_meal_analysis_and_log_routes_registered() {
         let state = AppState {
             conn: Arc::new(DatabaseConnection::default()),
+            payment_keys: Arc::new(Default::default()),
         };
 
         let app = Router::new()

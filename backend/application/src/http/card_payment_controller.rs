@@ -7,7 +7,7 @@ use axum::http::HeaderMap;
 use axum::Json;
 use business::domain::card_submission::{AuthorizeCardPayment, SensitiveCardData};
 use business::domain::user::User;
-use business::gateway::payment_secret_resolver::EnvironmentPaymentSecretResolver;
+use crate::infrastructure::payment_secret_resolver::DatabasePaymentSecretResolver;
 use business::use_cases::card_payment_use_case::CardPaymentUseCase;
 
 #[utoipa::path(
@@ -46,7 +46,7 @@ pub async fn authorize(
         AuthorizeCardPayment { attempt_id, card },
         client_ip(&headers),
         payload.tax_id.as_deref(),
-        &EnvironmentPaymentSecretResolver,
+        &DatabasePaymentSecretResolver::new(state.conn.clone(), state.payment_keys.clone()),
     )
     .await
     .map_err(|error| match error.message.as_str() {

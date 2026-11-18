@@ -101,7 +101,7 @@ describe('PaymentConnectionFormPage', () => {
     await userEvent.type(await screen.findByLabelText(/paymentConnections.merchantReference/), ' m-9 ');
     await userEvent.type(screen.getByLabelText(/paymentConnections.credentialsSecretRef/), 'secrets/asaas_prod');
     await userEvent.click(screen.getByRole('button', { name: 'common.save' }));
-    await waitFor(() => expect(provision).toHaveBeenCalledWith({ tenantId: 4, provider: 'rede', environment: 'sandbox', merchantReference: 'm-9', credentialsSecretRef: 'secrets/asaas_prod' }));
+    await waitFor(() => expect(provision).toHaveBeenCalledWith({ tenantId: 4, provider: 'stripe', environment: 'sandbox', merchantReference: 'm-9', credentialsSecretRef: 'secrets/asaas_prod' }));
     expect(await screen.findByTestId('elsewhere')).toBeInTheDocument();
   });
 

@@ -75,20 +75,47 @@ export const paymentChargeService = {
 /// says which one it is supporting. Clinic staff omit it: theirs is the only
 /// clinic they may touch, and the server holds them to it.
 export const paymentSettingsService = {
-  async getConnections(tenantId?: Id) {
+  async getSettings(tenantId?: Id) {
     const params = tenantId ? { tenantId } : undefined;
-    const response = await api.get('/v1/payments/connections', { params });
+    const response = await api.get('/v1/payments/settings', { params });
     return response.data;
   },
 
-  /**
-   * Chooses the acquirer and the methods offered through it.
-   * One acquirer per clinic: choosing retires the previous one.
-   */
-  async select({ tenantId, merchantId, creditEnabled, pixEnabled, recurringEnabled }: { tenantId?: Id; merchantId: Id; creditEnabled: boolean; pixEnabled: boolean; recurringEnabled: boolean }) {
-    const response = await api.put('/v1/payments/connections/selected', {
+  async saveSettings(data: {
+    tenantId?: Id | null;
+    secretKey?: string;
+    publishableKey?: string;
+    webhookSecret?: string;
+    creditEnabled?: boolean;
+    pixEnabled?: boolean;
+    recurringEnabled?: boolean;
+  }) {
+    const response = await api.put('/v1/payments/settings', data);
+    return response.data;
+  },
+
+  async getConnections(tenantId?: Id) {
+    const params = tenantId ? { tenantId } : undefined;
+    const response = await api.get('/v1/payments/settings', { params });
+    const settings = response.data;
+    if (!settings || !settings.configured) return [];
+    return [{
+      id: 1,
+      provider: settings.provider,
+      merchantReference: `tenant-${tenantId ?? 'default'}`,
+      environment: settings.environment,
+      active: true,
+      creditEnabled: settings.creditEnabled,
+      pixEnabled: settings.pixEnabled,
+      recurringEnabled: settings.recurringEnabled,
+      supportsPix: settings.supportsPix,
+      supportsRecurring: settings.supportsRecurring,
+    }];
+  },
+
+  async select({ tenantId, creditEnabled, pixEnabled, recurringEnabled }: { tenantId?: Id; merchantId?: Id; creditEnabled: boolean; pixEnabled: boolean; recurringEnabled: boolean }) {
+    const response = await api.put('/v1/payments/settings', {
       tenantId: tenantId ?? null,
-      merchantId,
       creditEnabled,
       pixEnabled,
       recurringEnabled,

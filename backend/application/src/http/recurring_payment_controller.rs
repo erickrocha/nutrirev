@@ -21,7 +21,7 @@ use business::domain::card_submission::SensitiveCardData;
 use business::domain::card_token::TokenHolder;
 use business::domain::user::User;
 use business::gateway::payment_provider_factory::{active_connection, psp_client, PspClient};
-use business::gateway::payment_secret_resolver::EnvironmentPaymentSecretResolver;
+use crate::infrastructure::payment_secret_resolver::DatabasePaymentSecretResolver;
 use business::use_cases::card_on_file_use_case::{
     subscription_owned_by_user, CardOnFileUseCase,
 };
@@ -245,7 +245,8 @@ async fn provider_for(
             ErrorKey::PaymentMethodUnavailable,
         ));
     }
-    psp_client(&connection, &EnvironmentPaymentSecretResolver)
+    let secrets = DatabasePaymentSecretResolver::new(state.conn.clone(), state.payment_keys.clone());
+    psp_client(&connection, &secrets)
         .map_err(|_| ExceptionResponse::BadRequest(locale, ErrorKey::PaymentProviderUnavailable))
 }
 

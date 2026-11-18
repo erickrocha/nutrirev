@@ -55,6 +55,28 @@ export interface PaymentConnection {
   supportsRecurring: boolean;
 }
 
+export interface PaymentSettingsResponse {
+  configured: boolean;
+  provider: string;
+  environment: string;
+  publishableKey?: string | null;
+  creditEnabled: boolean;
+  pixEnabled: boolean;
+  recurringEnabled: boolean;
+  supportsPix: boolean;
+  supportsRecurring: boolean;
+}
+
+export interface SavePaymentSettings {
+  tenantId?: number | null;
+  secretKey?: string;
+  publishableKey?: string;
+  webhookSecret?: string;
+  creditEnabled?: boolean;
+  pixEnabled?: boolean;
+  recurringEnabled?: boolean;
+}
+
 export interface PaymentMethodsSelection {
   tenantId: number | undefined;
   merchantId: number;

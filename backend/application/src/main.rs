@@ -278,14 +278,9 @@ impl Modify for SecurityAddon {
         http::payment_charge_controller::list_charges,
         http::payment_charge_controller::prepare_charge,
         http::payment_charge_controller::list_reversals,
-        http::payment_settings_controller::provision,
-        http::payment_settings_controller::list_connections,
-        http::payment_settings_controller::select,
+        http::payment_settings_controller::get_settings,
+        http::payment_settings_controller::save_settings,
         http::payment_settings_controller::offered_methods,
-        http::payment_settings_controller::admin_list,
-        http::payment_settings_controller::admin_update,
-        http::payment_settings_controller::admin_disable,
-        http::payment_settings_controller::admin_delete,
         http::pix_payment_controller::create_pix_charge,
         http::pix_payment_controller::attempt_status,
         http::pix_payment_controller::cancel,
@@ -343,10 +338,8 @@ impl Modify for SecurityAddon {
             http::json::payment_charge_json::PrepareChargePaymentJson,
             http::json::payment_charge_json::PreparedAttemptJson,
             http::json::payment_reversal_json::PaymentReversalJson,
-            http::json::payment_settings_json::ProvisionConnectionJson,
-            http::json::payment_settings_json::SelectConnectionJson,
-            http::json::payment_settings_json::UpdateConnectionJson,
-            http::json::payment_settings_json::PaymentConnectionJson,
+            http::json::payment_settings_json::SavePaymentSettingsJson,
+            http::json::payment_settings_json::PaymentSettingsResponseJson,
             http::json::payment_settings_json::OfferedMethodsJson,
             http::json::pix_payment_json::CreatePixChargeJson,
             http::json::pix_payment_json::PixChargeJson,
@@ -462,8 +455,16 @@ async fn start() -> anyhow::Result<()> {
 
     business::use_cases::user_use_case::UserUseCase::seed_sysadmin(&connection).await;
 
+    let payment_keys = Arc::new(
+        infrastructure::payment_credentials::PaymentKeyRing::from_env().unwrap_or_else(|e| {
+            log::warn!("[PaymentKeyRing] could not load from env: {e}");
+            infrastructure::payment_credentials::PaymentKeyRing::default()
+        }),
+    );
+
     let state = AppState {
         conn: Arc::new(connection),
+        payment_keys,
     };
 
     if business::use_cases::image_storage_use_case::ImageStorageUseCase::get_storage_mode()
@@ -478,7 +479,7 @@ async fn start() -> anyhow::Result<()> {
         .map(|value| !matches!(value.trim().to_ascii_lowercase().as_str(), "false" | "0" | "off"))
         .unwrap_or(true)
     {
-        infrastructure::billing_worker::start(Arc::clone(&state.conn));
+        infrastructure::billing_worker::start(Arc::clone(&state.conn), Arc::clone(&state.payment_keys));
     }
 
     log::info!("Starting server...");
@@ -569,6 +570,7 @@ async fn start() -> anyhow::Result<()> {
 #[derive(Clone)]
 pub struct AppState {
     pub conn: Arc<DatabaseConnection>,
+    pub payment_keys: Arc<infrastructure::payment_credentials::PaymentKeyRing>,
 }
 
 pub fn main() {

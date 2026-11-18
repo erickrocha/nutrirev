@@ -10,7 +10,7 @@ use axum::Json;
 use business::domain::card_payment::PaymentScope;
 use business::domain::user::User;
 use business::gateway::card_payment_gateway::CardPaymentGateway;
-use business::gateway::payment_secret_resolver::EnvironmentPaymentSecretResolver;
+use crate::infrastructure::payment_secret_resolver::DatabasePaymentSecretResolver;
 use business::use_cases::payment_schedule_use_case::PaymentScheduleUseCase;
 use business::use_cases::pix_payment_use_case::{cancel_attempt, PixPaymentUseCase};
 
@@ -45,7 +45,7 @@ pub async fn create_pix_charge(
         payload.idempotency_key,
         client_ip(&headers),
         payload.tax_id.as_deref(),
-        &EnvironmentPaymentSecretResolver,
+        &DatabasePaymentSecretResolver::new(state.conn.clone(), state.payment_keys.clone()),
     )
     .await
     .map_err(|error| map_error(locale, &error.message))?;
