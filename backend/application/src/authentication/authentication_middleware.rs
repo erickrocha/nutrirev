@@ -67,6 +67,36 @@ pub async fn authentication(
         ));
     }
 
+    if matches!(current_user.role, Role::TenantOwner | Role::TenantUser)
+        && let Some(tenant_id) = current_user.tenant_id
+    {
+        let path = req.uri().path();
+        let is_subscription_path = path.starts_with("/v1/tenant-subscription")
+            || path.starts_with("/refresh")
+            || path.starts_with("/login")
+            || path.starts_with("/logout");
+
+        if !is_subscription_path
+            && let Ok(sub) = business::use_cases::tenant_subscription_use_case::TenantSubscriptionUseCase::get_status(
+                &state.conn,
+                tenant_id,
+                state.platform_stripe.grace_period_days,
+            ).await
+            && sub.status == "blocked"
+        {
+            log::warn!(
+                "[AuthMiddleware] Tenant #{} bloqueado por inadimplência (vencido há {} dias). Rota {} negada.",
+                tenant_id,
+                sub.days_overdue,
+                path
+            );
+            return Err(ExceptionResponse::Forbidden(
+                locale,
+                ErrorKey::SubscriptionBlocked,
+            ));
+        }
+    }
+
     let audit_user = entity::audit::AuditUser {
         id: current_user.id.unwrap_or(0),
         email: current_user.email.clone(),

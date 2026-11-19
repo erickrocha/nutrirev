@@ -26,7 +26,7 @@ use crate::domain::payment_records::{CardPaymentAttempt, CardPaymentAttemptMappe
 use crate::domain::pix_payment::{PixChargeRequest, PixStatus};
 use crate::gateway::card_payment_gateway::CardPaymentGateway;
 use crate::gateway::pix_processor::{PixProcessor, PixProcessorError};
-use crate::gateway::payment_provider_factory::{active_connection, asaas_client};
+use crate::gateway::payment_provider_factory::{active_connection, psp_client};
 use crate::gateway::payment_secret_resolver::PaymentSecretResolver;
 use crate::gateway::provider_customer::ProviderCustomerRegistry;
 use crate::use_cases::card_payment_use_case::{CardPaymentUseCase, NewPixAttempt};
@@ -76,7 +76,7 @@ impl PixPaymentUseCase {
         if !connection.supports(PaymentMethod::Pix) {
             return Err(error("This payment method is not enabled for this clinic"));
         }
-        let processor = asaas_client(&connection, secrets)?;
+        let processor = psp_client(&connection, secrets)?;
 
         let charge = charge_of_attempt(db, tenant_id, charge_id)
             .await?
@@ -412,10 +412,12 @@ pub async fn ensure_provider_customer<R: ProviderCustomerRegistry>(
         .map_err(|_| error("Unable to read customer"))?
         .ok_or_else(|| error("Customer not found"))?;
 
+    // An id issued by a previous acquirer is treated as absent: the clinic
+    // switched providers, and the payer must be registered with the new one.
     if let Some(existing) = customer
         .provider_customer_id
         .as_deref()
-        .filter(|id| !id.is_empty())
+        .filter(|id| !id.is_empty() && registry.owns_customer_id(id))
     {
         return Ok(existing.to_owned());
     }

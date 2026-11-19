@@ -61,3 +61,4 @@ plan-order-forbidden = Only the system administrator can manage orders
 plan-order-not-found = Order not found
 plan-order-invalid = Invalid order data
 plan-order-not-pending = This order is not pending
+subscription-blocked = Clinic access is blocked due to subscription payment overdue. Please complete payment to resume access.

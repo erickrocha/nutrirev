@@ -47,4 +47,9 @@ describe('routeConfig', () => {
   it('não libera catálogos exclusivos da clínica para o usuário comum', () => {
     expect(allowed(ROLES.USER, '/bowel-functions/new')).toBe(false);
   });
+
+  it('libera histórico de pagamentos de assinaturas só para o SysAdmin', () => {
+    expect(allowed(ROLES.SYS_ADMIN, PATHS.SUBSCRIPTION_PAYMENTS)).toBe(true);
+    expect(allowed(ROLES.TENANT_OWNER, PATHS.SUBSCRIPTION_PAYMENTS)).toBe(false);
+  });
 });

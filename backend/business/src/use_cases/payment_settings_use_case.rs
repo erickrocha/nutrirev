@@ -68,7 +68,7 @@ impl PaymentSettingsUseCase {
             provider: Set(input.provider.as_str().to_owned()),
             environment: Set(input.environment),
             merchant_reference: Set(input.merchant_reference),
-            credentials_secret_ref: Set(input.credentials_secret_ref),
+            credentials_secret_ref: Set(Some(input.credentials_secret_ref)),
             status: Set("disabled".into()),
             // Sensible starting point: every acquirer here does cards, and the
             // clinic turns on what it actually wants.
@@ -133,7 +133,7 @@ impl PaymentSettingsUseCase {
 
         let mut active = existing.into_active_model();
         active.merchant_reference = Set(input.merchant_reference);
-        active.credentials_secret_ref = Set(input.credentials_secret_ref);
+        active.credentials_secret_ref = Set(Some(input.credentials_secret_ref));
         active.environment = Set(input.environment);
         active
             .update(db)

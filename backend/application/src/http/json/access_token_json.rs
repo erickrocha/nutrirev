@@ -1,3 +1,4 @@
+use crate::http::json::tenant_subscription_json::TenantSubscriptionStatusJson;
 use business::domain::enums::Role;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -16,4 +17,6 @@ pub struct AccessTokenJson {
     pub role: Role,
     pub tenant_id: Option<i32>,
     pub first_login: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub subscription_status: Option<TenantSubscriptionStatusJson>,
 }

@@ -120,6 +120,31 @@ impl CardPaymentGateway {
             .await
     }
 
+    /// The attempt a provider id belongs to, across clinics, for callbacks that
+    /// carry the provider's id but not our reference (a Stripe dispute names
+    /// the PaymentIntent, not its metadata).
+    ///
+    /// Same trust story as `attempt_by_reference`: it locates, it does not
+    /// authorise. Requires exactly one match — `ix_pa_provider_tx` is not
+    /// unique, and acting on an ambiguous match would touch an arbitrary charge.
+    pub async fn attempt_by_provider_transaction<C: ConnectionTrait>(
+        db: &C,
+        provider_transaction_id: &str,
+    ) -> Result<Option<attempt::Model>, DbErr> {
+        if provider_transaction_id.is_empty() {
+            return Ok(None);
+        }
+        let mut found = attempt::Entity::find()
+            .filter(attempt::Column::ProviderTransactionId.eq(provider_transaction_id))
+            .limit(2)
+            .all(db)
+            .await?;
+        if found.len() != 1 {
+            return Ok(None);
+        }
+        Ok(found.pop())
+    }
+
 /// The clinic's live acquirer connection, whichever provider that is.
     ///
     /// One per clinic and environment, guaranteed by `uq_pm_one_active` rather

@@ -44,3 +44,4 @@ pub mod tax_id;
 pub mod pix_payment;
 pub mod card_token;
 pub mod merchant_capabilities;
+pub mod tenant_subscription_payment;

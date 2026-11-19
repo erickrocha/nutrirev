@@ -60,8 +60,8 @@ async fn fixtures(db: &DbConn, due_date: NaiveDate) -> (i32, i32, i32) {
     )
     .await;
     let customer = insert(db, format!("INSERT INTO customer (uuid, tenant_id, name, email, phone, date_of_birth, gender, provider_customer_id, created_at, updated_at) VALUES (UNHEX(REPLACE(UUID(),'-','')), {tenant}, 'CoF', CONCAT(UUID(),'@example.test'), '1', '1990-01-01', 'other', 'cus_fixture', NOW(), NOW())")).await;
-    insert(db, format!("INSERT INTO payment_merchant (tenant_id, provider, environment, merchant_reference, credentials_secret_ref, status, created_at, credit_enabled, pix_enabled, recurring_enabled) VALUES ({tenant}, 'asaas', 'sandbox', CONCAT('fix-', UUID()), 'asaas/fixture', 'enabled', NOW(), 1, 1, 1)")).await;
-    let token = insert(db, format!("INSERT INTO payment_token (tenant_id, customer_id, provider, provider_token, brand, last4, status, consent_at, created_at) VALUES ({tenant}, {customer}, 'asaas', 'tok_fixture', 'VISA', '1234', 'active', NOW(), NOW())")).await;
+    insert(db, format!("INSERT INTO payment_merchant (tenant_id, provider, environment, merchant_reference, credentials_secret_ref, status, created_at, credit_enabled, pix_enabled, recurring_enabled) VALUES ({tenant}, 'stripe', 'sandbox', CONCAT('fix-', UUID()), 'asaas/fixture', 'enabled', NOW(), 1, 1, 1)")).await;
+    let token = insert(db, format!("INSERT INTO payment_token (tenant_id, customer_id, provider, provider_token, brand, last4, status, consent_at, created_at) VALUES ({tenant}, {customer}, 'stripe', 'tok_fixture', 'VISA', '1234', 'active', NOW(), NOW())")).await;
     let subscription = insert(db, format!("INSERT INTO payment_date (uuid, tenant_id, customer_id, first_due_date, next_due_date, status, billing_mode, payment_token_id, is_active, created_at, updated_at) VALUES (UNHEX(REPLACE(UUID(),'-','')), {tenant}, {customer}, '{due_date}', '{due_date}', 'active', 'card_on_file', {token}, 1, NOW(), NOW())")).await;
 
     let charge = run_with_user(
@@ -134,6 +134,10 @@ impl CardTokenizer for StubTokenizer {
             Outcome::Declined => Err(CardProcessorError::Declined(Box::new(result))),
             Outcome::Unknown => Err(CardProcessorError::Unknown),
         }
+    }
+
+    fn provider_name(&self) -> &'static str {
+        "stripe"
     }
 }
 

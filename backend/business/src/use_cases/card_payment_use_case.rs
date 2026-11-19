@@ -11,7 +11,7 @@ use crate::gateway::card_processor::{CardProcessor, CardProcessorError};
 use crate::gateway::payment_secret_resolver::PaymentSecretResolver;
 use crate::domain::merchant_capabilities::{MerchantCapabilities, Provider};
 use crate::gateway::payment_provider_factory::{
-    active_connection, asaas_client, card_client, ActiveConnection,
+    active_connection, card_client, psp_client, ActiveConnection,
 };
 use crate::use_cases::pix_payment_use_case::holder_for_customer;
 use chrono::{NaiveDate, Utc};
@@ -112,23 +112,18 @@ impl CardPaymentUseCase {
         // The PSP attaches every payment to a registered payer; the card-only
         // acquirer takes the card and nothing else. Filling this in is what lets
         // one checkout serve both.
-        let holder = match provider {
-            Provider::Rede => None,
-            Provider::Asaas => {
-                let registry = asaas_client(&connection, secrets)?;
-                Some(
-                    holder_for_customer(
-                        db,
-                        scope.tenant_id(),
-                        charge.customer_id,
-                        remote_ip,
-                        tax_id,
-                        &registry,
-                    )
-                    .await?,
-                )
-            }
-        };
+        let registry = psp_client(&connection, secrets)?;
+        let holder = Some(
+            holder_for_customer(
+                db,
+                scope.tenant_id(),
+                charge.customer_id,
+                remote_ip,
+                tax_id,
+                &registry,
+            )
+            .await?,
+        );
         Self::authorize(db, user_id, input, &processor, holder).await
     }
 

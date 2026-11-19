@@ -83,9 +83,9 @@ impl SysAdminDashboardUseCase {
             .all(db)
             .await?;
             
-        let active_plan_by_tenant: HashMap<i32, i32> = active_plans
+        let active_plan_by_tenant: HashMap<i32, (i32, NaiveDate)> = active_plans
             .iter()
-            .map(|plan| (plan.tenant_id, plan.business_plan_id))
+            .map(|plan| (plan.tenant_id, (plan.business_plan_id, plan.payment_date)))
             .collect();
 
         let plan_ids: Vec<i32> = {
@@ -143,7 +143,8 @@ impl SysAdminDashboardUseCase {
         let plan_name_by_tenant: HashMap<i32, String> = all_tenants
             .iter()
             .filter_map(|tenant| {
-                let plan = plans_by_id.get(&active_plan_by_tenant.get(&tenant.id).copied()?)?;
+                let (plan_id, _) = active_plan_by_tenant.get(&tenant.id)?;
+                let plan = plans_by_id.get(plan_id)?;
                 Some((tenant.id, plan.name.clone()))
             })
             .collect();
@@ -152,7 +153,11 @@ impl SysAdminDashboardUseCase {
 
         let monthly_recurring_revenue_in_cents = all_tenants
             .iter()
-            .filter_map(|tenant| Some((tenant, plans_by_id.get(&active_plan_by_tenant.get(&tenant.id).copied()?)?)))
+            .filter_map(|tenant| {
+                let (plan_id, _) = active_plan_by_tenant.get(&tenant.id)?;
+                let plan = plans_by_id.get(plan_id)?;
+                Some((tenant, plan))
+            })
             .try_fold(0_i64, |total, (tenant, plan)| -> Result<i64, DbErr> {
                 let tiers = tiers_by_plan
                     .get(&plan.id)
@@ -194,8 +199,9 @@ impl SysAdminDashboardUseCase {
         let mut attention: Vec<BillingAttentionItem> = all_tenants
             .iter()
             .filter_map(|tenant| {
-                let plan = plans_by_id.get(&active_plan_by_tenant.get(&tenant.id).copied()?)?;
-                if plan.payment_date > attention_until {
+                let (plan_id, tenant_payment_date) = active_plan_by_tenant.get(&tenant.id).copied()?;
+                let plan = plans_by_id.get(&plan_id)?;
+                if tenant_payment_date > attention_until {
                     return None;
                 }
                 let tiers = tiers_by_plan
@@ -216,9 +222,9 @@ impl SysAdminDashboardUseCase {
                     tenant_id: tenant.id,
                     tenant_name: tenant.name.clone(),
                     plan_name: plan.name.clone(),
-                    payment_date: plan.payment_date,
+                    payment_date: tenant_payment_date,
                     contract_value_in_cents,
-                    overdue: plan.payment_date < today,
+                    overdue: tenant_payment_date < today,
                 })
             })
             .collect();

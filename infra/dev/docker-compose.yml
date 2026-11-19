@@ -1,7 +1,7 @@
 # Ambiente de desenvolvimento: MariaDB + LocalStack (S3 e SQS). Uso: docker compose up -d
 services:
   mariadb:
-    image: mariadb:11
+    image: mariadb:12.3
     container_name: nutrirev-dev-mariadb
     environment:
       MARIADB_DATABASE: ${MARIADB_DATABASE}
@@ -19,7 +19,7 @@ services:
       retries: 20
 
   localstack:
-    image: localstack/localstack:3
+    image: localstack/localstack:4.14
     container_name: nutrirev-dev-localstack
     environment:
       SERVICES: s3,sqs

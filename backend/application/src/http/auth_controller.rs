@@ -3,13 +3,16 @@ use crate::commons::i18n::{ErrorKey, Locale};
 use crate::http::json::access_token_json::AccessTokenJson;
 use crate::http::json::login_request::LoginRequest;
 use crate::http::json::refresh_token_request::RefreshTokenRequest;
+use crate::http::json::tenant_subscription_json::TenantSubscriptionStatusJson;
 use crate::infrastructure::mapper::{AccessTokenMapper, Mapper};
 use crate::AppState;
 use axum::extract::State;
 use axum::{Extension, Form, Json};
 use axum::http::StatusCode;
+use business::domain::enums::Role;
 use business::use_cases::account_invite_use_case::AccountInviteUseCase;
 use business::use_cases::authentication_use_case::AuthenticationUseCase;
+use business::use_cases::tenant_subscription_use_case::TenantSubscriptionUseCase;
 
 #[utoipa::path(
     post,
@@ -29,7 +32,30 @@ pub async fn sign_in(
         AuthenticationUseCase::execute(&state.conn, login_request.email, login_request.password)
             .await;
     match access_token {
-        Ok(token) => Ok(Json(AccessTokenMapper::json(token))),
+        Ok(token) => {
+            let mut json = AccessTokenMapper::json(token);
+            if matches!(json.role, Role::TenantOwner | Role::TenantUser)
+                && let Some(tenant_id) = json.tenant_id
+                && let Ok(sub) = TenantSubscriptionUseCase::get_status(
+                    &state.conn,
+                    tenant_id,
+                    state.platform_stripe.grace_period_days,
+                ).await
+            {
+                json.subscription_status = Some(TenantSubscriptionStatusJson {
+                    status: sub.status,
+                    days_overdue: sub.days_overdue,
+                    payment_date: sub.payment_date.to_string(),
+                    grace_period_days: sub.grace_period_days,
+                    plan_name: sub.plan_name,
+                    amount_cents: sub.amount_cents,
+                    formatted_amount: sub.formatted_amount,
+                    business_plan_id: sub.business_plan_id,
+                    publishable_key: Some(state.platform_stripe.publishable_key.clone()),
+                });
+            }
+            Ok(Json(json))
+        }
         Err(_) => Err(ExceptionResponse::Unauthorized(
             locale,
             ErrorKey::BadCredentials,
@@ -81,7 +107,30 @@ pub async fn refresh_token(
     let access_token =
         AuthenticationUseCase::refresh_token(&state.conn, request.refresh_token).await;
     match access_token {
-        Ok(token) => Ok(Json(AccessTokenMapper::json(token))),
+        Ok(token) => {
+            let mut json = AccessTokenMapper::json(token);
+            if matches!(json.role, Role::TenantOwner | Role::TenantUser)
+                && let Some(tenant_id) = json.tenant_id
+                && let Ok(sub) = TenantSubscriptionUseCase::get_status(
+                    &state.conn,
+                    tenant_id,
+                    state.platform_stripe.grace_period_days,
+                ).await
+            {
+                json.subscription_status = Some(TenantSubscriptionStatusJson {
+                    status: sub.status,
+                    days_overdue: sub.days_overdue,
+                    payment_date: sub.payment_date.to_string(),
+                    grace_period_days: sub.grace_period_days,
+                    plan_name: sub.plan_name,
+                    amount_cents: sub.amount_cents,
+                    formatted_amount: sub.formatted_amount,
+                    business_plan_id: sub.business_plan_id,
+                    publishable_key: Some(state.platform_stripe.publishable_key.clone()),
+                });
+            }
+            Ok(Json(json))
+        }
         Err(_) => Err(ExceptionResponse::Unauthorized(
             locale,
             ErrorKey::BadCredentials,

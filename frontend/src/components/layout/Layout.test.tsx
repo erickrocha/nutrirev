@@ -8,17 +8,29 @@ import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import authReducer from '../../store/authSlice';
 import tenantReducer from '../../store/tenantSlice';
+import tenantSubscriptionReducer from '../../store/tenantSubscriptionSlice';
 
 // Referência estável, como no react-i18next real (efeitos dependem de `t`).
 const i18n = { t: (key: string) => key, i18n: { language: 'pt', changeLanguage: vi.fn() } };
 vi.mock('react-i18next', () => ({ useTranslation: () => i18n }));
 
-const setup = (role: string, route: string, children: React.ReactNode = <MainLayout />, tenantName?: string) => {
+const setup = (
+  role: string,
+  route: string,
+  children: React.ReactNode = <MainLayout />,
+  tenantName?: string,
+  subscriptionStatus?: unknown,
+) => {
   const store = configureStore({
-    reducer: combineReducers({ auth: authReducer, tenant: tenantReducer }),
+    reducer: combineReducers({
+      auth: authReducer,
+      tenant: tenantReducer,
+      tenantSubscription: tenantSubscriptionReducer,
+    }),
     preloadedState: {
       auth: { token: 't', refreshToken: null, user: { name: 'Ana', email: 'ana@x.com', role }, isAuthenticated: true, isInitializing: false, isSysAdmin: role === 'SysAdmin', loading: false, error: null },
       ...(tenantName ? { tenant: { activeTenant: { id: 1, name: tenantName }, tenantsList: [], loading: false, error: null } } : {}),
+      ...(subscriptionStatus ? { tenantSubscription: { status: subscriptionStatus, loading: false, pixLoading: false, cardSubmitting: false, pix: null, error: null, lastSuccess: null } } : {}),
     } as never,
   });
   return render(
@@ -30,6 +42,7 @@ const setup = (role: string, route: string, children: React.ReactNode = <MainLay
             <Route path="/home" element={<p>início</p>} />
             <Route path="/users" element={<p>usuários</p>} />
             <Route path="/admin/dashboard" element={<p>painel admin</p>} />
+            <Route path="/subscription-payment" element={<p>tela de pagamento da assinatura</p>} />
           </Route>
           <Route path="*" element={<p>fora</p>} />
         </Routes>
@@ -58,6 +71,26 @@ describe('MainLayout', () => {
   it('o SysAdmin cai no painel da plataforma', () => {
     setup('SysAdmin', '/home');
     expect(screen.getByText('painel admin')).toBeInTheDocument();
+  });
+
+  it('redireciona a clínica inadimplente com status blocked diretamente para o pagamento', () => {
+    setup('TenantOwner', '/dashboard', <MainLayout />, undefined, {
+      status: 'blocked',
+      daysOverdue: 10,
+      paymentDate: '2026-11-01',
+    });
+    expect(screen.getByText('tela de pagamento da assinatura')).toBeInTheDocument();
+    expect(screen.queryByText('painel')).not.toBeInTheDocument();
+  });
+
+  it('mostra o banner de aviso quando a assinatura estiver com status warning', () => {
+    setup('TenantOwner', '/dashboard', <MainLayout />, undefined, {
+      status: 'warning',
+      daysOverdue: 2,
+      paymentDate: '2026-11-16',
+    });
+    expect(screen.getByText('painel')).toBeInTheDocument();
+    expect(screen.getByText('tenantSubscription.payNow')).toBeInTheDocument();
   });
 });
 

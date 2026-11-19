@@ -1,7 +1,7 @@
-use business::gateway::asaas_processor::AsaasProcessor;
 use business::gateway::billing_gateway::BillingGateway;
-use business::gateway::payment_provider_factory::{active_connection, asaas_client};
-use business::gateway::payment_secret_resolver::EnvironmentPaymentSecretResolver;
+use business::gateway::payment_provider_factory::{active_connection, psp_client, PspClient};
+use crate::infrastructure::payment_secret_resolver::DatabasePaymentSecretResolver;
+use crate::infrastructure::payment_credentials::PaymentKeyRing;
 use business::sea_orm::{ConnectionTrait, DatabaseConnection, Statement, TryGetable};
 use business::use_cases::card_on_file_use_case::{CardOnFileUseCase, UnattendedReport};
 use business::use_cases::payment_schedule_use_case::PaymentScheduleUseCase;
@@ -21,12 +21,13 @@ const LOCK_NAME: &str = "nutrirev_billing";
 
 /// Spawns the recurring billing job: generate the charges each subscription
 /// owes, age the past-due ones, and block or restore app access accordingly.
-pub fn start(db: Arc<DatabaseConnection>) {
+pub fn start(db: Arc<DatabaseConnection>, payment_keys: Arc<PaymentKeyRing>) {
+    let keys = payment_keys.clone();
     tokio::spawn(async move {
         log::info!("Billing worker starting...");
 
         loop {
-            match run_tick(&db).await {
+            match run_tick(&db, &keys).await {
                 Ok(Some(report)) => {
                     if report.charges_created > 0
                         || report.charges_marked_overdue > 0
@@ -68,6 +69,7 @@ pub fn start(db: Arc<DatabaseConnection>) {
 /// run.
 async fn run_tick(
     db: &DatabaseConnection,
+    keys: &Arc<PaymentKeyRing>,
 ) -> Result<Option<business::use_cases::payment_schedule_use_case::BillingTickReport>, business::sea_orm::DbErr>
 {
     if !try_lock(db).await? {
@@ -82,7 +84,7 @@ async fn run_tick(
     // not an emergency — the charge stays open and the clinic's grace period
     // decides access, exactly as it does for a patient who never pays.
     if result.is_ok() {
-        match charge_stored_cards(db, today).await {
+        match charge_stored_cards(db, keys, today).await {
             Ok(report) if report.charged > 0 || report.declined > 0 || report.uncertain > 0 => {
                 log::info!(
                     "Stored-card billing: {} charged, {} declined, {} needing reconciliation",
@@ -115,13 +117,14 @@ async fn run_tick(
 /// is skipped rather than failing the pass for everyone else.
 async fn charge_stored_cards(
     db: &DatabaseConnection,
+    keys: &Arc<PaymentKeyRing>,
     today: chrono::NaiveDate,
 ) -> Result<UnattendedReport, business::sea_orm::DbErr> {
     let environment = provider_environment();
     // One client per clinic, resolved from that clinic's live connection and its
     // own secret. A clinic usually owes more than one charge, and each would
     // otherwise re-read the same secret.
-    let mut clients: HashMap<i32, Option<Arc<AsaasProcessor>>> = HashMap::new();
+    let mut clients: HashMap<i32, Option<Arc<PspClient>>> = HashMap::new();
 
     for due in BillingGateway::card_on_file_due(db, today).await? {
         if clients.contains_key(&due.tenant_id) {
@@ -129,7 +132,8 @@ async fn charge_stored_cards(
         }
         let client = match active_connection(db, due.tenant_id, &environment).await {
             Ok(connection) if connection.capabilities.recurring => {
-                asaas_client(&connection, &EnvironmentPaymentSecretResolver)
+                let secrets = DatabasePaymentSecretResolver::new(Arc::new(db.clone()), keys.clone());
+                psp_client(&connection, &secrets)
                     .ok()
                     .map(Arc::new)
             }

@@ -1,17 +1,18 @@
-//! Builds the right provider client for a clinic, from its live connection.
-//!
-//! Before this, each payment path named its own acquirer in code: the card
-//! checkout asked for Rede, Pix asked for the PSP. A clinic set up with only one
-//! of them could not use the other half of the product. The acquirer is now the
-//! clinic's choice, resolved here, once.
+//! Builds the Stripe provider client for a clinic, from its live connection.
 
 use crate::domain::business_error::BusinessError;
 use crate::domain::card_payment::PaymentMethod;
+use crate::domain::card_submission::{CardProcessorResult, SensitiveCardData};
+use crate::domain::card_token::{CardToken, TokenChargeRequest, TokenHolder};
 use crate::domain::merchant_capabilities::{MerchantCapabilities, Provider};
-use crate::gateway::asaas_processor::AsaasProcessor;
+use crate::domain::pix_payment::{PixChargeRequest, PixChargeResult, PixChargeState};
 use crate::gateway::card_payment_gateway::CardPaymentGateway;
+use crate::gateway::card_processor::{CardProcessor, CardProcessorError};
+use crate::gateway::card_tokenizer::CardTokenizer;
 use crate::gateway::payment_secret_resolver::PaymentSecretResolver;
-use crate::gateway::rede_card_processor::RedeSandboxProcessor;
+use crate::gateway::pix_processor::{PixProcessor, PixProcessorError};
+use crate::gateway::provider_customer::ProviderCustomerRegistry;
+use crate::gateway::stripe_processor::StripeProcessor;
 use entity::payment_merchant_entity as merchant;
 use sea_orm::ConnectionTrait;
 
@@ -28,31 +29,80 @@ impl ActiveConnection {
     }
 }
 
-/// Either acquirer, behind the card boundary.
-///
-/// An enum rather than a boxed trait object: there are exactly two, the set is
-/// closed by a database check constraint, and a match here is what makes adding
-/// a third a compile error instead of a silent gap.
-pub enum CardClient {
-    Rede(RedeSandboxProcessor),
-    Asaas(AsaasProcessor),
+pub struct StripeClient {
+    processor: StripeProcessor,
+}
+
+impl StripeClient {
+    pub fn new(processor: StripeProcessor) -> Self {
+        Self { processor }
+    }
 }
 
 #[async_trait::async_trait]
-impl crate::gateway::card_processor::CardProcessor for CardClient {
+impl CardProcessor for StripeClient {
     async fn authorize(
         &self,
         submission: &crate::domain::card_submission::CardSubmission,
-    ) -> Result<
-        crate::domain::card_submission::CardProcessorResult,
-        crate::gateway::card_processor::CardProcessorError,
-    > {
-        match self {
-            Self::Rede(processor) => processor.authorize(submission).await,
-            Self::Asaas(processor) => processor.authorize(submission).await,
-        }
+    ) -> Result<CardProcessorResult, CardProcessorError> {
+        self.processor.authorize(submission).await
     }
 }
+
+#[async_trait::async_trait]
+impl ProviderCustomerRegistry for StripeClient {
+    async fn create_customer(&self, holder: &TokenHolder) -> Result<String, CardProcessorError> {
+        self.processor.create_customer(holder).await
+    }
+
+    fn owns_customer_id(&self, provider_customer_id: &str) -> bool {
+        self.processor.owns_customer_id(provider_customer_id)
+    }
+}
+
+#[async_trait::async_trait]
+impl PixProcessor for StripeClient {
+    async fn create_charge(
+        &self,
+        request: &PixChargeRequest,
+    ) -> Result<PixChargeResult, PixProcessorError> {
+        self.processor.create_charge(request).await
+    }
+
+    async fn charge_status(
+        &self,
+        provider_payment_id: &str,
+    ) -> Result<PixChargeState, PixProcessorError> {
+        self.processor.charge_status(provider_payment_id).await
+    }
+}
+
+#[async_trait::async_trait]
+impl CardTokenizer for StripeClient {
+    async fn tokenize(
+        &self,
+        card: &SensitiveCardData,
+        holder: &TokenHolder,
+    ) -> Result<CardToken, CardProcessorError> {
+        self.processor.tokenize(card, holder).await
+    }
+
+    async fn charge_token(
+        &self,
+        provider_token: &str,
+        request: &TokenChargeRequest,
+    ) -> Result<CardProcessorResult, CardProcessorError> {
+        self.processor.charge_token(provider_token, request).await
+    }
+
+    fn provider_name(&self) -> &'static str {
+        "stripe"
+    }
+}
+
+// Aliases for polymorphic compatibility
+pub type CardClient = StripeClient;
+pub type PspClient = StripeClient;
 
 /// The clinic's live connection, or an error naming what is missing.
 pub async fn active_connection<C: ConnectionTrait>(
@@ -86,41 +136,32 @@ pub fn card_client<R: PaymentSecretResolver>(
     connection: &ActiveConnection,
     secrets: &R,
 ) -> Result<CardClient, BusinessError> {
-    let secret_ref = &connection.merchant.credentials_secret_ref;
-    match connection.provider {
-        Provider::Rede => {
-            let credentials = secrets.rede_sandbox(secret_ref).map_err(|_| {
-                BusinessError::new("Payment merchant credentials are unavailable".to_owned())
-            })?;
-            RedeSandboxProcessor::new(
-                credentials.client_id.to_string(),
-                credentials.client_secret.to_string(),
-            )
-            .map(CardClient::Rede)
-            .map_err(|_| BusinessError::new("Payment processor is unavailable".to_owned()))
-        }
-        Provider::Asaas => asaas_client(connection, secrets).map(CardClient::Asaas),
-    }
+    psp_client(connection, secrets)
 }
 
-/// The PSP client, for the paths only it can serve: Pix and stored cards.
-pub fn asaas_client<R: PaymentSecretResolver>(
+/// The PSP client, for payer registration, Pix and stored cards.
+pub fn psp_client<R: PaymentSecretResolver>(
     connection: &ActiveConnection,
     secrets: &R,
-) -> Result<AsaasProcessor, BusinessError> {
-    if connection.provider != Provider::Asaas {
+) -> Result<PspClient, BusinessError> {
+    psp_client_for(&connection.merchant, connection.provider, secrets)
+}
+
+/// Builds a client directly from a merchant row.
+pub fn psp_client_for<R: PaymentSecretResolver>(
+    merchant: &merchant::Model,
+    provider: Provider,
+    secrets: &R,
+) -> Result<PspClient, BusinessError> {
+    if provider != Provider::Stripe {
         return Err(BusinessError::new(
-            "This payment method is not available for the clinic's acquirer".to_owned(),
+            "Only Stripe is supported as payment provider".to_owned(),
         ));
     }
     let credentials = secrets
-        .asaas(&connection.merchant.credentials_secret_ref)
-        .map_err(|_| {
-            BusinessError::new("Payment merchant credentials are unavailable".to_owned())
-        })?;
-    AsaasProcessor::new(
-        credentials.api_key.to_string(),
-        &connection.merchant.environment,
-    )
-    .map_err(|_| BusinessError::new("Payment processor is unavailable".to_owned()))
+        .stripe(merchant.id)
+        .map_err(|_| BusinessError::new("Payment merchant credentials are unavailable".to_owned()))?;
+    let processor = StripeProcessor::new(credentials.secret_key.to_string(), &merchant.environment)
+        .map_err(|_| BusinessError::new("Payment processor is unavailable".to_owned()))?;
+    Ok(StripeClient::new(processor))
 }

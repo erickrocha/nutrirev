@@ -25,6 +25,9 @@ reqwest = { version = "0.13.5", features = ["json", "multipart", "form"] }
 image = "0.25.10"
 async-trait = "0.1.92"
 base64 = "0.23.1"
+hmac = "0.12.1"
+sha2 = "0.10.9"
+hex = "0.4.3"
 
 zeroize = "1.9.1"
 

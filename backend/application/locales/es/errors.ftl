@@ -48,3 +48,4 @@ payment-tax-id-required = Informe el CPF o CNPJ para pagar este cargo
 payment-attempt-not-found = Intento de pago no encontrado
 payment-provider-unavailable = El proveedor de pago no está disponible, inténtelo en unos instantes
 payment-method-unavailable = Esta clínica no ofrece esa forma de pago
+subscription-blocked = El acceso de la clínica está bloqueado por mora en el pago de la suscripción. Regularice el pago para continuar utilizando el sistema.

@@ -63,3 +63,4 @@ pub mod payment_merchant_entity;
 pub mod payment_token_entity;
 pub mod payment_charge_entity;
 pub mod payment_attempt_entity;
+pub mod tenant_subscription_payment_entity;

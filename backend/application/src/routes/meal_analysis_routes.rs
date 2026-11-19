@@ -42,6 +42,8 @@ mod tests {
     async fn test_meal_analysis_and_log_routes_registered() {
         let state = AppState {
             conn: Arc::new(DatabaseConnection::default()),
+            payment_keys: Arc::new(Default::default()),
+            platform_stripe: Arc::new(crate::infrastructure::platform_stripe_config::PlatformStripeConfig::from_env()),
         };
 
         let app = Router::new()

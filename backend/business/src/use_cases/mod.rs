@@ -48,3 +48,4 @@ pub mod card_payment_use_case;
 pub mod pix_payment_use_case;
 pub mod card_on_file_use_case;
 pub mod payment_settings_use_case;
+pub mod tenant_subscription_use_case;

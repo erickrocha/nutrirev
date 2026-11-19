@@ -24,6 +24,7 @@ export const PATHS = {
   BUSINESS_PLAN_EDIT: '/admin/business-plans/:id/edit',
   PLAN_ORDERS: '/admin/orders',
   PLAN_ORDER_DETAIL: '/admin/orders/:uuid',
+  SUBSCRIPTION_PAYMENTS: '/admin/subscription-payments',
   PAYMENT_CONNECTIONS: '/admin/payment-connections',
   USERS: '/users',
   TENANTS: '/tenants',
@@ -50,6 +51,7 @@ export const PATHS = {
   MEAL_PLANS: '/meal-plans',
   DOCTORS: '/doctors',
   MEAL_POINT_TIERS: '/meal-point-tiers',
+  SUBSCRIPTION_PAYMENT: '/subscription-payment',
 };
 
 // Catalog CRUD screens: list, add and edit are separate pages.
@@ -70,6 +72,7 @@ const CLINICAL_ONLY_PATHS = [
 
 const TENANT_USER_PATHS = [
   PATHS.TENANT_DASHBOARD,
+  PATHS.SUBSCRIPTION_PAYMENT,
   ...withForms(PATHS.CUSTOMERS),
   ...withForms(PATHS.CUSTOMER_GOALS),
   ...withForms(PATHS.CLINICAL_PLANS),
@@ -101,6 +104,7 @@ export const ROLE_ALLOWED_PATHS: Record<string, string[]> = {
     PATHS.BUSINESS_PLAN_EDIT,
     PATHS.PLAN_ORDERS,
     PATHS.PLAN_ORDER_DETAIL,
+    PATHS.SUBSCRIPTION_PAYMENTS,
     // Provisioning acquirer connections is the platform operator's alone: the
     // secret pointer names a deployment secret, not a clinic-settable value.
     ...withForms(PATHS.PAYMENT_CONNECTIONS),

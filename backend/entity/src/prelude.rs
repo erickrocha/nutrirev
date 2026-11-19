@@ -55,3 +55,4 @@ pub use super::meal_plan_meal_entity::Entity as MealPlanMealEntity;
 pub use super::meal_plan_option_entity::Entity as MealPlanOptionEntity;
 pub use super::meal_plan_item_entity::Entity as MealPlanItemEntity;
 pub use super::meal_plan_item_substitute_entity::Entity as MealPlanItemSubstituteEntity;
+pub use super::tenant_subscription_payment_entity::Entity as TenantSubscriptionPaymentEntity;

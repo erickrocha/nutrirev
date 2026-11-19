@@ -26,6 +26,7 @@ import doctorReducer from './doctorSlice';
 import paymentReducer from './paymentSlice';
 import customerAppReducer from './customerAppSlice';
 import dashboardReducer from './dashboardSlice';
+import tenantSubscriptionReducer from './tenantSubscriptionSlice';
 
 export const store = configureStore({
   reducer: {
@@ -56,6 +57,7 @@ export const store = configureStore({
     payment: paymentReducer,
     customerApp: customerAppReducer,
     dashboard: dashboardReducer,
+    tenantSubscription: tenantSubscriptionReducer,
   },
 });
 

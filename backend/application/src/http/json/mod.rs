@@ -49,3 +49,4 @@ pub mod pix_payment_json;
 pub mod recurring_payment_json;
 pub mod payment_reversal_json;
 pub mod payment_settings_json;
+pub mod tenant_subscription_json;

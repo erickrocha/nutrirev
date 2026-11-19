@@ -48,6 +48,8 @@ const CustomerEatDetailPage = lazy(() => import('../pages/eat/CustomerEatDetailP
 const CustomerPaymentsPage = lazy(() => import('../pages/payments/CustomerPaymentsPage').then((module) => ({ default: module.CustomerPaymentsPage })));
 const IngredientListPage = lazy(() => import('../pages/clinical/IngredientListPage').then((module) => ({ default: module.IngredientListPage })));
 const IngredientFormPage = lazy(() => import('../pages/clinical/IngredientFormPage').then((module) => ({ default: module.IngredientFormPage })));
+const TenantSubscriptionPaymentPage = lazy(() => import('../pages/clinical/TenantSubscriptionPaymentPage').then((module) => ({ default: module.TenantSubscriptionPaymentPage })));
+const TenantSubscriptionPaymentHistoryPage = lazy(() => import('../pages/admin/TenantSubscriptionPaymentHistoryPage').then((module) => ({ default: module.TenantSubscriptionPaymentHistoryPage })));
 
 // "/" e "/login" (ex.: logo após entrar) levam à página inicial do perfil; qualquer outro endereço sem rota é um 404.
 const UnknownRoute = () => {
@@ -79,6 +81,7 @@ export const AppRoutes = () => (
       <Route path={PATHS.BUSINESS_PLAN_EDIT} element={<BusinessPlanFormPage />} />
       <Route path={PATHS.PLAN_ORDERS} element={<PlanOrderManagement />} />
       <Route path={PATHS.PLAN_ORDER_DETAIL} element={<PlanOrderDetailPage />} />
+      <Route path={PATHS.SUBSCRIPTION_PAYMENTS} element={<TenantSubscriptionPaymentHistoryPage />} />
       <Route path={PATHS.PAYMENT_CONNECTIONS} element={<PaymentConnectionListPage />} />
       <Route path={newPath(PATHS.PAYMENT_CONNECTIONS)} element={<PaymentConnectionFormPage />} />
       <Route path={editPath(PATHS.PAYMENT_CONNECTIONS, ':id')} element={<PaymentConnectionFormPage />} />
@@ -119,6 +122,7 @@ export const AppRoutes = () => (
       <Route path={PATHS.INGREDIENTS} element={<IngredientListPage />} />
       <Route path={newPath(PATHS.INGREDIENTS)} element={<IngredientFormPage />} />
       <Route path={editPath(PATHS.INGREDIENTS, ':id')} element={<IngredientFormPage />} />
+      <Route path={PATHS.SUBSCRIPTION_PAYMENT} element={<TenantSubscriptionPaymentPage />} />
       <Route path={PATHS.MEAL_PLANS} element={<MealPlanListPage />} />
       <Route path={newPath(PATHS.MEAL_PLANS)} element={<MealPlanFormPage />} />
       <Route path={editPath(PATHS.MEAL_PLANS, ':id')} element={<MealPlanFormPage />} />

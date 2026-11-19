@@ -67,6 +67,7 @@ pub enum ErrorKey {
     PaymentAttemptNotFound,
     PaymentProviderUnavailable,
     PaymentMethodUnavailable,
+    SubscriptionBlocked,
 }
 
 impl ErrorKey {
@@ -98,6 +99,7 @@ impl ErrorKey {
             ErrorKey::PaymentAttemptNotFound => "PaymentAttemptNotFound",
             ErrorKey::PaymentProviderUnavailable => "PaymentProviderUnavailable",
             ErrorKey::PaymentMethodUnavailable => "PaymentMethodUnavailable",
+            ErrorKey::SubscriptionBlocked => "SubscriptionBlocked",
         }
     }
 
@@ -129,6 +131,7 @@ impl ErrorKey {
             ErrorKey::PaymentAttemptNotFound => "payment-attempt-not-found",
             ErrorKey::PaymentProviderUnavailable => "payment-provider-unavailable",
             ErrorKey::PaymentMethodUnavailable => "payment-method-unavailable",
+            ErrorKey::SubscriptionBlocked => "subscription-blocked",
         }
     }
 }

@@ -62,6 +62,9 @@ mod m20260906_000001_dataload_taco_ingredients;
 mod m20260907_000001_ingredient_bilingual;
 mod m20260907_000002_dataload_usda_sr_legacy;
 mod m20260908_000001_dataload_fit_recipes;
+mod m20261111_000001_stripe_provider_support;
+mod m20261118_000001_stripe_exclusive_encrypted_settings;
+mod m20261119_000001_create_tenant_subscription_payment_table;
 
 pub struct Migrator;
 
@@ -129,6 +132,9 @@ impl MigratorTrait for Migrator {
             Box::new(m20260907_000001_ingredient_bilingual::Migration),
             Box::new(m20260907_000002_dataload_usda_sr_legacy::Migration),
             Box::new(m20260908_000001_dataload_fit_recipes::Migration),
+            Box::new(m20261111_000001_stripe_provider_support::Migration),
+            Box::new(m20261118_000001_stripe_exclusive_encrypted_settings::Migration),
+            Box::new(m20261119_000001_create_tenant_subscription_payment_table::Migration),
         ]
     }
 }

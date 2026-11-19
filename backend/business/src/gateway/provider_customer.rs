@@ -9,4 +9,14 @@ use crate::gateway::card_processor::CardProcessorError;
 #[async_trait::async_trait]
 pub trait ProviderCustomerRegistry: Send + Sync {
     async fn create_customer(&self, holder: &TokenHolder) -> Result<String, CardProcessorError>;
+
+    /// Whether a stored payer id was issued by this provider.
+    ///
+    /// The customer row holds one provider id. When a clinic switches acquirer,
+    /// the id on file belongs to the previous one, and sending it to the new
+    /// provider fails every payment for that patient. Returning `false` makes
+    /// the caller register the payer again instead.
+    fn owns_customer_id(&self, _provider_customer_id: &str) -> bool {
+        true
+    }
 }

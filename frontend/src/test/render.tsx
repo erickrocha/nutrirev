@@ -29,6 +29,7 @@ import mealPlanReducer from '../store/mealPlanSlice';
 import recipeReducer from '../store/recipeSlice';
 import ingredientReducer from '../store/ingredientSlice';
 import tenantPlanReducer from '../store/tenantPlanSlice';
+import tenantSubscriptionReducer from '../store/tenantSubscriptionSlice';
 
 export interface TestUser { role?: string; email?: string }
 
@@ -62,6 +63,7 @@ export const makeStore = (user: TestUser | null = null) => configureStore({
     recipe: recipeReducer,
     ingredient: ingredientReducer,
     tenantPlan: tenantPlanReducer,
+    tenantSubscription: tenantSubscriptionReducer,
   },
 });
 
