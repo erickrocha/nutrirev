@@ -91,7 +91,7 @@ export const StripePaymentElementForm = ({
         ) : (
           <Button
             type="button"
-            variant="secondary"
+            variant="outline"
             onClick={onCancel}
             className="py-2.5 px-4"
             disabled={submitting}

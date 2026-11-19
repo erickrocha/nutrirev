@@ -10,7 +10,7 @@ import type {
   TenantSubscriptionSuccess,
 } from '../types/tenantSubscription';
 
-interface TenantSubscriptionState {
+export interface TenantSubscriptionState {
   status: TenantSubscriptionStatus | null;
   loading: boolean;
   pixLoading: boolean;

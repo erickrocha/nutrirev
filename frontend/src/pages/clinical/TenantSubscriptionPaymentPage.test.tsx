@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { MemoryRouter } from 'react-router-dom';
 import { TenantSubscriptionPaymentPage } from './TenantSubscriptionPaymentPage';
 import tenantSubscriptionReducer from '../../store/tenantSubscriptionSlice';
@@ -64,10 +64,10 @@ vi.mock('../../services/tenantSubscriptionService', () => ({
 
 const renderPage = (initialStatus?: Partial<TenantSubscriptionStatus>) => {
   const store = configureStore({
-    reducer: {
+    reducer: combineReducers({
       tenantSubscription: tenantSubscriptionReducer,
       auth: authReducer,
-    },
+    }),
     preloadedState: {
       tenantSubscription: {
         status: initialStatus
@@ -199,10 +199,10 @@ describe('TenantSubscriptionPaymentPage', () => {
   it('renderiza o Stripe Payment Element oficial quando o intent estiver disponível', async () => {
     const user = userEvent.setup();
     const store = configureStore({
-      reducer: {
+      reducer: combineReducers({
         tenantSubscription: tenantSubscriptionReducer,
         auth: authReducer,
-      },
+      }),
       preloadedState: {
         tenantSubscription: {
           status: {

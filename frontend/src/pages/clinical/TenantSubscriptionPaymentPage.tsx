@@ -498,7 +498,7 @@ export const TenantSubscriptionPaymentPage = () => {
                     />
                     <Button
                       type="button"
-                      variant="secondary"
+                      variant="outline"
                       onClick={handleCopyPix}
                       className="shrink-0 text-xs py-1.5 px-3"
                     >
@@ -577,10 +577,9 @@ export const TenantSubscriptionPaymentPage = () => {
               ) : (
                 <form onSubmit={handleSubmit(onCardSubmit)} className="space-y-4">
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-[var(--text-heading)]">
-                      {t('payments.cardholderName', 'Nome no Cartão')}
-                    </label>
                     <TextField
+                      id="cardholderName"
+                      label={t('payments.cardholderName', 'Nome no Cartão')}
                       {...register('cardholderName')}
                       onChange={(e) => setValue('cardholderName', e.target.value.toUpperCase())}
                       placeholder="EX: MARIA S SILVA"
@@ -590,9 +589,6 @@ export const TenantSubscriptionPaymentPage = () => {
 
                   <div>
                     <div className="mb-1 flex items-center justify-between">
-                      <label className="block text-xs font-semibold text-[var(--text-heading)]">
-                        {t('payments.cardNumber', 'Número do Cartão')}
-                      </label>
                       {brand && (
                         <span className="text-xs font-bold uppercase text-[var(--accent-primary)]">
                           {brand}
@@ -600,6 +596,8 @@ export const TenantSubscriptionPaymentPage = () => {
                       )}
                     </div>
                     <TextField
+                      id="cardNumber"
+                      label={t('payments.cardNumber', 'Número do Cartão')}
                       {...register('cardNumber')}
                       onChange={(e) => setValue('cardNumber', formatCardNumber(e.target.value))}
                       placeholder="0000 0000 0000 0000"
@@ -610,10 +608,9 @@ export const TenantSubscriptionPaymentPage = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="mb-1 block text-xs font-semibold text-[var(--text-heading)]">
-                        {t('payments.cardExpiry', 'Validade (MM/AA)')}
-                      </label>
                       <TextField
+                        id="expiry"
+                        label={t('payments.cardExpiry', 'Validade (MM/AA)')}
                         {...register('expiry')}
                         onChange={(e) => setValue('expiry', formatExpiry(e.target.value))}
                         placeholder="MM/AA"
@@ -623,10 +620,9 @@ export const TenantSubscriptionPaymentPage = () => {
                     </div>
 
                     <div>
-                      <label className="mb-1 block text-xs font-semibold text-[var(--text-heading)]">
-                        {t('payments.cardCvv', 'CVV')}
-                      </label>
                       <TextField
+                        id="securityCode"
+                        label={t('payments.cardCvv', 'CVV')}
                         type="password"
                         {...register('securityCode')}
                         onChange={(e) =>
@@ -644,7 +640,7 @@ export const TenantSubscriptionPaymentPage = () => {
                     {isBlocked ? (
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant="outline"
                         onClick={() => reset()}
                         className="py-2.5 px-4"
                       >
@@ -653,7 +649,7 @@ export const TenantSubscriptionPaymentPage = () => {
                     ) : (
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant="outline"
                         onClick={() => navigate(PATHS.TENANT_DASHBOARD)}
                         className="py-2.5 px-4"
                       >

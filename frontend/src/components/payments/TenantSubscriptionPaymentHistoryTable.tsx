@@ -117,7 +117,7 @@ export const TenantSubscriptionPaymentHistoryTable = ({
           {(method !== 'all' || startDate || endDate) && (
             <Button
               type="button"
-              variant="secondary"
+              variant="outline"
               onClick={handleClearFilter}
               className="text-xs py-2 px-3"
             >

@@ -31,7 +31,7 @@ export const TenantSubscriptionPaymentHistoryPage = () => {
     <div className="w-full">
       <Breadcrumb
         items={[
-          { label: t('sidebar.adminDashboard', 'Dashboard'), path: '/admin/dashboard' },
+          { label: t('sidebar.adminDashboard', 'Dashboard'), to: '/admin/dashboard' },
           { label: t('tenantSubscription.paymentsTitle', 'Pagamentos de Assinaturas') },
         ]}
       />

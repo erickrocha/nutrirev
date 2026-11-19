@@ -26,6 +26,7 @@ import type { MealPlanState } from './mealPlanSlice';
 import type { RecipeState } from './recipeSlice';
 import type { IngredientState } from './ingredientSlice';
 import type { TenantPlanState } from './tenantPlanSlice';
+import type { TenantSubscriptionState } from './tenantSubscriptionSlice';
 import type { ClinicalPlan, MealPointTier } from '../types/clinical';
 
 // O store.js ainda é JS; tipamos só as fatias já migradas.
@@ -57,6 +58,7 @@ export interface RootState {
   recipe: RecipeState;
   ingredient: IngredientState;
   tenantPlan: TenantPlanState;
+  tenantSubscription: TenantSubscriptionState;
 }
 export type AppDispatch = ThunkDispatch<RootState, undefined, UnknownAction>;
 
