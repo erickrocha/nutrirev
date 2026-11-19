@@ -59,3 +59,31 @@ pub struct TenantSubscriptionPaymentSuccessJson {
 pub struct VerifyPaymentIntentJson {
     pub payment_intent_id: String,
 }
+
+#[derive(Clone, Debug, Deserialize, utoipa::IntoParams)]
+#[serde(rename_all = "camelCase")]
+pub struct TenantSubscriptionPaymentsQuery {
+    pub tenant_id: Option<i32>,
+    pub payment_method: Option<String>,
+    pub start_date: Option<String>,
+    pub end_date: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct TenantSubscriptionPaymentItemJson {
+    pub id: i32,
+    pub uuid: String,
+    pub tenant_id: i32,
+    pub tenant_name: Option<String>,
+    pub business_plan_id: i32,
+    pub plan_name: String,
+    pub amount_cents: i64,
+    pub formatted_amount: String,
+    pub currency: String,
+    pub payment_method: String,
+    pub payment_intent_id: Option<String>,
+    pub status: String,
+    pub paid_at: String,
+    pub created_at: String,
+}

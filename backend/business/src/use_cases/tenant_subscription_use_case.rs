@@ -1,10 +1,30 @@
 use crate::domain::business_error::BusinessError;
 use base64::Engine;
 use chrono::{Duration, NaiveDate, Utc};
-use entity::{business_plan_entity, plan_order_entity, tenant_entity, tenant_plan_entity};
+use entity::{
+    business_plan_entity, plan_order_entity, tenant_entity, tenant_plan_entity,
+    tenant_subscription_payment_entity,
+};
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, DbConn, DbErr, EntityTrait, QueryFilter, QueryOrder, Set,
 };
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TenantSubscriptionPaymentHistoryItem {
+    pub id: i32,
+    pub uuid: String,
+    pub tenant_id: i32,
+    pub tenant_name: Option<String>,
+    pub business_plan_id: i32,
+    pub plan_name: String,
+    pub amount_cents: i64,
+    pub currency: String,
+    pub payment_method: String,
+    pub payment_intent_id: Option<String>,
+    pub status: String,
+    pub paid_at: chrono::DateTime<Utc>,
+    pub created_at: chrono::DateTime<Utc>,
+}
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TenantSubscriptionStatus {
@@ -186,6 +206,7 @@ impl TenantSubscriptionUseCase {
             ("currency".to_string(), "brl".to_string()),
             ("automatic_payment_methods[enabled]".to_string(), "true".to_string()),
             ("description".to_string(), format!("NutriRev Assinatura - Clínica #{} ({})", tenant_id, status.plan_name)),
+            ("metadata[tenant_id]".to_string(), tenant_id.to_string()),
             ("metadata[reference]".to_string(), reference.clone()),
         ];
 
@@ -272,6 +293,7 @@ impl TenantSubscriptionUseCase {
             ("payment_method_data[type]".to_string(), "pix".to_string()),
             ("payment_method_options[pix][expires_after_seconds]".to_string(), "3600".to_string()),
             ("description".to_string(), format!("NutriRev Assinatura - Clínica #{} ({})", tenant_id, status.plan_name)),
+            ("metadata[tenant_id]".to_string(), tenant_id.to_string()),
             ("metadata[reference]".to_string(), reference.clone()),
         ];
         if !customer_id.is_empty() {
@@ -402,6 +424,7 @@ impl TenantSubscriptionUseCase {
 
         let reference = format!("nutrirev-sub-card-{}-{}", tenant_id, Utc::now().timestamp());
         form.push(("description".to_string(), format!("NutriRev Assinatura - Clínica #{} ({})", tenant_id, status.plan_name)));
+        form.push(("metadata[tenant_id]".to_string(), tenant_id.to_string()));
         form.push(("metadata[reference]".to_string(), reference.clone()));
         form.push(("expand[]".to_string(), "latest_charge".to_string()));
 
@@ -427,11 +450,12 @@ impl TenantSubscriptionUseCase {
 
         let intent_status = body.get("status").and_then(|s| s.as_str()).unwrap_or_default();
         if intent_status == "succeeded" || intent_status == "requires_capture" {
+            let pi_id = body.get("id").and_then(|s| s.as_str());
             log::info!(
                 "[TenantSubscriptionUseCase] Cartão aprovado para tenant #{}. Renovando plano...",
                 tenant_id
             );
-            Self::renew_after_payment(db, tenant_id).await
+            Self::renew_after_payment(db, tenant_id, Some("card"), Some(status.amount_cents), pi_id).await
         } else {
             let msg = body.pointer("/last_payment_error/message")
                 .and_then(|m| m.as_str())
@@ -477,16 +501,23 @@ impl TenantSubscriptionUseCase {
                 payment_intent_id,
                 tenant_id
             );
-            Self::renew_after_payment(db, tenant_id).await
+            let amount = body.get("amount").and_then(|a| a.as_i64());
+            let pm_type = body.pointer("/latest_charge/payment_method_details/type")
+                .and_then(|t| t.as_str())
+                .unwrap_or("card");
+            Self::renew_after_payment(db, tenant_id, Some(pm_type), amount, Some(payment_intent_id)).await
         } else {
             Err(BusinessError::new("Pagamento ainda não foi confirmado".to_string()))
         }
     }
 
-    /// Renova o plano do tenant após confirmação de pagamento.
+    /// Renova o plano do tenant após confirmação de pagamento e registra o histórico.
     pub async fn renew_after_payment(
         db: &DbConn,
         tenant_id: i32,
+        payment_method: Option<&str>,
+        amount_cents: Option<i64>,
+        payment_intent_id: Option<&str>,
     ) -> Result<NaiveDate, BusinessError> {
         let active_plan = tenant_plan_entity::Entity::find()
             .filter(tenant_plan_entity::Column::TenantId.eq(tenant_id))
@@ -513,6 +544,26 @@ impl TenantSubscriptionUseCase {
             .map_err(db_err)?
             .ok_or_else(|| BusinessError::new("Business plan not found".to_string()))?;
 
+        // Idempotency: se esse payment_intent já foi registrado, não renova nem duplica histórico
+        if let Some(pi_id) = payment_intent_id
+            && !pi_id.is_empty()
+        {
+            let existing = tenant_subscription_payment_entity::Entity::find()
+                .filter(tenant_subscription_payment_entity::Column::PaymentIntentId.eq(pi_id))
+                .one(db)
+                .await
+                .map_err(db_err)?;
+
+            if existing.is_some() {
+                log::info!(
+                    "[TenantSubscriptionUseCase] Pagamento {} já registrado para tenant #{}. Ignorando duplicação.",
+                    pi_id,
+                    tenant_id
+                );
+                return Ok(plan_model.payment_date);
+            }
+        }
+
         let today = Utc::now().date_naive();
         let base_date = if plan_model.payment_date > today {
             plan_model.payment_date
@@ -522,7 +573,7 @@ impl TenantSubscriptionUseCase {
         let period_days = if bp.period_days > 0 { bp.period_days } else { 30 };
         let new_payment_date = base_date + Duration::days(period_days as i64);
 
-        let mut active: tenant_plan_entity::ActiveModel = plan_model.into();
+        let mut active: tenant_plan_entity::ActiveModel = plan_model.clone().into();
         active.payment_date = Set(new_payment_date);
         active.active = Set(true);
         active.update(db).await.map_err(db_err)?;
@@ -541,6 +592,29 @@ impl TenantSubscriptionUseCase {
             let _ = o.update(db).await;
         }
 
+        // Registra no histórico de pagamentos de assinatura
+        let paid_at = Utc::now();
+        let payment_record = tenant_subscription_payment_entity::ActiveModel {
+            uuid: Set(uuid::Uuid::new_v4().as_bytes().to_vec()),
+            tenant_id: Set(tenant_id),
+            business_plan_id: Set(plan_model.business_plan_id),
+            plan_name: Set(bp.name.clone()),
+            amount_cents: Set(amount_cents.unwrap_or(bp.price_in_cents)),
+            currency: Set("BRL".to_string()),
+            payment_method: Set(payment_method.unwrap_or("card").to_string()),
+            payment_intent_id: Set(payment_intent_id.map(|s| s.to_string())),
+            status: Set("paid".to_string()),
+            paid_at: Set(paid_at),
+            created_at: Set(paid_at),
+            created_by: Set(Some("system".to_string())),
+            updated_at: Set(paid_at),
+            updated_by: Set(Some("system".to_string())),
+            ..Default::default()
+        };
+        if let Err(e) = payment_record.insert(db).await {
+            log::error!("[TenantSubscriptionUseCase] Erro ao registrar histórico de pagamento: {}", e);
+        }
+
         log::info!(
             "[TenantSubscriptionUseCase] Assinatura do tenant #{} renovada até {}",
             tenant_id,
@@ -548,5 +622,93 @@ impl TenantSubscriptionUseCase {
         );
 
         Ok(new_payment_date)
+    }
+
+    /// Lista o histórico de pagamentos com filtros opcionais.
+    pub async fn list_payments(
+        db: &DbConn,
+        tenant_id: Option<i32>,
+        payment_method: Option<String>,
+        start_date: Option<NaiveDate>,
+        end_date: Option<NaiveDate>,
+    ) -> Result<Vec<TenantSubscriptionPaymentHistoryItem>, BusinessError> {
+        log::info!(
+            "[TenantSubscriptionUseCase] list_payments: tenant={:?}, method={:?}, start={:?}, end={:?}",
+            tenant_id,
+            payment_method,
+            start_date,
+            end_date
+        );
+
+        let mut query = tenant_subscription_payment_entity::Entity::find();
+
+        if let Some(tid) = tenant_id {
+            query = query.filter(tenant_subscription_payment_entity::Column::TenantId.eq(tid));
+        }
+
+        if let Some(ref method) = payment_method {
+            let m = method.trim().to_lowercase();
+            if !m.is_empty() && m != "all" {
+                query = query.filter(tenant_subscription_payment_entity::Column::PaymentMethod.eq(m));
+            }
+        }
+
+        if let Some(start) = start_date
+            && let Some(dt) = start.and_hms_opt(0, 0, 0)
+        {
+            query = query.filter(tenant_subscription_payment_entity::Column::PaidAt.gte(dt.and_utc()));
+        }
+
+        if let Some(end) = end_date
+            && let Some(dt) = end.and_hms_opt(23, 59, 59)
+        {
+            query = query.filter(tenant_subscription_payment_entity::Column::PaidAt.lte(dt.and_utc()));
+        }
+
+        query = query.order_by_desc(tenant_subscription_payment_entity::Column::PaidAt);
+
+        let payments = query.all(db).await.map_err(db_err)?;
+
+        let tenant_ids: Vec<i32> = payments.iter().map(|p| p.tenant_id).collect();
+        let tenants_map: std::collections::HashMap<i32, String> = if !tenant_ids.is_empty() {
+            tenant_entity::Entity::find()
+                .filter(tenant_entity::Column::Id.is_in(tenant_ids))
+                .all(db)
+                .await
+                .map_err(db_err)?
+                .into_iter()
+                .map(|t| (t.id, t.name.unwrap_or_else(|| format!("Clínica #{}", t.id))))
+                .collect()
+        } else {
+            std::collections::HashMap::new()
+        };
+
+        let items = payments
+            .into_iter()
+            .map(|p| {
+                let uuid_str = uuid::Uuid::from_slice(&p.uuid)
+                    .map(|u| u.to_string())
+                    .unwrap_or_else(|_| hex::encode(&p.uuid));
+                let tenant_name = tenants_map.get(&p.tenant_id).cloned();
+
+                TenantSubscriptionPaymentHistoryItem {
+                    id: p.id,
+                    uuid: uuid_str,
+                    tenant_id: p.tenant_id,
+                    tenant_name,
+                    business_plan_id: p.business_plan_id,
+                    plan_name: p.plan_name,
+                    amount_cents: p.amount_cents,
+                    currency: p.currency,
+                    payment_method: p.payment_method,
+                    payment_intent_id: p.payment_intent_id,
+                    status: p.status,
+                    paid_at: p.paid_at,
+                    created_at: p.created_at,
+                }
+            })
+            .collect();
+
+        Ok(items)
     }
 }

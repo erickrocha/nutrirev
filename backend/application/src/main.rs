@@ -289,9 +289,11 @@ impl Modify for SecurityAddon {
         http::recurring_payment_controller::disable_recurring,
         http::recurring_payment_controller::billing_mode,
         http::tenant_subscription_controller::get_status,
+        http::tenant_subscription_controller::create_payment_intent,
         http::tenant_subscription_controller::pay_pix,
         http::tenant_subscription_controller::pay_card,
         http::tenant_subscription_controller::verify_payment,
+        http::tenant_subscription_controller::list_payments,
     ),
     components(
         schemas(
@@ -349,8 +351,10 @@ impl Modify for SecurityAddon {
             http::json::tenant_subscription_json::TenantSubscriptionStatusJson,
             http::json::tenant_subscription_json::TenantSubscriptionPixResponseJson,
             http::json::tenant_subscription_json::PayTenantSubscriptionCardJson,
+            http::json::tenant_subscription_json::TenantSubscriptionIntentResponseJson,
             http::json::tenant_subscription_json::TenantSubscriptionPaymentSuccessJson,
             http::json::tenant_subscription_json::VerifyPaymentIntentJson,
+            http::json::tenant_subscription_json::TenantSubscriptionPaymentItemJson,
             http::json::pix_payment_json::CreatePixChargeJson,
             http::json::pix_payment_json::PixChargeJson,
             http::json::pix_payment_json::AttemptStatusJson,

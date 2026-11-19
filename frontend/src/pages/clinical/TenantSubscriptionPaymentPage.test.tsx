@@ -58,6 +58,7 @@ vi.mock('../../services/tenantSubscriptionService', () => ({
       publishableKey: 'pk_test_123',
       amountCents: 19900,
     }),
+    getPayments: vi.fn().mockResolvedValue([]),
   },
 }));
 
@@ -85,6 +86,11 @@ const renderPage = (initialStatus?: Partial<TenantSubscriptionStatus>) => {
         loading: false,
         pixLoading: false,
         cardSubmitting: false,
+        intentLoading: false,
+        paymentIntent: null,
+        payments: [],
+        paymentsLoading: false,
+        paymentsFilter: {},
         pix: {
           paymentIntentId: 'pi_test_1',
           payload: '00020126580014br.gov.bcb.pix0136test-payload',
@@ -156,6 +162,16 @@ describe('TenantSubscriptionPaymentPage', () => {
 
     expect(await screen.findByTestId('stripe-elements')).toBeInTheDocument();
     expect(screen.getByTestId('stripe-payment-element')).toBeInTheDocument();
+  });
+
+  it('permite alternar para a aba de Histórico de Pagamentos', async () => {
+    renderPage({ status: 'ok', daysOverdue: 0 });
+    const user = userEvent.setup();
+
+    const historyTab = screen.getByRole('button', { name: /Histórico/i });
+    await user.click(historyTab);
+
+    expect(await screen.findByText('Nenhum pagamento registrado')).toBeInTheDocument();
   });
 
   it('valida dados do cartão no formulário fallback quando o intent não estiver disponível', async () => {

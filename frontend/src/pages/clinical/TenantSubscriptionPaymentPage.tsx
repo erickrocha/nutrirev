@@ -15,6 +15,7 @@ import {
   CreditCard,
   Lock,
   QrCode,
+  Receipt,
   RefreshCw,
   ShieldAlert,
   Sparkles,
@@ -23,9 +24,12 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { StripePaymentElementForm } from '../../components/payments/StripePaymentElementForm';
+import { TenantSubscriptionPaymentHistoryTable } from '../../components/payments/TenantSubscriptionPaymentHistoryTable';
+import type { TenantSubscriptionPaymentsFilter } from '../../types/tenantSubscription';
 import {
   createTenantSubscriptionIntent,
   createTenantSubscriptionPix,
+  fetchTenantSubscriptionPayments,
   fetchTenantSubscriptionStatus,
   payTenantSubscriptionCard,
   verifyTenantSubscriptionPayment,
@@ -66,11 +70,13 @@ export const TenantSubscriptionPaymentPage = () => {
     intentLoading,
     paymentIntent,
     pix,
+    payments,
+    paymentsLoading,
     error,
     lastSuccess,
   } = useAppSelector((state) => state.tenantSubscription);
 
-  const [method, setMethod] = useState<'pix' | 'card'>('pix');
+  const [method, setMethod] = useState<'pix' | 'card' | 'history'>('pix');
   const [copied, setCopied] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -147,6 +153,17 @@ export const TenantSubscriptionPaymentPage = () => {
       dispatch(createTenantSubscriptionIntent());
     }
   }, [method, paymentIntent, status, dispatch]);
+
+  // When method switches to history, load payments
+  useEffect(() => {
+    if (method === 'history') {
+      dispatch(fetchTenantSubscriptionPayments());
+    }
+  }, [method, dispatch]);
+
+  const handleFilterPayments = (filter: TenantSubscriptionPaymentsFilter) => {
+    dispatch(fetchTenantSubscriptionPayments(filter));
+  };
 
   // Load Stripe instance with publishable key
   const stripePromise = useMemo(() => {
@@ -411,6 +428,18 @@ export const TenantSubscriptionPaymentPage = () => {
               <CreditCard size={18} />
               <span>{t('tenantSubscription.creditCard', 'Cartão de Crédito')}</span>
             </button>
+            <button
+              type="button"
+              onClick={() => setMethod('history')}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition ${
+                method === 'history'
+                  ? 'bg-[var(--bg-alt)] text-[var(--accent-primary)] shadow-sm'
+                  : 'text-[var(--text-body)] hover:text-[var(--text-heading)]'
+              }`}
+            >
+              <Receipt size={18} />
+              <span>{t('tenantSubscription.historyTab', 'Histórico')}</span>
+            </button>
           </div>
 
           {(error || formError) && (
@@ -666,6 +695,17 @@ export const TenantSubscriptionPaymentPage = () => {
                   </div>
                 </form>
               )}
+            </div>
+          )}
+
+          {/* HISTORY TAB */}
+          {method === 'history' && (
+            <div className="py-2">
+              <TenantSubscriptionPaymentHistoryTable
+                payments={payments}
+                loading={paymentsLoading}
+                onFilter={handleFilterPayments}
+              />
             </div>
           )}
         </div>

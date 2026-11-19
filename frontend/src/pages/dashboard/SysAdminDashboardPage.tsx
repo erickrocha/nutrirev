@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, Building, CalendarClock, CreditCard, FileText, RefreshCw, ShieldCheck, UserCog, Users } from 'lucide-react';
+import { AlertCircle, Building, CalendarClock, CreditCard, FileText, Receipt, RefreshCw, ShieldCheck, UserCog, Users } from 'lucide-react';
 import { Breadcrumb } from '../../components/molecules/Breadcrumb';
 import { ErrorAlert } from '../../components/molecules/ErrorAlert';
 import { MetricCard } from '../../components/molecules/MetricCard';
@@ -49,7 +49,7 @@ export const SysAdminDashboardPage = () => {
       </section>
 
       <nav aria-label={t('sysAdminDashboard.quickActions')} className="mb-6 flex flex-wrap gap-3">
-        {([[PATHS.TENANTS, Building, 'manageTenants'], [PATHS.USERS, UserCog, 'manageUsers'], [PATHS.BUSINESS_PLANS, FileText, 'managePlans'], [PATHS.TENANT_DASHBOARD, ShieldCheck, 'openTenantDashboard']] as const).map(([to, Icon, key]) => (
+        {([[PATHS.TENANTS, Building, 'manageTenants'], [PATHS.USERS, UserCog, 'manageUsers'], [PATHS.BUSINESS_PLANS, FileText, 'managePlans'], [PATHS.SUBSCRIPTION_PAYMENTS, Receipt, 'subscriptionPayments'], [PATHS.TENANT_DASHBOARD, ShieldCheck, 'openTenantDashboard']] as const).map(([to, Icon, key]) => (
           <Link key={key} to={to} className="flex items-center gap-2 rounded-xl border border-[var(--border-color)] bg-white px-4 py-3 text-[.88rem] font-semibold text-[var(--text-heading)] no-underline hover:border-[var(--accent-primary)]"><Icon size={18} />{t(`sysAdminDashboard.${key}`)}</Link>
         ))}
       </nav>
@@ -61,7 +61,7 @@ export const SysAdminDashboardPage = () => {
               <h3 className="m-0 flex items-center gap-2 text-[1rem]"><CalendarClock size={18} />{t('sysAdminDashboard.billingAttention')}</h3>
               <p className="m-0 text-[.8rem] text-[var(--text-body)]">{t('sysAdminDashboard.billingAttentionSubtitle')}</p>
             </div>
-            <Link to={PATHS.BUSINESS_PLANS} className="text-[var(--accent-primary)] no-underline">{viewAll}</Link>
+            <Link to={PATHS.SUBSCRIPTION_PAYMENTS} className="text-[var(--accent-primary)] no-underline">{viewAll}</Link>
           </header>
           {loading ? <p role="status" className="p-8 text-center text-[var(--text-body)]"><RefreshCw size={22} className="animate-spin" /></p>
             : billing.length === 0 ? <div className="flex flex-col items-center gap-2 p-8 text-center text-[var(--text-body)]"><CalendarClock size={30} /><p className="m-0">{t('sysAdminDashboard.noBillingAttention')}</p></div>

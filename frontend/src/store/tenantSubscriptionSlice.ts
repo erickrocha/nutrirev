@@ -3,6 +3,8 @@ import { tenantSubscriptionService } from '../services/tenantSubscriptionService
 import type {
   PayTenantSubscriptionCardPayload,
   TenantSubscriptionIntentResponse,
+  TenantSubscriptionPaymentItem,
+  TenantSubscriptionPaymentsFilter,
   TenantSubscriptionPixResponse,
   TenantSubscriptionStatus,
   TenantSubscriptionSuccess,
@@ -16,6 +18,9 @@ interface TenantSubscriptionState {
   intentLoading: boolean;
   paymentIntent: TenantSubscriptionIntentResponse | null;
   pix: TenantSubscriptionPixResponse | null;
+  payments: TenantSubscriptionPaymentItem[];
+  paymentsLoading: boolean;
+  paymentsFilter: TenantSubscriptionPaymentsFilter;
   error: string | null;
   lastSuccess: TenantSubscriptionSuccess | null;
 }
@@ -28,6 +33,9 @@ const initialState: TenantSubscriptionState = {
   intentLoading: false,
   paymentIntent: null,
   pix: null,
+  payments: [],
+  paymentsLoading: false,
+  paymentsFilter: {},
   error: null,
   lastSuccess: null,
 };
@@ -95,6 +103,18 @@ export const verifyTenantSubscriptionPayment = createAsyncThunk<
   }
 });
 
+export const fetchTenantSubscriptionPayments = createAsyncThunk<
+  TenantSubscriptionPaymentItem[],
+  TenantSubscriptionPaymentsFilter | undefined,
+  { rejectValue: string }
+>('tenantSubscription/fetchPayments', async (filter, { rejectWithValue }) => {
+  try {
+    return await tenantSubscriptionService.getPayments(filter);
+  } catch (err) {
+    return rejectWithValue(messageOf(err, 'Falha ao carregar histórico de pagamentos'));
+  }
+});
+
 const slice = createSlice({
   name: 'tenantSubscription',
   initialState,
@@ -110,6 +130,12 @@ const slice = createSlice({
     },
     resetSubscriptionSuccess: (state) => {
       state.lastSuccess = null;
+    },
+    setPaymentsFilter: (
+      state,
+      action: PayloadAction<TenantSubscriptionPaymentsFilter>
+    ) => {
+      state.paymentsFilter = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -179,6 +205,18 @@ const slice = createSlice({
           state.status.daysOverdue = 0;
           state.status.paymentDate = action.payload.newPaymentDate;
         }
+      })
+      // fetchTenantSubscriptionPayments
+      .addCase(fetchTenantSubscriptionPayments.pending, (state) => {
+        state.paymentsLoading = true;
+      })
+      .addCase(fetchTenantSubscriptionPayments.fulfilled, (state, action) => {
+        state.paymentsLoading = false;
+        state.payments = action.payload;
+      })
+      .addCase(fetchTenantSubscriptionPayments.rejected, (state, action) => {
+        state.paymentsLoading = false;
+        state.error = action.payload ?? 'Erro ao carregar pagamentos';
       });
   },
 });
@@ -188,6 +226,7 @@ export const {
   clearSubscriptionError,
   resetSubscriptionPix,
   resetSubscriptionSuccess,
+  setPaymentsFilter,
 } = slice.actions;
 
 export default slice.reducer;

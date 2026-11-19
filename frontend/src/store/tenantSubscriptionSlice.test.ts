@@ -2,7 +2,9 @@ import reducer, {
   setSubscriptionStatus,
   clearSubscriptionError,
   resetSubscriptionPix,
+  setPaymentsFilter,
   fetchTenantSubscriptionStatus,
+  fetchTenantSubscriptionPayments,
   createTenantSubscriptionPix,
   createTenantSubscriptionIntent,
   payTenantSubscriptionCard,
@@ -18,6 +20,9 @@ describe('tenantSubscriptionSlice', () => {
     intentLoading: false,
     paymentIntent: null,
     pix: null,
+    payments: [],
+    paymentsLoading: false,
+    paymentsFilter: {},
     error: null,
     lastSuccess: null,
   };
@@ -137,5 +142,38 @@ describe('tenantSubscriptionSlice', () => {
     expect(next.status?.paymentDate).toBe('2026-12-09');
     expect(next.lastSuccess).toEqual(successPayload);
     expect(next.cardSubmitting).toBe(false);
+  });
+
+  it('atualiza paymentsFilter via setPaymentsFilter', () => {
+    const filter = { paymentMethod: 'pix', startDate: '2026-11-01' };
+    const next = reducer(initial, setPaymentsFilter(filter));
+    expect(next.paymentsFilter).toEqual(filter);
+  });
+
+  it('atualiza estado com lista de pagamentos via fetchTenantSubscriptionPayments.fulfilled', () => {
+    const mockPayments = [
+      {
+        id: 1,
+        uuid: 'uuid-1',
+        tenantId: 10,
+        tenantName: 'Clínica Vida',
+        businessPlanId: 1,
+        planName: 'Pro',
+        amountCents: 19900,
+        formattedAmount: 'R$ 199,00',
+        currency: 'BRL',
+        paymentMethod: 'card',
+        paymentIntentId: 'pi_123',
+        status: 'paid',
+        paidAt: '2026-11-19T00:00:00Z',
+        createdAt: '2026-11-19T00:00:00Z',
+      },
+    ];
+    const next = reducer(initial, {
+      type: fetchTenantSubscriptionPayments.fulfilled.type,
+      payload: mockPayments,
+    });
+    expect(next.payments).toEqual(mockPayments);
+    expect(next.paymentsLoading).toBe(false);
   });
 });

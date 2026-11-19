@@ -25,6 +25,7 @@ use crate::http::json::payment_date_json::PaymentDateJson;
 use crate::http::json::doctor_json::DoctorJson;
 use crate::http::json::province_json::ProvinceJson;
 use crate::http::json::city_json::CityJson;
+use crate::http::json::tenant_subscription_json::TenantSubscriptionPaymentItemJson;
 
 use business::domain::access_token::AccessToken;
 use business::domain::enums::Role;
@@ -54,6 +55,7 @@ use business::domain::payment_schedule::{BillingMode, SubscriptionStatus};
 use business::domain::doctor::Doctor;
 use business::domain::province::Province;
 use business::domain::city::City;
+use business::use_cases::tenant_subscription_use_case::TenantSubscriptionPaymentHistoryItem;
 
 
 pub trait Mapper<T, U> {
@@ -1297,6 +1299,33 @@ impl PaymentChargeJsonMapper {
     }
 
     pub fn json_vec(list: Vec<PaymentCharge>) -> Vec<PaymentChargeJson> {
+        list.into_iter().map(Self::json).collect()
+    }
+}
+
+pub struct TenantSubscriptionPaymentItemJsonMapper;
+impl TenantSubscriptionPaymentItemJsonMapper {
+    pub fn json(item: TenantSubscriptionPaymentHistoryItem) -> TenantSubscriptionPaymentItemJson {
+        let formatted_amount = format!("R$ {:.2}", (item.amount_cents as f64) / 100.0).replace('.', ",");
+        TenantSubscriptionPaymentItemJson {
+            id: item.id,
+            uuid: item.uuid,
+            tenant_id: item.tenant_id,
+            tenant_name: item.tenant_name,
+            business_plan_id: item.business_plan_id,
+            plan_name: item.plan_name,
+            amount_cents: item.amount_cents,
+            formatted_amount,
+            currency: item.currency,
+            payment_method: item.payment_method,
+            payment_intent_id: item.payment_intent_id,
+            status: item.status,
+            paid_at: item.paid_at.to_rfc3339(),
+            created_at: item.created_at.to_rfc3339(),
+        }
+    }
+
+    pub fn json_vec(list: Vec<TenantSubscriptionPaymentHistoryItem>) -> Vec<TenantSubscriptionPaymentItemJson> {
         list.into_iter().map(Self::json).collect()
     }
 }

@@ -2,6 +2,8 @@ import { api } from './api';
 import type {
   PayTenantSubscriptionCardPayload,
   TenantSubscriptionIntentResponse,
+  TenantSubscriptionPaymentItem,
+  TenantSubscriptionPaymentsFilter,
   TenantSubscriptionPixResponse,
   TenantSubscriptionStatus,
   TenantSubscriptionSuccess,
@@ -32,6 +34,16 @@ export const tenantSubscriptionService = {
     const response = await api.post<TenantSubscriptionSuccess>('/v1/tenant-subscription/verify', {
       paymentIntentId,
     });
+    return response.data;
+  },
+
+  getPayments: async (
+    filter?: TenantSubscriptionPaymentsFilter
+  ): Promise<TenantSubscriptionPaymentItem[]> => {
+    const response = await api.get<TenantSubscriptionPaymentItem[]>(
+      '/v1/tenant-subscription/payments',
+      { params: filter }
+    );
     return response.data;
   },
 };

@@ -107,6 +107,7 @@
     "systemVersion": "NutriRev v1.0",
     "paymentSettings": "Payment methods",
     "subscriptionPayment": "Clinic Subscription",
+    "subscriptionPayments": "Plan Payments",
     "planOrders": "Orders"
   },
   "topbar": {
@@ -915,6 +916,7 @@
     "manageTenants": "Manage tenants",
     "manageUsers": "Manage users",
     "managePlans": "Manage plans",
+    "subscriptionPayments": "Billing history",
     "openTenantDashboard": "Open tenant dashboard",
     "billingAttention": "Billing attention",
     "billingAttentionSubtitle": "Overdue plans and payments due in the next 30 days.",
@@ -1533,6 +1535,24 @@
     "generatePixButton": "Generate PIX Code",
     "payButton": "Pay Subscription",
     "loadingStripe": "Initializing Stripe secure checkout...",
-    "copyError": "Error copying PIX code"
+    "copyError": "Error copying PIX code",
+    "historyTab": "Payment History",
+    "paymentsTitle": "Subscription Payments",
+    "paymentsSubtitle": "Consolidated history of subscription payments made by clinics.",
+    "filterMethod": "Payment Method",
+    "filterAllMethods": "All methods",
+    "filterCard": "Credit Card",
+    "filterStartDate": "Start Date",
+    "filterEndDate": "End Date",
+    "noPayments": "No payments recorded",
+    "noPaymentsSubtitle": "Completed payments will appear listed here.",
+    "tenant": "Clinic",
+    "plan": "Plan",
+    "method": "Method",
+    "amount": "Amount",
+    "date": "Date",
+    "status": "Status",
+    "transactionId": "ID / Reference",
+    "paid": "Paid"
   }
 }

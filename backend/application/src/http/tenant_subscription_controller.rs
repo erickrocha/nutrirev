@@ -2,11 +2,13 @@ use crate::commons::exception_response::{ExceptionResponse, HttpResponse};
 use crate::commons::i18n::{ErrorKey, Locale};
 use crate::http::json::tenant_subscription_json::{
     PayTenantSubscriptionCardJson, TenantSubscriptionIntentResponseJson,
-    TenantSubscriptionPaymentSuccessJson, TenantSubscriptionPixResponseJson,
+    TenantSubscriptionPaymentItemJson, TenantSubscriptionPaymentSuccessJson,
+    TenantSubscriptionPaymentsQuery, TenantSubscriptionPixResponseJson,
     TenantSubscriptionStatusJson, VerifyPaymentIntentJson,
 };
+use crate::infrastructure::mapper::TenantSubscriptionPaymentItemJsonMapper;
 use crate::AppState;
-use axum::extract::{Extension, State};
+use axum::extract::{Extension, Query, State};
 use axum::http::{HeaderMap, StatusCode};
 use axum::Json;
 use business::domain::enums::Role;
@@ -15,7 +17,6 @@ use business::gateway::stripe_processor::{verify_webhook_signature, WEBHOOK_TOLE
 use business::use_cases::tenant_subscription_use_case::{
     PlatformStripeContext, TenantSubscriptionCardParams, TenantSubscriptionUseCase,
 };
-use serde::Deserialize;
 
 #[utoipa::path(
     get,
@@ -281,20 +282,57 @@ pub async fn verify_payment(
     ))
 }
 
-#[derive(Deserialize)]
-struct StripeWebhookEvent {
-    pub r#type: String,
-    pub data: StripeWebhookData,
-}
+#[utoipa::path(
+    get,
+    tag = "TenantSubscription",
+    path = "/v1/tenant-subscription/payments",
+    params(TenantSubscriptionPaymentsQuery),
+    responses(
+        (status = 200, description = "Histórico de pagamentos de assinaturas", body = Vec<TenantSubscriptionPaymentItemJson>),
+        (status = 401, description = "Não autenticado"),
+        (status = 403, description = "Sem permissão")
+    ),
+    security(("bearer_auth" = []))
+)]
+pub async fn list_payments(
+    State(state): State<AppState>,
+    Extension(locale): Extension<Locale>,
+    Extension(user): Extension<User>,
+    Query(query): Query<TenantSubscriptionPaymentsQuery>,
+) -> HttpResponse<Json<Vec<TenantSubscriptionPaymentItemJson>>> {
+    let target_tenant_id = if user.role == Role::SysAdmin {
+        query.tenant_id
+    } else if user.role == Role::TenantOwner || user.role == Role::TenantUser {
+        user.tenant_id
+    } else {
+        return Err(ExceptionResponse::Forbidden(locale, ErrorKey::SubscriptionBlocked));
+    };
 
-#[derive(Deserialize)]
-struct StripeWebhookData {
-    pub object: StripeWebhookObject,
-}
+    let start_date = query
+        .start_date
+        .as_deref()
+        .and_then(|s| chrono::NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
+    let end_date = query
+        .end_date
+        .as_deref()
+        .and_then(|s| chrono::NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
 
-#[derive(Deserialize)]
-struct StripeWebhookObject {
-    pub metadata: std::collections::HashMap<String, String>,
+    let payments = TenantSubscriptionUseCase::list_payments(
+        &state.conn,
+        target_tenant_id,
+        query.payment_method,
+        start_date,
+        end_date,
+    )
+    .await
+    .map_err(|e| {
+        log::error!("[TenantSubscription] list_payments error: {}", e.message);
+        ExceptionResponse::BadRequest(locale, ErrorKey::InvalidParameterValue)
+    })?;
+
+    let items = TenantSubscriptionPaymentItemJsonMapper::json_vec(payments);
+
+    Ok(Json(items))
 }
 
 pub async fn platform_stripe_webhook(
@@ -318,20 +356,54 @@ pub async fn platform_stripe_webhook(
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    let event: StripeWebhookEvent = match serde_json::from_str(&body) {
-        Ok(ev) => ev,
+    let val: serde_json::Value = match serde_json::from_str(&body) {
+        Ok(v) => v,
         Err(e) => {
             log::warn!("[PlatformStripeWebhook] Could not parse event: {}", e);
             return Err(StatusCode::BAD_REQUEST);
         }
     };
 
-    if event.r#type == "payment_intent.succeeded"
-        && let Some(tenant_id_str) = event.data.object.metadata.get("tenant_id")
-        && let Ok(tenant_id) = tenant_id_str.parse::<i32>()
-    {
-        let _ = TenantSubscriptionUseCase::renew_after_payment(&state.conn, tenant_id).await;
-        log::info!("[PlatformStripeWebhook] Tenant #{} renewed via webhook", tenant_id);
+    let event_type = val.get("type").and_then(|v| v.as_str()).unwrap_or_default();
+    if event_type == "payment_intent.succeeded" {
+        let data_obj = val.pointer("/data/object");
+        let intent_id = data_obj.and_then(|o| o.get("id")).and_then(|v| v.as_str()).unwrap_or_default();
+        let amount = data_obj.and_then(|o| o.get("amount")).and_then(|v| v.as_i64());
+        let pm_type = data_obj
+            .and_then(|o| o.pointer("/charges/data/0/payment_method_details/type"))
+            .and_then(|v| v.as_str())
+            .unwrap_or("card");
+
+        let tenant_id = data_obj
+            .and_then(|o| o.pointer("/metadata/tenant_id"))
+            .and_then(|v| v.as_str())
+            .and_then(|s| s.parse::<i32>().ok())
+            .or_else(|| {
+                let reference = data_obj
+                    .and_then(|o| o.pointer("/metadata/reference"))
+                    .and_then(|v| v.as_str())?;
+                let parts: Vec<&str> = reference.split('-').collect();
+                if parts.len() >= 4 && parts[0] == "nutrirev" && parts[1] == "sub" {
+                    parts[3].parse::<i32>().ok()
+                } else {
+                    None
+                }
+            });
+
+        if let Some(tenant_id) = tenant_id {
+            let pi_opt = if !intent_id.is_empty() { Some(intent_id) } else { None };
+            let _ = TenantSubscriptionUseCase::renew_after_payment(
+                &state.conn,
+                tenant_id,
+                Some(pm_type),
+                amount,
+                pi_opt,
+            )
+            .await;
+            log::info!("[PlatformStripeWebhook] Tenant #{} renewed via webhook (PI: {})", tenant_id, intent_id);
+        } else {
+            log::warn!("[PlatformStripeWebhook] payment_intent.succeeded received without identifiable tenant_id");
+        }
     }
 
     Ok(StatusCode::OK)

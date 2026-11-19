@@ -107,6 +107,7 @@
     "systemVersion": "NutriRev v1.0",
     "paymentSettings": "Formas de pagamento",
     "subscriptionPayment": "Assinatura da Clínica",
+    "subscriptionPayments": "Pagamentos de Planos",
     "planOrders": "Pedidos"
   },
   "topbar": {
@@ -915,6 +916,7 @@
     "manageTenants": "Gerenciar clínicas",
     "manageUsers": "Gerenciar usuários",
     "managePlans": "Gerenciar planos",
+    "subscriptionPayments": "Histórico de faturamento",
     "openTenantDashboard": "Abrir dashboard da clínica",
     "billingAttention": "Atenção ao faturamento",
     "billingAttentionSubtitle": "Planos vencidos e pagamentos previstos para os próximos 30 dias.",
@@ -1533,6 +1535,24 @@
     "generatePixButton": "Gerar Código PIX",
     "payButton": "Pagar Assinatura",
     "loadingStripe": "Inicializando checkout seguro da Stripe...",
-    "copyError": "Erro ao copiar código PIX"
+    "copyError": "Erro ao copiar código PIX",
+    "historyTab": "Histórico de Pagamentos",
+    "paymentsTitle": "Pagamentos de Assinaturas",
+    "paymentsSubtitle": "Histórico consolidado de pagamentos de planos efetuados pelas clínicas.",
+    "filterMethod": "Forma de Pagamento",
+    "filterAllMethods": "Todas as formas",
+    "filterCard": "Cartão de Crédito",
+    "filterStartDate": "Data Inicial",
+    "filterEndDate": "Data Final",
+    "noPayments": "Nenhum pagamento registrado",
+    "noPaymentsSubtitle": "Os pagamentos efetuados aparecerão listados aqui.",
+    "tenant": "Clínica",
+    "plan": "Plano",
+    "method": "Forma",
+    "amount": "Valor",
+    "date": "Data",
+    "status": "Status",
+    "transactionId": "ID / Referência",
+    "paid": "Pago"
   }
 }

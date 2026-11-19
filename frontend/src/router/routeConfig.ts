@@ -24,6 +24,7 @@ export const PATHS = {
   BUSINESS_PLAN_EDIT: '/admin/business-plans/:id/edit',
   PLAN_ORDERS: '/admin/orders',
   PLAN_ORDER_DETAIL: '/admin/orders/:uuid',
+  SUBSCRIPTION_PAYMENTS: '/admin/subscription-payments',
   PAYMENT_CONNECTIONS: '/admin/payment-connections',
   USERS: '/users',
   TENANTS: '/tenants',
@@ -103,6 +104,7 @@ export const ROLE_ALLOWED_PATHS: Record<string, string[]> = {
     PATHS.BUSINESS_PLAN_EDIT,
     PATHS.PLAN_ORDERS,
     PATHS.PLAN_ORDER_DETAIL,
+    PATHS.SUBSCRIPTION_PAYMENTS,
     // Provisioning acquirer connections is the platform operator's alone: the
     // secret pointer names a deployment secret, not a clinic-settable value.
     ...withForms(PATHS.PAYMENT_CONNECTIONS),

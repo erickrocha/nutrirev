@@ -1,6 +1,6 @@
 import {
   Activity, AlertCircle, Apple, Building, CalendarDays, Calculator, Compass, CreditCard, FileText, Flame, Heart, Home, Inbox,
-  LayoutDashboard, Settings, Star, Stethoscope, Target, UserCheck, Users, Utensils, Zap,
+  LayoutDashboard, Receipt, Settings, Star, Stethoscope, Target, UserCheck, Users, Utensils, Zap,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { PATHS } from '../router/routeConfig';
@@ -43,6 +43,7 @@ export const buildMenu = (role: string, t: Translate): MenuSection[] => {
         ...when(isSysAdmin, { path: PATHS.TENANTS, label: t('sidebar.tenants'), icon: Building }),
         ...when(isSysAdmin, { path: PATHS.BUSINESS_PLANS, label: t('sidebar.businessPlans'), icon: FileText }),
         ...when(isSysAdmin, { path: PATHS.PLAN_ORDERS, label: t('sidebar.planOrders'), icon: Inbox }),
+        ...when(isSysAdmin, { path: PATHS.SUBSCRIPTION_PAYMENTS, label: t('sidebar.subscriptionPayments'), icon: Receipt }),
         ...when(isSysAdmin, { path: PATHS.PAYMENT_CONNECTIONS, label: t('sidebar.paymentConnections'), icon: CreditCard }),
         { path: PATHS.CUSTOMERS, label: t('sidebar.customers'), icon: UserCheck },
         ...when(isTenantOwner || isTenantUser || isSysAdmin, { path: PATHS.DOCTORS, label: t('sidebar.doctors'), icon: Stethoscope }),

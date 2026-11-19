@@ -43,3 +43,27 @@ export interface TenantSubscriptionSuccess {
 export interface VerifyPaymentIntentPayload {
   paymentIntentId: string;
 }
+
+export interface TenantSubscriptionPaymentItem {
+  id: number;
+  uuid: string;
+  tenantId: number;
+  tenantName?: string | null;
+  businessPlanId: number;
+  planName: string;
+  amountCents: number;
+  formattedAmount: string;
+  currency: string;
+  paymentMethod: 'card' | 'pix' | string;
+  paymentIntentId?: string | null;
+  status: string;
+  paidAt: string;
+  createdAt: string;
+}
+
+export interface TenantSubscriptionPaymentsFilter {
+  tenantId?: number;
+  paymentMethod?: string;
+  startDate?: string;
+  endDate?: string;
+}

@@ -49,6 +49,7 @@ const CustomerPaymentsPage = lazy(() => import('../pages/payments/CustomerPaymen
 const IngredientListPage = lazy(() => import('../pages/clinical/IngredientListPage').then((module) => ({ default: module.IngredientListPage })));
 const IngredientFormPage = lazy(() => import('../pages/clinical/IngredientFormPage').then((module) => ({ default: module.IngredientFormPage })));
 const TenantSubscriptionPaymentPage = lazy(() => import('../pages/clinical/TenantSubscriptionPaymentPage').then((module) => ({ default: module.TenantSubscriptionPaymentPage })));
+const TenantSubscriptionPaymentHistoryPage = lazy(() => import('../pages/admin/TenantSubscriptionPaymentHistoryPage').then((module) => ({ default: module.TenantSubscriptionPaymentHistoryPage })));
 
 // "/" e "/login" (ex.: logo após entrar) levam à página inicial do perfil; qualquer outro endereço sem rota é um 404.
 const UnknownRoute = () => {
@@ -80,6 +81,7 @@ export const AppRoutes = () => (
       <Route path={PATHS.BUSINESS_PLAN_EDIT} element={<BusinessPlanFormPage />} />
       <Route path={PATHS.PLAN_ORDERS} element={<PlanOrderManagement />} />
       <Route path={PATHS.PLAN_ORDER_DETAIL} element={<PlanOrderDetailPage />} />
+      <Route path={PATHS.SUBSCRIPTION_PAYMENTS} element={<TenantSubscriptionPaymentHistoryPage />} />
       <Route path={PATHS.PAYMENT_CONNECTIONS} element={<PaymentConnectionListPage />} />
       <Route path={newPath(PATHS.PAYMENT_CONNECTIONS)} element={<PaymentConnectionFormPage />} />
       <Route path={editPath(PATHS.PAYMENT_CONNECTIONS, ':id')} element={<PaymentConnectionFormPage />} />
