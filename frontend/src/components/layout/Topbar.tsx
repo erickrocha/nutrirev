@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Building, ChevronDown, LogOut, Menu, Shield, User, UserCheck } from 'lucide-react';
+import { Building, ChevronDown, CreditCard, LogOut, Menu, Shield, User, UserCheck } from 'lucide-react';
 import { LogoMark } from '../brand/Logo';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { logout } from '../../store/authSlice';
@@ -78,6 +78,11 @@ export const Topbar = ({ onToggleMobileMenu }: { onToggleMobileMenu: () => void 
               {roleName === ROLES.USER && (
                 <button type="button" role="menuitem" className={ITEM} onClick={() => { setOpen(false); navigate(PATHS.SETTINGS); }}>
                   <UserCheck size={16} /><span>{t('topbar.editProfile')}</span>
+                </button>
+              )}
+              {(roleName === ROLES.TENANT_OWNER || roleName === ROLES.TENANT_USER) && (
+                <button type="button" role="menuitem" className={ITEM} onClick={() => { setOpen(false); navigate(PATHS.SUBSCRIPTION_PAYMENT); }}>
+                  <CreditCard size={16} /><span>{t('sidebar.subscriptionPayment', 'Assinatura da Clínica')}</span>
                 </button>
               )}
               <LanguageSwitcher />

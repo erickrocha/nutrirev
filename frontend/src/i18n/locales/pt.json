@@ -106,6 +106,7 @@
     "mealPointTiers": "Níveis de Pontos (Gamificação)",
     "systemVersion": "NutriRev v1.0",
     "paymentSettings": "Formas de pagamento",
+    "subscriptionPayment": "Assinatura da Clínica",
     "planOrders": "Pedidos"
   },
   "topbar": {
@@ -1503,5 +1504,34 @@
     "home": "Ir para o início",
     "login": "Ir para o login",
     "code": "404"
+  },
+  "tenantSubscription": {
+    "warningBanner": "Atenção: A assinatura da clínica está pendente de pagamento (vencimento: {{date}}). Regularize para evitar o bloqueio.",
+    "payNow": "Pagar Assinatura",
+    "accessBlockedMenu": "Acesso Restrito",
+    "menuLabel": "Pagar Assinatura",
+    "blockedTitle": "Acesso Bloqueado por Pendência Financeira",
+    "blockedDescription": "O prazo de tolerância da sua assinatura expirou. Para restabelecer o acesso completo ao sistema, realize o pagamento abaixo.",
+    "warningTitle": "Assinatura Pendente de Regularização",
+    "warningDescription": "Sua assinatura está com pagamento pendente. Evite a interrupção dos serviços efetuando o pagamento da fatura.",
+    "okTitle": "Assinatura em Dia!",
+    "okDescription": "O pagamento da assinatura está regularizado. Próximo vencimento: {{date}}",
+    "backToDashboard": "Ir para o Painel",
+    "summaryTitle": "Resumo da Assinatura",
+    "defaultPlan": "Plano NutriRev",
+    "totalDue": "Valor da Fatura",
+    "dueDate": "Vencimento",
+    "daysOverdue": "Dias em atraso",
+    "statusLabel": "Situação",
+    "statusBlocked": "Bloqueado",
+    "statusWarning": "Pendente",
+    "statusOk": "Em dia",
+    "creditCard": "Cartão de Crédito",
+    "generatingPix": "Gerando QR Code PIX...",
+    "pixInstructions": "Abra o app do seu banco, escolha Pagar via Pix e aponte a câmera para o QR Code acima ou copie o código abaixo.",
+    "awaitingPix": "Aguardando confirmação do pagamento em tempo real...",
+    "generatePixButton": "Gerar Código PIX",
+    "payButton": "Pagar Assinatura",
+    "copyError": "Erro ao copiar código PIX"
   }
 }

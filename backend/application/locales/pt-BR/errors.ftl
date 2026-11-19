@@ -61,3 +61,4 @@ plan-order-forbidden = Apenas o administrador do sistema pode gerenciar pedidos
 plan-order-not-found = Pedido não encontrado
 plan-order-invalid = Dados inválidos para o pedido
 plan-order-not-pending = Este pedido não está pendente
+subscription-blocked = O acesso da clínica está bloqueado por pendência financeira na assinatura. Regularize o pagamento para continuar utilizando o sistema.

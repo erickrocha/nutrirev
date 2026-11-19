@@ -55,6 +55,7 @@ export const buildMenu = (role: string, t: Translate): MenuSection[] => {
         { path: PATHS.CLINICAL_PLANS, label: t('sidebar.clinicalPlans'), icon: FileText },
         { path: PATHS.PAYMENT_DATES, label: t('paymentDates.title'), icon: CalendarDays },
         { path: PATHS.PAYMENT_SETTINGS, label: t('sidebar.paymentSettings'), icon: CreditCard },
+        ...when(isTenantOwner || isTenantUser, { path: PATHS.SUBSCRIPTION_PAYMENT, label: t('sidebar.subscriptionPayment', 'Assinatura da Clínica'), icon: CreditCard }),
         { path: PATHS.PREPARE_MEALS, label: t('sidebar.prepareMeals'), icon: Utensils },
         { path: PATHS.DAILY_MEALS, label: t('sidebar.dailyMeals'), icon: CalendarDays },
         { path: PATHS.MEAL_POINT_TIERS, label: t('sidebar.mealPointTiers'), icon: Star },

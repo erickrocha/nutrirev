@@ -50,6 +50,7 @@ export const PATHS = {
   MEAL_PLANS: '/meal-plans',
   DOCTORS: '/doctors',
   MEAL_POINT_TIERS: '/meal-point-tiers',
+  SUBSCRIPTION_PAYMENT: '/subscription-payment',
 };
 
 // Catalog CRUD screens: list, add and edit are separate pages.
@@ -70,6 +71,7 @@ const CLINICAL_ONLY_PATHS = [
 
 const TENANT_USER_PATHS = [
   PATHS.TENANT_DASHBOARD,
+  PATHS.SUBSCRIPTION_PAYMENT,
   ...withForms(PATHS.CUSTOMERS),
   ...withForms(PATHS.CUSTOMER_GOALS),
   ...withForms(PATHS.CLINICAL_PLANS),

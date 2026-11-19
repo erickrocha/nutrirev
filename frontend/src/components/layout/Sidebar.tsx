@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronRight, PanelLeft, PanelLeftClose } from 'lucide-react';
+import { ChevronDown, ChevronRight, CreditCard, Lock, PanelLeft, PanelLeftClose } from 'lucide-react';
 import { buildMenu } from '../../config/menu';
 import { useAppSelector } from '../../store/hooks';
+import { PATHS } from '../../router/routeConfig';
+import { ROLES } from '../../utils/enums';
 
 interface Props {
   collapsed: boolean;
@@ -30,7 +32,13 @@ const writeExpanded = (key: string, value: Expanded) => {
 export const Sidebar = ({ collapsed, setCollapsed, mobileOpen, onCloseMobile }: Props) => {
   const { t } = useTranslation();
   const location = useLocation();
-  const role = useAppSelector((state) => state.auth.user?.role) ?? '';
+  const user = useAppSelector((state) => state.auth.user);
+  const subscriptionStatus =
+    useAppSelector((state) => state.tenantSubscription?.status) ??
+    user?.subscriptionStatus ??
+    user?.subscription_status;
+  const isBlocked = (user?.role === ROLES.TENANT_OWNER || user?.role === ROLES.TENANT_USER || !user?.role) && subscriptionStatus?.status === 'blocked';
+  const role = user?.role ?? '';
   const sections = useMemo(() => buildMenu(role, t), [role, t]);
   const storageKey = `nutrirev.sidebarSections.${role || 'guest'}`;
   const [expanded, setExpanded] = useState<Expanded>(() => readExpanded(storageKey));
@@ -79,30 +87,78 @@ export const Sidebar = ({ collapsed, setCollapsed, mobileOpen, onCloseMobile }: 
         </div>
 
         <nav className="flex w-full flex-col">
-          {sections.map((section) => {
-            const open = collapsed || expanded[section.id] !== false;
-            return (
-              <div key={section.id} className="mb-4 flex w-full flex-col gap-[2px]">
-                {!collapsed && (
-                  <button
-                    type="button" onClick={() => toggle(section.id)} aria-expanded={open}
-                    className="flex w-full items-center justify-between bg-transparent px-4 pb-1 pt-2 text-left text-[.7rem] font-bold uppercase tracking-[.1em] text-[var(--text-body)] hover:text-[var(--text-heading)]"
-                  >
-                    <span>{section.title}</span>{open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                  </button>
-                )}
-                {open && section.items.map(({ path, label, icon: Icon }) => (
-                  <NavLink
-                    key={path} to={path} title={label} onClick={onCloseMobile}
-                    className={({ isActive }) => `box-border flex w-full items-center gap-3 rounded-[10px] py-[10px] text-[.85rem] no-underline transition-colors ${collapsed ? 'justify-center px-3' : 'px-[14px]'} ${isActive ? 'bg-[var(--badge-bg)] font-bold text-[var(--accent-primary)]' : 'font-medium text-[var(--text-body)] hover:bg-[var(--bg-primary)] hover:text-[var(--text-heading)]'}`}
-                  >
-                    <Icon size={18} className="shrink-0" />
-                    {!collapsed && <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{label}</span>}
-                  </NavLink>
-                ))}
+          {isBlocked ? (
+            <div className="mb-4 flex w-full flex-col gap-2">
+              <div className="flex items-center gap-2 rounded-lg bg-red-50 p-2 text-xs font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-300">
+                <Lock size={14} className="shrink-0" />
+                <span>{t('tenantSubscription.accessBlockedMenu', 'Acesso Restrito')}</span>
               </div>
-            );
-          })}
+              <NavLink
+                to={PATHS.SUBSCRIPTION_PAYMENT}
+                onClick={onCloseMobile}
+                className={({ isActive }) =>
+                  `box-border flex w-full items-center gap-3 rounded-[10px] py-[10px] text-[.85rem] no-underline transition-colors ${
+                    collapsed ? 'justify-center px-3' : 'px-[14px]'
+                  } ${
+                    isActive
+                      ? 'bg-[var(--badge-bg)] font-bold text-[var(--accent-primary)]'
+                      : 'font-medium text-[var(--text-body)] hover:bg-[var(--bg-primary)] hover:text-[var(--text-heading)]'
+                  }`
+                }
+              >
+                <CreditCard size={18} className="shrink-0" />
+                {!collapsed && (
+                  <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+                    {t('tenantSubscription.menuLabel', 'Pagar Assinatura')}
+                  </span>
+                )}
+              </NavLink>
+            </div>
+          ) : (
+            sections.map((section) => {
+              const open = collapsed || expanded[section.id] !== false;
+              return (
+                <div key={section.id} className="mb-4 flex w-full flex-col gap-[2px]">
+                  {!collapsed && (
+                    <button
+                      type="button"
+                      onClick={() => toggle(section.id)}
+                      aria-expanded={open}
+                      className="flex w-full items-center justify-between bg-transparent px-4 pb-1 pt-2 text-left text-[.7rem] font-bold uppercase tracking-[.1em] text-[var(--text-body)] hover:text-[var(--text-heading)]"
+                    >
+                      <span>{section.title}</span>
+                      {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    </button>
+                  )}
+                  {open &&
+                    section.items.map(({ path, label, icon: Icon }) => (
+                      <NavLink
+                        key={path}
+                        to={path}
+                        title={label}
+                        onClick={onCloseMobile}
+                        className={({ isActive }) =>
+                          `box-border flex w-full items-center gap-3 rounded-[10px] py-[10px] text-[.85rem] no-underline transition-colors ${
+                            collapsed ? 'justify-center px-3' : 'px-[14px]'
+                          } ${
+                            isActive
+                              ? 'bg-[var(--badge-bg)] font-bold text-[var(--accent-primary)]'
+                              : 'font-medium text-[var(--text-body)] hover:bg-[var(--bg-primary)] hover:text-[var(--text-heading)]'
+                          }`
+                        }
+                      >
+                        <Icon size={18} className="shrink-0" />
+                        {!collapsed && (
+                          <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+                            {label}
+                          </span>
+                        )}
+                      </NavLink>
+                    ))}
+                </div>
+              );
+            })
+          )}
         </nav>
       </div>
 

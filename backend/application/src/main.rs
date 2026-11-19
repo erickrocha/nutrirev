@@ -63,6 +63,7 @@ use crate::routes::pix_payment_routes::pix_payment_routes;
 use crate::routes::payment_settings_routes::payment_settings_routes;
 use crate::routes::recurring_payment_routes::recurring_payment_routes;
 use crate::routes::payment_charge_routes::payment_charge_routes;
+use crate::routes::tenant_subscription_routes::tenant_subscription_routes;
 
 
 struct SecurityAddon;
@@ -287,6 +288,10 @@ impl Modify for SecurityAddon {
         http::recurring_payment_controller::enable_recurring,
         http::recurring_payment_controller::disable_recurring,
         http::recurring_payment_controller::billing_mode,
+        http::tenant_subscription_controller::get_status,
+        http::tenant_subscription_controller::pay_pix,
+        http::tenant_subscription_controller::pay_card,
+        http::tenant_subscription_controller::verify_payment,
     ),
     components(
         schemas(
@@ -341,6 +346,11 @@ impl Modify for SecurityAddon {
             http::json::payment_settings_json::SavePaymentSettingsJson,
             http::json::payment_settings_json::PaymentSettingsResponseJson,
             http::json::payment_settings_json::OfferedMethodsJson,
+            http::json::tenant_subscription_json::TenantSubscriptionStatusJson,
+            http::json::tenant_subscription_json::TenantSubscriptionPixResponseJson,
+            http::json::tenant_subscription_json::PayTenantSubscriptionCardJson,
+            http::json::tenant_subscription_json::TenantSubscriptionPaymentSuccessJson,
+            http::json::tenant_subscription_json::VerifyPaymentIntentJson,
             http::json::pix_payment_json::CreatePixChargeJson,
             http::json::pix_payment_json::PixChargeJson,
             http::json::pix_payment_json::AttemptStatusJson,
@@ -462,9 +472,14 @@ async fn start() -> anyhow::Result<()> {
         }),
     );
 
+    let platform_stripe = Arc::new(
+        infrastructure::platform_stripe_config::PlatformStripeConfig::from_env(),
+    );
+
     let state = AppState {
         conn: Arc::new(connection),
         payment_keys,
+        platform_stripe,
     };
 
     if business::use_cases::image_storage_use_case::ImageStorageUseCase::get_storage_mode()
@@ -555,6 +570,7 @@ async fn start() -> anyhow::Result<()> {
         .nest("/v1/payments", pix_payment_routes(state.clone()))
         .nest("/v1/payments", recurring_payment_routes(state.clone()))
         .nest("/v1/payments", payment_settings_routes(state.clone()))
+        .nest("/v1/tenant-subscription", tenant_subscription_routes(state.clone()))
         // No authentication layer: the handler verifies the clinic's own secret.
         .nest("/v1/payments/webhooks", payment_webhook_routes())
         .layer(cors)
@@ -571,6 +587,7 @@ async fn start() -> anyhow::Result<()> {
 pub struct AppState {
     pub conn: Arc<DatabaseConnection>,
     pub payment_keys: Arc<infrastructure::payment_credentials::PaymentKeyRing>,
+    pub platform_stripe: Arc<infrastructure::platform_stripe_config::PlatformStripeConfig>,
 }
 
 pub fn main() {

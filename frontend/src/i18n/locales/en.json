@@ -106,6 +106,7 @@
     "mealPointTiers": "Meal Point Tiers (Gamification)",
     "systemVersion": "NutriRev v1.0",
     "paymentSettings": "Payment methods",
+    "subscriptionPayment": "Clinic Subscription",
     "planOrders": "Orders"
   },
   "topbar": {
@@ -1503,5 +1504,34 @@
     "home": "Go to the start page",
     "login": "Go to login",
     "code": "404"
+  },
+  "tenantSubscription": {
+    "warningBanner": "Warning: Your clinic subscription has a pending payment (due date: {{date}}). Settle payment to avoid account suspension.",
+    "payNow": "Pay Subscription",
+    "accessBlockedMenu": "Restricted Access",
+    "menuLabel": "Pay Subscription",
+    "blockedTitle": "Access Blocked due to Overdue Payment",
+    "blockedDescription": "The grace period for your subscription has expired. To restore full access to the system, please complete the payment below.",
+    "warningTitle": "Subscription Payment Pending",
+    "warningDescription": "Your subscription payment is overdue. Please settle your invoice to prevent service interruption.",
+    "okTitle": "Subscription Up to Date!",
+    "okDescription": "Your subscription payment is fully up to date. Next due date: {{date}}",
+    "backToDashboard": "Go to Dashboard",
+    "summaryTitle": "Subscription Summary",
+    "defaultPlan": "NutriRev Plan",
+    "totalDue": "Invoice Total",
+    "dueDate": "Due Date",
+    "daysOverdue": "Days overdue",
+    "statusLabel": "Status",
+    "statusBlocked": "Blocked",
+    "statusWarning": "Pending",
+    "statusOk": "Up to date",
+    "creditCard": "Credit Card",
+    "generatingPix": "Generating PIX QR Code...",
+    "pixInstructions": "Open your banking app, choose Pay with Pix, and scan the QR code above or copy the code below.",
+    "awaitingPix": "Awaiting payment confirmation in real time...",
+    "generatePixButton": "Generate PIX Code",
+    "payButton": "Pay Subscription",
+    "copyError": "Error copying PIX code"
   }
 }

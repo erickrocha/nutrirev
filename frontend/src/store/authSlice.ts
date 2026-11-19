@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { authService } from '../services/authService';
 import { fetchTenantById } from './tenantSlice';
+import { setSubscriptionStatus, fetchTenantSubscriptionStatus } from './tenantSubscriptionSlice';
+import type { TenantSubscriptionStatus } from '../types/tenantSubscription';
 import { ROLES } from '../utils/enums';
 import { authStorage, refreshTokenOf, tenantIdOfSession, tokenOf, type StoredSession } from '../utils/authStorage';
 import { isTokenExpired } from '../utils/jwt';
@@ -10,6 +12,8 @@ export interface AuthUser extends StoredSession {
   name?: string;
   email?: string;
   role?: string;
+  subscriptionStatus?: TenantSubscriptionStatus | null;
+  subscription_status?: TenantSubscriptionStatus | null;
 }
 
 interface AuthState {
@@ -28,10 +32,20 @@ interface Session { token: string | null; refreshToken: string | null; user: Aut
 const LOGIN_FAILED = 'Email ou senha inválidos. Por favor, tente novamente.';
 const messageOf = (err: unknown, fallback: string): string => (err as { response?: { data?: { message?: string } } }).response?.data?.message || fallback;
 
-// A clínica do usuário vira a clínica ativa assim que a sessão existe.
-const loadTenantOf = (session: StoredSession | null | undefined, dispatch: (action: ReturnType<typeof fetchTenantById>) => unknown) => {
+const loadTenantAndSubscriptionOf = (
+  session: StoredSession | null | undefined,
+  dispatch: (action: any) => unknown
+) => {
   const tenantId = tenantIdOfSession(session);
   if (tenantId) dispatch(fetchTenantById(tenantId));
+
+  const authUser = session as AuthUser | null | undefined;
+  const subStatus = authUser?.subscriptionStatus || authUser?.subscription_status;
+  if (subStatus) {
+    dispatch(setSubscriptionStatus(subStatus));
+  } else if (authUser?.role === ROLES.TENANT_OWNER || authUser?.role === ROLES.TENANT_USER) {
+    dispatch(fetchTenantSubscriptionStatus());
+  }
 };
 
 export const loginUser = createAsyncThunk<AuthUser, { email: string; password: string }, { rejectValue: string }>(
@@ -40,7 +54,7 @@ export const loginUser = createAsyncThunk<AuthUser, { email: string; password: s
     try {
       const data = (await authService.login(email, password)) as AuthUser;
       authStorage.saveSession(data);
-      loadTenantOf(data, dispatch);
+      loadTenantAndSubscriptionOf(data, dispatch);
       return data;
     } catch (err) {
       return rejectWithValue(messageOf(err, LOGIN_FAILED));
@@ -57,7 +71,7 @@ export const validateOrRefreshToken = createAsyncThunk<Session, void, { rejectVa
     const storedUser = authStorage.user<AuthUser>();
 
     if (token && !isTokenExpired(token)) {
-      loadTenantOf(storedUser, dispatch);
+      loadTenantAndSubscriptionOf(storedUser, dispatch);
       return { token, refreshToken, user: storedUser };
     }
 
@@ -65,7 +79,7 @@ export const validateOrRefreshToken = createAsyncThunk<Session, void, { rejectVa
       try {
         const data = (await authService.refreshToken(refreshToken)) as AuthUser;
         authStorage.saveSession(data, refreshToken);
-        loadTenantOf(data, dispatch);
+        loadTenantAndSubscriptionOf(data, dispatch);
         return { token: tokenOf(data) ?? null, refreshToken: refreshTokenOf(data) || refreshToken, user: data };
       } catch {
         authStorage.clear();

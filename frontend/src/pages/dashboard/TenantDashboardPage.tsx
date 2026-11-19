@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Building, ClipboardCheck, FileText, LayoutGrid, List, RefreshCw, Smartphone, Stethoscope, UserCheck, Users } from 'lucide-react';
+import { AlertTriangle, Building, ClipboardCheck, FileText, LayoutGrid, List, RefreshCw, Smartphone, Stethoscope, UserCheck, Users } from 'lucide-react';
 import { Breadcrumb } from '../../components/molecules/Breadcrumb';
 import { ErrorAlert } from '../../components/molecules/ErrorAlert';
 import { MetricCard } from '../../components/molecules/MetricCard';
@@ -23,6 +23,7 @@ export const TenantDashboardPage = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
+  const subscriptionStatus = useAppSelector((state) => state.tenantSubscription?.status);
   const { activeTenant, tenantsList, loading: tenantsLoading } = useAppSelector((state) => state.tenant);
   const { tenant: dashboard, plans, meals, tenantLoading, tenantError } = useAppSelector((state) => state.dashboard);
   const isSysAdmin = user?.role === ROLES.SYS_ADMIN;
@@ -71,6 +72,34 @@ export const TenantDashboardPage = () => {
           <Button variant="outline" onClick={load} disabled={loading} title={t('common.refresh')} aria-label={t('common.refresh')}><RefreshCw size={16} className={loading ? 'animate-spin' : ''} /></Button>
         </div>
       </header>
+
+      {subscriptionStatus && subscriptionStatus.status !== 'ok' && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900 shadow-sm dark:border-amber-900/50 dark:bg-amber-950/50 dark:text-amber-200">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-6 w-6 shrink-0 text-amber-600 dark:text-amber-400" />
+            <div>
+              <p className="font-bold text-sm m-0">
+                {subscriptionStatus.status === 'blocked'
+                  ? t('tenantSubscription.blockedTitle', 'Acesso Bloqueado por Pendência Financeira')
+                  : t('tenantSubscription.warningTitle', 'Assinatura Pendente de Regularização')}
+              </p>
+              <p className="text-xs text-amber-800 dark:text-amber-300 m-0 mt-0.5">
+                {t(
+                  'tenantSubscription.warningBanner',
+                  `Vencimento: ${subscriptionStatus.paymentDate}. Regularize para evitar suspensão.`
+                )}
+              </p>
+            </div>
+          </div>
+          <Link
+            to={PATHS.SUBSCRIPTION_PAYMENT}
+            className="rounded-lg bg-amber-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-700 transition no-underline"
+          >
+            {t('tenantSubscription.payNow', 'Pagar Assinatura')}{' '}
+            {subscriptionStatus.formattedAmount ? `(${subscriptionStatus.formattedAmount})` : ''}
+          </Link>
+        </div>
+      )}
 
       {tenantError !== null && <ErrorAlert message={tenantError || t('tenantDashboard.loadError')} onRetry={load} />}
       {isSysAdmin && !activeTenant && !tenantsLoading && (

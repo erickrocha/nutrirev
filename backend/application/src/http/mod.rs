@@ -46,3 +46,4 @@ pub mod payment_webhook_controller;
 pub mod recurring_payment_controller;
 pub mod payment_settings_controller;
 pub mod plan_order_controller;
+pub mod tenant_subscription_controller;

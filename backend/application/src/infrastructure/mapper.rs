@@ -82,6 +82,7 @@ impl Mapper<AccessToken, AccessTokenJson> for AccessTokenMapper {
             role: access_token.role,
             tenant_id: access_token.tenant_id,
             first_login: access_token.first_login,
+            subscription_status: None,
         }
     }
 

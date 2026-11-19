@@ -43,3 +43,4 @@ pub mod pix_payment_routes;
 pub mod recurring_payment_routes;
 pub mod payment_settings_routes;
 pub mod plan_order_routes;
+pub mod tenant_subscription_routes;
