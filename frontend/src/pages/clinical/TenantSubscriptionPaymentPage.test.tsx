@@ -11,6 +11,56 @@ import type { TenantSubscriptionStatus } from '../../types/tenantSubscription';
 const mockI18n = { t: (key: string, fallback?: string) => fallback || key };
 vi.mock('react-i18next', () => ({ useTranslation: () => mockI18n }));
 
+vi.mock('@stripe/react-stripe-js', () => ({
+  Elements: ({ children }: { children: React.ReactNode }) => <div data-testid="stripe-elements">{children}</div>,
+  PaymentElement: () => <div data-testid="stripe-payment-element">Stripe Payment Element</div>,
+  useStripe: () => ({ confirmPayment: vi.fn() }),
+  useElements: () => ({}),
+}));
+
+vi.mock('@stripe/stripe-js', () => ({
+  loadStripe: vi.fn().mockResolvedValue({}),
+}));
+
+vi.mock('../../services/tenantSubscriptionService', () => ({
+  tenantSubscriptionService: {
+    getStatus: vi.fn().mockResolvedValue({
+      status: 'blocked',
+      daysOverdue: 6,
+      paymentDate: '2026-11-10',
+      gracePeriodDays: 5,
+      planName: 'Plano Premium',
+      amountCents: 19900,
+      formattedAmount: 'R$ 199,00',
+      businessPlanId: 1,
+      publishableKey: 'pk_test_123',
+    }),
+    createPix: vi.fn().mockResolvedValue({
+      paymentIntentId: 'pi_test_1',
+      payload: '00020126580014br.gov.bcb.pix0136test-payload',
+      encodedImage: null,
+      expiresAt: null,
+      amountCents: 19900,
+    }),
+    payWithCard: vi.fn().mockResolvedValue({
+      paymentIntentId: 'pi_test_card',
+      status: 'paid',
+      amountCents: 19900,
+    }),
+    verifyPayment: vi.fn().mockResolvedValue({
+      status: 'paid',
+      message: 'Pagamento confirmado com sucesso!',
+      paidAt: '2026-11-19T00:00:00Z',
+    }),
+    createPaymentIntent: vi.fn().mockResolvedValue({
+      clientSecret: 'pi_test_secret_123',
+      paymentIntentId: 'pi_test_123',
+      publishableKey: 'pk_test_123',
+      amountCents: 19900,
+    }),
+  },
+}));
+
 const renderPage = (initialStatus?: Partial<TenantSubscriptionStatus>) => {
   const store = configureStore({
     reducer: {
@@ -104,25 +154,91 @@ describe('TenantSubscriptionPaymentPage', () => {
     const cardTab = screen.getByRole('button', { name: /Cartão de Crédito/i });
     await user.click(cardTab);
 
-    expect(screen.getByPlaceholderText('EX: MARIA S SILVA')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('0000 0000 0000 0000')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('MM/AA')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('123')).toBeInTheDocument();
+    expect(await screen.findByTestId('stripe-elements')).toBeInTheDocument();
+    expect(screen.getByTestId('stripe-payment-element')).toBeInTheDocument();
   });
 
-  it('valida dados do cartão antes de enviar', async () => {
+  it('valida dados do cartão no formulário fallback quando o intent não estiver disponível', async () => {
+    const { tenantSubscriptionService } = await import('../../services/tenantSubscriptionService');
+    vi.mocked(tenantSubscriptionService.createPaymentIntent).mockRejectedValueOnce(
+      new Error('unavailable')
+    );
+
     renderPage({ status: 'blocked' });
     const user = userEvent.setup();
 
     const cardTab = screen.getByRole('button', { name: /Cartão de Crédito/i });
     await user.click(cardTab);
 
-    // Provide invalid cardholder name
-    const form = screen.getByPlaceholderText('EX: MARIA S SILVA').closest('form')!;
+    // Provide invalid cardholder name in fallback form
+    const formInput = await screen.findByPlaceholderText('EX: MARIA S SILVA');
+    const form = formInput.closest('form')!;
     fireEvent.submit(form);
 
     await waitFor(() => {
       expect(screen.getByText('Informe o nome impresso no cartão')).toBeInTheDocument();
     });
+  });
+
+  it('renderiza o Stripe Payment Element oficial quando o intent estiver disponível', async () => {
+    const user = userEvent.setup();
+    const store = configureStore({
+      reducer: {
+        tenantSubscription: tenantSubscriptionReducer,
+        auth: authReducer,
+      },
+      preloadedState: {
+        tenantSubscription: {
+          status: {
+            status: 'blocked',
+            daysOverdue: 6,
+            paymentDate: '2026-11-10',
+            gracePeriodDays: 5,
+            planName: 'Plano Premium',
+            amountCents: 19900,
+            formattedAmount: 'R$ 199,00',
+            businessPlanId: 1,
+            publishableKey: 'pk_test_123',
+          },
+          loading: false,
+          pixLoading: false,
+          cardSubmitting: false,
+          intentLoading: false,
+          paymentIntent: {
+            clientSecret: 'pi_test_secret_123',
+            paymentIntentId: 'pi_test',
+            publishableKey: 'pk_test_123',
+            amountCents: 19900,
+            formattedAmount: 'R$ 199,00',
+          },
+          pix: null,
+          error: null,
+          lastSuccess: null,
+        },
+        auth: {
+          token: 'token',
+          refreshToken: null,
+          user: { name: 'Dr. Silva', role: 'TenantOwner' },
+          isAuthenticated: true,
+          isInitializing: false,
+          isSysAdmin: false,
+          loading: false,
+          error: null,
+        },
+      } as never,
+    });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <TenantSubscriptionPaymentPage />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const cardTab = screen.getByRole('button', { name: /Cartão de Crédito/i });
+    await user.click(cardTab);
+
+    expect(screen.getByTestId('stripe-payment-element')).toBeInTheDocument();
   });
 });

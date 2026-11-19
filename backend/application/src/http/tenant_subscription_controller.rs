@@ -1,8 +1,9 @@
 use crate::commons::exception_response::{ExceptionResponse, HttpResponse};
 use crate::commons::i18n::{ErrorKey, Locale};
 use crate::http::json::tenant_subscription_json::{
-    PayTenantSubscriptionCardJson, TenantSubscriptionPaymentSuccessJson,
-    TenantSubscriptionPixResponseJson, TenantSubscriptionStatusJson, VerifyPaymentIntentJson,
+    PayTenantSubscriptionCardJson, TenantSubscriptionIntentResponseJson,
+    TenantSubscriptionPaymentSuccessJson, TenantSubscriptionPixResponseJson,
+    TenantSubscriptionStatusJson, VerifyPaymentIntentJson,
 };
 use crate::AppState;
 use axum::extract::{Extension, State};
@@ -64,6 +65,58 @@ pub async fn get_status(
 #[utoipa::path(
     post,
     tag = "TenantSubscription",
+    path = "/v1/tenant-subscription/intent",
+    responses(
+        (status = 201, description = "Intenção de pagamento criada para Stripe Payment Element", body = TenantSubscriptionIntentResponseJson),
+        (status = 401, description = "Não autenticado"),
+        (status = 403, description = "Apenas equipe da clínica")
+    ),
+    security(("bearer_auth" = []))
+)]
+pub async fn create_payment_intent(
+    State(state): State<AppState>,
+    Extension(locale): Extension<Locale>,
+    Extension(user): Extension<User>,
+) -> HttpResponse<(StatusCode, Json<TenantSubscriptionIntentResponseJson>)> {
+    let tenant_id = match user.tenant_id {
+        Some(id) if user.role == Role::TenantOwner || user.role == Role::TenantUser => id,
+        _ => return Err(ExceptionResponse::Forbidden(locale, ErrorKey::SubscriptionBlocked)),
+    };
+
+    let stripe_ctx = PlatformStripeContext {
+        secret_key: state.platform_stripe.secret_key.clone(),
+        publishable_key: state.platform_stripe.publishable_key.clone(),
+        environment: state.platform_stripe.environment.clone(),
+        grace_period_days: state.platform_stripe.grace_period_days,
+    };
+
+    let result = TenantSubscriptionUseCase::create_payment_intent(
+        &state.conn,
+        tenant_id,
+        stripe_ctx,
+        &user.email,
+    )
+    .await
+    .map_err(|e| {
+        log::error!("[TenantSubscription] create_payment_intent error: {}", e.message);
+        ExceptionResponse::BadRequest(locale, ErrorKey::PaymentProviderUnavailable)
+    })?;
+
+    Ok((
+        StatusCode::CREATED,
+        Json(TenantSubscriptionIntentResponseJson {
+            client_secret: result.client_secret,
+            payment_intent_id: result.payment_intent_id,
+            publishable_key: result.publishable_key,
+            amount_cents: result.amount_cents,
+            formatted_amount: result.formatted_amount,
+        }),
+    ))
+}
+
+#[utoipa::path(
+    post,
+    tag = "TenantSubscription",
     path = "/v1/tenant-subscription/pay/pix",
     responses(
         (status = 201, description = "Cobrança Pix gerada para a assinatura da clínica", body = TenantSubscriptionPixResponseJson),
@@ -83,6 +136,7 @@ pub async fn pay_pix(
 
     let stripe_ctx = PlatformStripeContext {
         secret_key: state.platform_stripe.secret_key.clone(),
+        publishable_key: state.platform_stripe.publishable_key.clone(),
         environment: state.platform_stripe.environment.clone(),
         grace_period_days: state.platform_stripe.grace_period_days,
     };
@@ -149,6 +203,7 @@ pub async fn pay_card(
 
     let stripe_ctx = PlatformStripeContext {
         secret_key: state.platform_stripe.secret_key.clone(),
+        publishable_key: state.platform_stripe.publishable_key.clone(),
         environment: state.platform_stripe.environment.clone(),
         grace_period_days: state.platform_stripe.grace_period_days,
     };

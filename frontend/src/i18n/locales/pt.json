@@ -1532,6 +1532,7 @@
     "awaitingPix": "Aguardando confirmação do pagamento em tempo real...",
     "generatePixButton": "Gerar Código PIX",
     "payButton": "Pagar Assinatura",
+    "loadingStripe": "Inicializando checkout seguro da Stripe...",
     "copyError": "Erro ao copiar código PIX"
   }
 }

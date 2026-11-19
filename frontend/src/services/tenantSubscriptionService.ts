@@ -1,6 +1,7 @@
 import { api } from './api';
 import type {
   PayTenantSubscriptionCardPayload,
+  TenantSubscriptionIntentResponse,
   TenantSubscriptionPixResponse,
   TenantSubscriptionStatus,
   TenantSubscriptionSuccess,
@@ -9,6 +10,11 @@ import type {
 export const tenantSubscriptionService = {
   getStatus: async (): Promise<TenantSubscriptionStatus> => {
     const response = await api.get<TenantSubscriptionStatus>('/v1/tenant-subscription/status');
+    return response.data;
+  },
+
+  createPaymentIntent: async (): Promise<TenantSubscriptionIntentResponse> => {
+    const response = await api.post<TenantSubscriptionIntentResponse>('/v1/tenant-subscription/intent');
     return response.data;
   },
 

@@ -1532,6 +1532,7 @@
     "awaitingPix": "Awaiting payment confirmation in real time...",
     "generatePixButton": "Generate PIX Code",
     "payButton": "Pay Subscription",
+    "loadingStripe": "Initializing Stripe secure checkout...",
     "copyError": "Error copying PIX code"
   }
 }

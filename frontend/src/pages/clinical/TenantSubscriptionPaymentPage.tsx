@@ -20,10 +20,15 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import { StripePaymentElementForm } from '../../components/payments/StripePaymentElementForm';
 import {
+  createTenantSubscriptionIntent,
   createTenantSubscriptionPix,
   fetchTenantSubscriptionStatus,
   payTenantSubscriptionCard,
+  verifyTenantSubscriptionPayment,
 } from '../../store/tenantSubscriptionSlice';
 import {
   detectBrand,
@@ -53,9 +58,17 @@ export const TenantSubscriptionPaymentPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { status, loading, pixLoading, cardSubmitting, pix, error, lastSuccess } = useAppSelector(
-    (state) => state.tenantSubscription
-  );
+  const {
+    status,
+    loading,
+    pixLoading,
+    cardSubmitting,
+    intentLoading,
+    paymentIntent,
+    pix,
+    error,
+    lastSuccess,
+  } = useAppSelector((state) => state.tenantSubscription);
 
   const [method, setMethod] = useState<'pix' | 'card'>('pix');
   const [copied, setCopied] = useState(false);
@@ -127,6 +140,47 @@ export const TenantSubscriptionPaymentPage = () => {
       dispatch(createTenantSubscriptionPix());
     }
   }, [method, pix, status, dispatch]);
+
+  // When method switches to Card, automatically create Stripe PaymentIntent for Payment Element
+  useEffect(() => {
+    if (method === 'card' && !paymentIntent && status && status.status !== 'ok') {
+      dispatch(createTenantSubscriptionIntent());
+    }
+  }, [method, paymentIntent, status, dispatch]);
+
+  // Load Stripe instance with publishable key
+  const stripePromise = useMemo(() => {
+    const key = paymentIntent?.publishableKey || status?.publishableKey;
+    if (!key) return null;
+    return loadStripe(key);
+  }, [paymentIntent?.publishableKey, status?.publishableKey]);
+
+  // Handle redirect callback from Stripe 3DS
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const piId = searchParams.get('payment_intent');
+    const piClientSecret = searchParams.get('payment_intent_client_secret');
+    const idToVerify = piId || (piClientSecret ? piClientSecret.split('_secret_')[0] : '');
+    if (idToVerify) {
+      dispatch(verifyTenantSubscriptionPayment(idToVerify)).then((res) => {
+        if (verifyTenantSubscriptionPayment.fulfilled.match(res)) {
+          setTimeout(() => {
+            navigate(PATHS.TENANT_DASHBOARD);
+          }, 2000);
+        }
+      });
+    }
+  }, [dispatch, navigate]);
+
+  // Handle Stripe Payment Element confirmation success
+  const handleStripeSuccess = async (paymentIntentId: string) => {
+    const res = await dispatch(verifyTenantSubscriptionPayment(paymentIntentId));
+    if (verifyTenantSubscriptionPayment.fulfilled.match(res)) {
+      setTimeout(() => {
+        navigate(PATHS.TENANT_DASHBOARD);
+      }, 2000);
+    }
+  };
 
   // Polling for Pix payment status
   const pollStatus = useCallback(async () => {
@@ -458,127 +512,161 @@ export const TenantSubscriptionPaymentPage = () => {
             </div>
           )}
 
-          {/* CARD TAB WITH REACT HOOK FORM + YUP */}
+          {/* CARD TAB: STRIPE PAYMENT ELEMENT WITH FALLBACK */}
           {method === 'card' && (
-            <form onSubmit={handleSubmit(onCardSubmit)} className="space-y-4">
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-[var(--text-heading)]">
-                  {t('payments.cardholderName', 'Nome no Cartão')}
-                </label>
-                <TextField
-                  {...register('cardholderName')}
-                  onChange={(e) => setValue('cardholderName', e.target.value.toUpperCase())}
-                  placeholder="EX: MARIA S SILVA"
-                  error={errors.cardholderName?.message}
-                />
-              </div>
-
-              <div>
-                <div className="mb-1 flex items-center justify-between">
-                  <label className="block text-xs font-semibold text-[var(--text-heading)]">
-                    {t('payments.cardNumber', 'Número do Cartão')}
-                  </label>
-                  {brand && (
-                    <span className="text-xs font-bold uppercase text-[var(--accent-primary)]">
-                      {brand}
-                    </span>
-                  )}
+            <div>
+              {intentLoading ? (
+                <div className="py-12 flex flex-col items-center">
+                  <RefreshCw className="h-8 w-8 animate-spin text-[var(--accent-primary)]" />
+                  <p className="mt-3 text-sm text-[var(--text-body)]">
+                    {t(
+                      'tenantSubscription.loadingStripe',
+                      'Inicializando checkout seguro da Stripe...'
+                    )}
+                  </p>
                 </div>
-                <TextField
-                  {...register('cardNumber')}
-                  onChange={(e) => setValue('cardNumber', formatCardNumber(e.target.value))}
-                  placeholder="0000 0000 0000 0000"
-                  maxLength={19}
-                  error={errors.cardNumber?.message}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-[var(--text-heading)]">
-                    {t('payments.cardExpiry', 'Validade (MM/AA)')}
-                  </label>
-                  <TextField
-                    {...register('expiry')}
-                    onChange={(e) => setValue('expiry', formatExpiry(e.target.value))}
-                    placeholder="MM/AA"
-                    maxLength={5}
-                    error={errors.expiry?.message}
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-[var(--text-heading)]">
-                    {t('payments.cardCvv', 'CVV')}
-                  </label>
-                  <TextField
-                    type="password"
-                    {...register('securityCode')}
-                    onChange={(e) =>
-                      setValue('securityCode', e.target.value.replace(/\D/g, ''))
-                    }
-                    placeholder="123"
-                    maxLength={4}
-                    error={errors.securityCode?.message}
-                  />
-                </div>
-              </div>
-
-              {/* Standard button alignment: Cancel on left, Save on right */}
-              <div className="flex items-center justify-between pt-4 gap-4">
-                {isBlocked ? (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => reset()}
-                    className="py-2.5 px-4"
-                  >
-                    {t('common.clear', 'Limpar')}
-                  </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => navigate(PATHS.TENANT_DASHBOARD)}
-                    className="py-2.5 px-4"
-                  >
-                    {t('common.cancel', 'Cancelar')}
-                  </Button>
-                )}
-
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="py-2.5 px-6"
-                  disabled={cardSubmitting || loading}
+              ) : paymentIntent?.clientSecret && stripePromise ? (
+                <Elements
+                  stripe={stripePromise}
+                  options={{
+                    clientSecret: paymentIntent.clientSecret,
+                    appearance: {
+                      theme: 'stripe',
+                      variables: {
+                        colorPrimary: '#10b981',
+                      },
+                    },
+                  }}
                 >
-                  {cardSubmitting ? (
-                    <>
-                      <RefreshCw size={16} className="mr-2 animate-spin" />
-                      <span>{t('payments.processing', 'Processando Pagamento...')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles size={16} className="mr-2" />
-                      <span>
-                        {t('tenantSubscription.payButton', 'Pagar Assinatura')}{' '}
-                        {status?.formattedAmount ? `(${status.formattedAmount})` : ''}
-                      </span>
-                    </>
-                  )}
-                </Button>
-              </div>
+                  <StripePaymentElementForm
+                    formattedAmount={status?.formattedAmount}
+                    isBlocked={isBlocked}
+                    onCancel={() => navigate(PATHS.TENANT_DASHBOARD)}
+                    onSuccess={handleStripeSuccess}
+                  />
+                </Elements>
+              ) : (
+                <form onSubmit={handleSubmit(onCardSubmit)} className="space-y-4">
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-[var(--text-heading)]">
+                      {t('payments.cardholderName', 'Nome no Cartão')}
+                    </label>
+                    <TextField
+                      {...register('cardholderName')}
+                      onChange={(e) => setValue('cardholderName', e.target.value.toUpperCase())}
+                      placeholder="EX: MARIA S SILVA"
+                      error={errors.cardholderName?.message}
+                    />
+                  </div>
 
-              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-[var(--text-body)]">
-                <Lock size={12} />
-                <span>
-                  {t(
-                    'payments.secureNotice',
-                    'Transação segura processada pela plataforma NutriRev via Stripe'
-                  )}
-                </span>
-              </div>
-            </form>
+                  <div>
+                    <div className="mb-1 flex items-center justify-between">
+                      <label className="block text-xs font-semibold text-[var(--text-heading)]">
+                        {t('payments.cardNumber', 'Número do Cartão')}
+                      </label>
+                      {brand && (
+                        <span className="text-xs font-bold uppercase text-[var(--accent-primary)]">
+                          {brand}
+                        </span>
+                      )}
+                    </div>
+                    <TextField
+                      {...register('cardNumber')}
+                      onChange={(e) => setValue('cardNumber', formatCardNumber(e.target.value))}
+                      placeholder="0000 0000 0000 0000"
+                      maxLength={19}
+                      error={errors.cardNumber?.message}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-[var(--text-heading)]">
+                        {t('payments.cardExpiry', 'Validade (MM/AA)')}
+                      </label>
+                      <TextField
+                        {...register('expiry')}
+                        onChange={(e) => setValue('expiry', formatExpiry(e.target.value))}
+                        placeholder="MM/AA"
+                        maxLength={5}
+                        error={errors.expiry?.message}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-[var(--text-heading)]">
+                        {t('payments.cardCvv', 'CVV')}
+                      </label>
+                      <TextField
+                        type="password"
+                        {...register('securityCode')}
+                        onChange={(e) =>
+                          setValue('securityCode', e.target.value.replace(/\D/g, ''))
+                        }
+                        placeholder="123"
+                        maxLength={4}
+                        error={errors.securityCode?.message}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Standard button alignment: Cancel on left, Save on right */}
+                  <div className="flex items-center justify-between pt-4 gap-4">
+                    {isBlocked ? (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => reset()}
+                        className="py-2.5 px-4"
+                      >
+                        {t('common.clear', 'Limpar')}
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => navigate(PATHS.TENANT_DASHBOARD)}
+                        className="py-2.5 px-4"
+                      >
+                        {t('common.cancel', 'Cancelar')}
+                      </Button>
+                    )}
+
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      className="py-2.5 px-6"
+                      disabled={cardSubmitting || loading}
+                    >
+                      {cardSubmitting ? (
+                        <>
+                          <RefreshCw size={16} className="mr-2 animate-spin" />
+                          <span>{t('payments.processing', 'Processando Pagamento...')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={16} className="mr-2" />
+                          <span>
+                            {t('tenantSubscription.payButton', 'Pagar Assinatura')}{' '}
+                            {status?.formattedAmount ? `(${status.formattedAmount})` : ''}
+                          </span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-center gap-2 text-xs text-[var(--text-body)]">
+                    <Lock size={12} />
+                    <span>
+                      {t(
+                        'payments.secureNotice',
+                        'Transação segura processada pela plataforma NutriRev via Stripe'
+                      )}
+                    </span>
+                  </div>
+                </form>
+              )}
+            </div>
           )}
         </div>
       </div>

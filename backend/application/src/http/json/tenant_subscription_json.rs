@@ -38,6 +38,16 @@ pub struct PayTenantSubscriptionCardJson {
 
 #[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
+pub struct TenantSubscriptionIntentResponseJson {
+    pub client_secret: String,
+    pub payment_intent_id: String,
+    pub publishable_key: String,
+    pub amount_cents: i64,
+    pub formatted_amount: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct TenantSubscriptionPaymentSuccessJson {
     pub success: bool,
     pub message: String,

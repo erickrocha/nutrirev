@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/tool
 import { tenantSubscriptionService } from '../services/tenantSubscriptionService';
 import type {
   PayTenantSubscriptionCardPayload,
+  TenantSubscriptionIntentResponse,
   TenantSubscriptionPixResponse,
   TenantSubscriptionStatus,
   TenantSubscriptionSuccess,
@@ -12,6 +13,8 @@ interface TenantSubscriptionState {
   loading: boolean;
   pixLoading: boolean;
   cardSubmitting: boolean;
+  intentLoading: boolean;
+  paymentIntent: TenantSubscriptionIntentResponse | null;
   pix: TenantSubscriptionPixResponse | null;
   error: string | null;
   lastSuccess: TenantSubscriptionSuccess | null;
@@ -22,6 +25,8 @@ const initialState: TenantSubscriptionState = {
   loading: false,
   pixLoading: false,
   cardSubmitting: false,
+  intentLoading: false,
+  paymentIntent: null,
   pix: null,
   error: null,
   lastSuccess: null,
@@ -51,6 +56,18 @@ export const createTenantSubscriptionPix = createAsyncThunk<
     return await tenantSubscriptionService.createPix();
   } catch (err) {
     return rejectWithValue(messageOf(err, 'Falha ao gerar QR Code Pix'));
+  }
+});
+
+export const createTenantSubscriptionIntent = createAsyncThunk<
+  TenantSubscriptionIntentResponse,
+  void,
+  { rejectValue: string }
+>('tenantSubscription/createIntent', async (_, { rejectWithValue }) => {
+  try {
+    return await tenantSubscriptionService.createPaymentIntent();
+  } catch (err) {
+    return rejectWithValue(messageOf(err, 'Falha ao iniciar pagamento com Stripe'));
   }
 });
 
@@ -121,6 +138,19 @@ const slice = createSlice({
       })
       .addCase(createTenantSubscriptionPix.rejected, (state, action) => {
         state.pixLoading = false;
+        state.error = action.payload ?? 'Erro desconhecido';
+      })
+      // createTenantSubscriptionIntent
+      .addCase(createTenantSubscriptionIntent.pending, (state) => {
+        state.intentLoading = true;
+        state.error = null;
+      })
+      .addCase(createTenantSubscriptionIntent.fulfilled, (state, action) => {
+        state.intentLoading = false;
+        state.paymentIntent = action.payload;
+      })
+      .addCase(createTenantSubscriptionIntent.rejected, (state, action) => {
+        state.intentLoading = false;
         state.error = action.payload ?? 'Erro desconhecido';
       })
       // payTenantSubscriptionCard

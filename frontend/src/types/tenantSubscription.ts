@@ -18,6 +18,14 @@ export interface TenantSubscriptionPixResponse {
   amountCents: number;
 }
 
+export interface TenantSubscriptionIntentResponse {
+  clientSecret: string;
+  paymentIntentId: string;
+  publishableKey: string;
+  amountCents: number;
+  formattedAmount: string;
+}
+
 export interface PayTenantSubscriptionCardPayload {
   cardholderName: string;
   cardNumber: string;

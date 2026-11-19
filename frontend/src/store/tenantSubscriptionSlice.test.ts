@@ -4,6 +4,7 @@ import reducer, {
   resetSubscriptionPix,
   fetchTenantSubscriptionStatus,
   createTenantSubscriptionPix,
+  createTenantSubscriptionIntent,
   payTenantSubscriptionCard,
 } from './tenantSubscriptionSlice';
 import type { TenantSubscriptionStatus } from '../types/tenantSubscription';
@@ -14,6 +15,8 @@ describe('tenantSubscriptionSlice', () => {
     loading: false,
     pixLoading: false,
     cardSubmitting: false,
+    intentLoading: false,
+    paymentIntent: null,
     pix: null,
     error: null,
     lastSuccess: null,
@@ -88,6 +91,22 @@ describe('tenantSubscriptionSlice', () => {
     });
     expect(next.pix).toEqual(mockPix);
     expect(next.pixLoading).toBe(false);
+  });
+
+  it('atualiza paymentIntent ao completar createTenantSubscriptionIntent.fulfilled', () => {
+    const mockIntent = {
+      clientSecret: 'pi_test_secret_123',
+      paymentIntentId: 'pi_test_123',
+      publishableKey: 'pk_test_123',
+      amountCents: 19900,
+      formattedAmount: 'R$ 199,00',
+    };
+    const next = reducer(initial, {
+      type: createTenantSubscriptionIntent.fulfilled.type,
+      payload: mockIntent,
+    });
+    expect(next.paymentIntent).toEqual(mockIntent);
+    expect(next.intentLoading).toBe(false);
   });
 
   it('atualiza status para ok ao aprovar pagamento via payTenantSubscriptionCard.fulfilled', () => {

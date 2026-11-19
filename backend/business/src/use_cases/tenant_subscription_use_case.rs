@@ -30,8 +30,18 @@ pub struct TenantSubscriptionPixResult {
 #[derive(Clone, Debug)]
 pub struct PlatformStripeContext {
     pub secret_key: String,
+    pub publishable_key: String,
     pub environment: String,
     pub grace_period_days: i64,
+}
+
+#[derive(Clone, Debug)]
+pub struct TenantSubscriptionIntentResult {
+    pub client_secret: String,
+    pub payment_intent_id: String,
+    pub publishable_key: String,
+    pub amount_cents: i64,
+    pub formatted_amount: String,
 }
 
 pub struct TenantSubscriptionCardParams {
@@ -149,6 +159,72 @@ impl TenantSubscriptionUseCase {
             amount_cents,
             formatted_amount,
             business_plan_id: bp.id,
+        })
+    }
+
+    /// Cria uma intenção de pagamento (PaymentIntent) na Stripe para uso com o Payment Element no frontend.
+    pub async fn create_payment_intent(
+        db: &DbConn,
+        tenant_id: i32,
+        stripe: PlatformStripeContext,
+        user_email: &str,
+    ) -> Result<TenantSubscriptionIntentResult, BusinessError> {
+        let status = Self::get_status(db, tenant_id, stripe.grace_period_days).await?;
+        if stripe.secret_key.is_empty() {
+            return Err(BusinessError::new("Platform Stripe secret key not configured".to_string()));
+        }
+
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(20))
+            .build()
+            .map_err(|e| BusinessError::new(format!("HTTP client error: {}", e)))?;
+
+        let reference = format!("nutrirev-sub-intent-{}-{}", tenant_id, Utc::now().timestamp());
+
+        let mut form: Vec<(String, String)> = vec![
+            ("amount".to_string(), status.amount_cents.to_string()),
+            ("currency".to_string(), "brl".to_string()),
+            ("automatic_payment_methods[enabled]".to_string(), "true".to_string()),
+            ("description".to_string(), format!("NutriRev Assinatura - Clínica #{} ({})", tenant_id, status.plan_name)),
+            ("metadata[reference]".to_string(), reference.clone()),
+        ];
+
+        let email_to_use = if !user_email.is_empty() {
+            user_email
+        } else {
+            "clinica@nutrirev.com"
+        };
+        form.push(("receipt_email".to_string(), email_to_use.to_string()));
+
+        let resp = client
+            .post("https://api.stripe.com/v1/payment_intents")
+            .bearer_auth(&stripe.secret_key)
+            .header("Idempotency-Key", &reference)
+            .form(&form)
+            .send()
+            .await
+            .map_err(|e| BusinessError::new(format!("Stripe request error: {}", e)))?;
+
+        let status_code = resp.status();
+        let body: serde_json::Value = resp.json().await.unwrap_or(serde_json::Value::Null);
+
+        if !status_code.is_success() {
+            let msg = body.pointer("/error/message")
+                .and_then(|m| m.as_str())
+                .unwrap_or("Erro ao criar intenção de pagamento na Stripe");
+            log::warn!("[TenantSubscriptionUseCase] Stripe PaymentIntent error: {}", msg);
+            return Err(BusinessError::new(msg.to_string()));
+        }
+
+        let payment_intent_id = body.get("id").and_then(|s| s.as_str()).unwrap_or_default().to_string();
+        let client_secret = body.get("client_secret").and_then(|s| s.as_str()).unwrap_or_default().to_string();
+
+        Ok(TenantSubscriptionIntentResult {
+            client_secret,
+            payment_intent_id,
+            publishable_key: stripe.publishable_key,
+            amount_cents: status.amount_cents,
+            formatted_amount: status.formatted_amount,
         })
     }
 
